@@ -10,13 +10,32 @@
 
 import CoreData
 
-extension NSManagedObject {
-    
-    public var uriRepresentationString: String {
+public extension NSManagedObject {
+    var uriRepresentationString: String {
         uriRepresentation.absoluteString
     }
-    
-    public var uriRepresentation: URL {
+
+    var uriRepresentation: URL {
         objectID.uriRepresentation()
+    }
+
+    static func getObjectID(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> NSManagedObjectID? {
+        if let psc = context.persistentStoreCoordinator,
+           let mobjectID = psc.managedObjectID(forURIRepresentation: url)
+        {
+            return mobjectID
+        }
+
+        return nil
+    }
+
+    static func get<T: NSManagedObject>(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> T? {
+        if let mobjectID = getObjectID(context, forURIRepresentation: url),
+           let mobject = context.object(with: mobjectID) as? T
+        {
+            return mobject
+        }
+
+        return nil
     }
 }
