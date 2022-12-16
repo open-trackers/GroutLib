@@ -71,6 +71,18 @@ public class Exercise: NSManagedObject {
 //    }
 }
 
+/// used in NavigationStack and State
+public struct ExerciseProxy: Hashable, Codable {
+    public var uriRepresentation: URL
+}
+
+extension Exercise {
+    public var proxy: ExerciseProxy {
+        ExerciseProxy(uriRepresentation: self.uriRepresentation)
+    }
+}
+
+
 extension Exercise: UserOrdered {}
 
 public extension Exercise {

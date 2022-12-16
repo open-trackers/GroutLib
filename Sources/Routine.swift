@@ -61,6 +61,19 @@ public class Routine: NSManagedObject {
 //    }
 }
 
+/// used in NavigationStack and State
+public struct RoutineProxy: Hashable, Codable {
+    public var uriRepresentation: URL
+}
+
+extension Routine {
+    public var proxy: RoutineProxy {
+        RoutineProxy(uriRepresentation: self.uriRepresentation)
+    }
+}
+
+
+
 extension Routine: UserOrdered {}
 
 public extension Routine {
