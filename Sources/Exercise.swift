@@ -20,11 +20,11 @@ extension Exercise: UserOrdered {}
 /// Typed to Exercise for use as a navigationDestination.
 public extension Exercise {
     struct UriRep: Hashable, Codable {
-        public var uriRepresentation: URL
+        public var value: URL
     }
 
     var uriRep: UriRep {
-        UriRep(uriRepresentation: uriRepresentation)
+        UriRep(value: uriRepresentation)
     }
 }
 
