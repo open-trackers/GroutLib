@@ -13,18 +13,20 @@ import CoreData
 @objc(Routine)
 public class Routine: NSManagedObject {}
 
-/// Typed struct used in NavigationStack, State, and UserActivity
+extension Routine: UserOrdered {}
+
+/// Struct providing archivable reference to the managed object.
+/// Codable for use in NavigationStack, State, and UserActivity.
+/// Typed to Routine for use as a navigationDestination.
 public extension Routine {
     struct UriRep: Hashable, Codable {
-        public var uriRepresentation: URL
+        public var value: URL
     }
 
     var uriRep: UriRep {
-        UriRep(uriRepresentation: uriRepresentation)
+        UriRep(value: uriRepresentation)
     }
 }
-
-extension Routine: UserOrdered {}
 
 public extension Routine {
     // NOTE: does NOT save to context

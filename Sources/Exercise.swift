@@ -13,7 +13,11 @@ import CoreData
 @objc(Exercise)
 public class Exercise: NSManagedObject {}
 
-/// Typed struct used in NavigationStack, State, and UserActivity
+extension Exercise: UserOrdered {}
+
+/// Struct providing archivable reference to the managed object.
+/// Codable for use in NavigationStack, State, and UserActivity.
+/// Typed to Exercise for use as a navigationDestination.
 public extension Exercise {
     struct UriRep: Hashable, Codable {
         public var uriRepresentation: URL
@@ -23,8 +27,6 @@ public extension Exercise {
         UriRep(uriRepresentation: uriRepresentation)
     }
 }
-
-extension Exercise: UserOrdered {}
 
 public extension Exercise {
     // NOTE: does NOT save to context
