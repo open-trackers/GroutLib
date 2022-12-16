@@ -40,15 +40,7 @@ public extension NSManagedObject {
     }
 }
 
-
-
-//extension CodingUserInfoKey {
-//    static let context = CodingUserInfoKey(rawValue: "context")!
-//}
-//
-//extension JSONDecoder {
-//    convenience init(context: NSManagedObjectContext) {
-//        self.init()
-//        self.userInfo[.context] = context
-//    }
-//}
+// NOTE: to support encoding/decoding url representation of Routine/Exercise into the app state
+extension CodingUserInfoKey {
+    static let managedObjectContext = CodingUserInfoKey(rawValue: "managedObjectContext")!
+}

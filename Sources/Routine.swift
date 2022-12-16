@@ -10,6 +10,48 @@
 
 import CoreData
 
+@objc(Routine)
+public class Routine: NSManagedObject, Codable {
+    private enum CodingKeys: String, CodingKey { case urlRep }
+
+    // Encode to URL representation
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(uriRepresentationString, forKey: .urlRep)
+    }
+
+    // Decode from URL representation
+    public required convenience init(from decoder: Decoder) throws {
+        guard let context = decoder.userInfo[.managedObjectContext] as? NSManagedObjectContext
+        else { throw DecoderConfigurationError.missingManagedObjectContext }
+
+//        self.init(context: context)
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let urlRep = try container.decode(URL.self, forKey: .urlRep)
+
+        guard let routine = NSManagedObject.get(context, forURIRepresentation: urlRep) as? Routine
+        else { throw DecodingError.valueNotFound(Routine.Type.self,
+                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
+                                                                       debugDescription: "Record not found")) }
+
+        self.init(entity: routine.entity, insertInto: context)
+
+        // let entity = NSEntityDescription.entity(forEntityName: "Routine", in: context)
+        // self.init(entity: entity, insertInto: managedObjectContext)
+
+        //        let container = try decoder.container(keyedBy: CodingKeys.self)
+        //                self.avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
+        //                self.username = try container.decodeIfPresent(String.self, forKey: .username)
+        //                self.role = try container.decodeIfPresent(String.self, forKey: .role)
+
+        //        let entity = NSEntityDescription.entity(forEntityName: "DataClass", in: context)!
+        //                self.init(entity: entity, insertInto: context)
+        //                let values = try decoder.container(keyedBy: CodingKeys.self)
+        //                name = try values.decode(String.self, forKey: .name)
+    }
+}
+
 extension Routine: UserOrdered {}
 
 public extension Routine {
@@ -128,56 +170,66 @@ public extension Routine {
     }
 }
 
-//extension Routine: Codable {
+// extension Routine: Codable {
 //    private enum CodingKeys: String, CodingKey { case urlRepStr }
-//    
+//
+//    // Encode to URL representation
 //    public func encode(to encoder: Encoder) throws {
 //        var container = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(self.uriRepresentationString, forKey: .urlRepStr)
 //    }
-//    
-//    public convenience init(from decoder: Decoder) throws {
+//
+//    // Decode from URL representation
+//    public required convenience init(from decoder: Decoder) throws {
 //        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext
 //        else { fatalError("Error: NSManagedObject not specified!") }
-//        
+//
+//        //let entity = NSEntityDescription.entity(forEntityName: "Routine", in: context)
+//        //self.init(entity: entity, insertInto: managedObjectContext)
+//
 //        let values = try decoder.container(keyedBy: CodingKeys.self)
 //        let urlRepStr = try values.decode(String.self, forKey: .urlRepStr)
-//        
+//
 //        guard let urlRep = URL(string: urlRepStr),
 //              let routine = NSManagedObject.get(context, forURIRepresentation: urlRep) as? Routine
 //        else { print("Error: unable to get Routine!"); return }
-//        
-//        self.init(entity: routine, insertInto: context)
-//        
+//
+////        self.init(entity: routine, insertInto: context)
+//
+////        let container = try decoder.container(keyedBy: CodingKeys.self)
+////                self.avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
+////                self.username = try container.decodeIfPresent(String.self, forKey: .username)
+////                self.role = try container.decodeIfPresent(String.self, forKey: .role)
+//
 //        //        let entity = NSEntityDescription.entity(forEntityName: "DataClass", in: context)!
 //        //                self.init(entity: entity, insertInto: context)
 //        //                let values = try decoder.container(keyedBy: CodingKeys.self)
 //        //                name = try values.decode(String.self, forKey: .name)
 //    }
-//    
-//    // if using decoder
-////    let context = // get the managed object context
-////    let decoder = JSONDecoder(context: context)
-//    
-//    /*
-//     https://www.hackingwithswift.com/forums/100-days-of-swiftui/day-61-my-solution-to-make-core-data-conform-to-codable/2434
-//    func loadData() {
-//            // I'm omitting all the code to load data and focus on just how to encode it into Core Data
-//            // before doing anything here I recommend checking if there's already data (users.isEmpty)
-//            let decoder = JSONDecoder()
-//
-//            // add context to the decoder so the data can decode itself into Core Data
-//            // since we added the 'CodingUserInfoKey.context' property we know it's not nil, so force-unwrapping is fine
-//            decoder.userInfo[CodingUserInfoKey.context!] = self.moc
-//
-//            // in case anyone struggled with the dates, didn't want to leave this out here
-//            decoder.dateDecodingStrategy = .iso8601
-//
-//            // we don't actually need to save the result anywhere since we use a @FetchRequest to display the data
-//            // that gets decoded right into the Core Data entities
-//            // though I suppose it would be possible to skip the fetchrequest and just use a @State variable, but that
-//            // would kind of defeat the purpose of using Core Data
-//            _ = try? decoder.decode([User].self, from: data)
-//        }
-//     */
-//}
+
+// if using decoder
+//    let context = // get the managed object context
+//    let decoder = JSONDecoder(context: context)
+
+/*
+  https://www.hackingwithswift.com/forums/100-days-of-swiftui/day-61-my-solution-to-make-core-data-conform-to-codable/2434
+ func loadData() {
+         // I'm omitting all the code to load data and focus on just how to encode it into Core Data
+         // before doing anything here I recommend checking if there's already data (users.isEmpty)
+         let decoder = JSONDecoder()
+
+         // add context to the decoder so the data can decode itself into Core Data
+         // since we added the 'CodingUserInfoKey.context' property we know it's not nil, so force-unwrapping is fine
+         decoder.userInfo[CodingUserInfoKey.context!] = self.moc
+
+         // in case anyone struggled with the dates, didn't want to leave this out here
+         decoder.dateDecodingStrategy = .iso8601
+
+         // we don't actually need to save the result anywhere since we use a @FetchRequest to display the data
+         // that gets decoded right into the Core Data entities
+         // though I suppose it would be possible to skip the fetchrequest and just use a @State variable, but that
+         // would kind of defeat the purpose of using Core Data
+         _ = try? decoder.decode([User].self, from: data)
+     }
+  */
+// }
