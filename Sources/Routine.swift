@@ -11,68 +11,18 @@
 import CoreData
 
 @objc(Routine)
-public class Routine: NSManagedObject {
-//    private enum CodingKeys: String, CodingKey { case urlRep }
-//
-//    // Encode to URL representation
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(uriRepresentationString, forKey: .urlRep)
-//    }
-//
-//    // Decode from URL representation
-//    public required convenience init(from decoder: Decoder) throws {
-////        guard let context = decoder.userInfo[.managedObjectContext] as? NSManagedObjectContext
-////        else { throw DecoderConfigurationError.missingManagedObjectContext }
-//        let context = PersistenceManager.shared.container.viewContext
-//
-////        self.init()
-//
-//        self.init(context: context)
+public class Routine: NSManagedObject {}
 
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        let urlRep = try container.decode(URL.self, forKey: .urlRep)
-//
-//        guard let routineID = NSManagedObject.getObjectID(context, forURIRepresentation: urlRep),
-//              let routine = context.object(with: routineID) as? Routine
-//        else { throw DecodingError.valueNotFound(Routine.Type.self,
-//                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
-//                                                                       debugDescription: "Record not found")) }
-        
-//        guard let routine = NSManagedObject.get(context, forURIRepresentation: urlRep) as? Routine
-//        else { throw DecodingError.valueNotFound(Routine.Type.self,
-//                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
-//                                                                       debugDescription: "Record not found")) }
-        
-//        self.init(entity: routine.entity, insertInto: context)
+/// Typed struct used in NavigationStack, State, and UserActivity
+public extension Routine {
+    struct UriRep: Hashable, Codable {
+        public var uriRepresentation: URL
+    }
 
-        // let entity = NSEntityDescription.entity(forEntityName: "Routine", in: context)
-        // self.init(entity: entity, insertInto: managedObjectContext)
-
-        //        let container = try decoder.container(keyedBy: CodingKeys.self)
-        //                self.avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
-        //                self.username = try container.decodeIfPresent(String.self, forKey: .username)
-        //                self.role = try container.decodeIfPresent(String.self, forKey: .role)
-
-        //        let entity = NSEntityDescription.entity(forEntityName: "DataClass", in: context)!
-        //                self.init(entity: entity, insertInto: context)
-        //                let values = try decoder.container(keyedBy: CodingKeys.self)
-        //                name = try values.decode(String.self, forKey: .name)
-//    }
-}
-
-/// used in NavigationStack and State
-public struct RoutineProxy: Hashable, Codable {
-    public var uriRepresentation: URL
-}
-
-extension Routine {
-    public var proxy: RoutineProxy {
-        RoutineProxy(uriRepresentation: self.uriRepresentation)
+    var uriRep: UriRep {
+        UriRep(uriRepresentation: uriRepresentation)
     }
 }
-
-
 
 extension Routine: UserOrdered {}
 
