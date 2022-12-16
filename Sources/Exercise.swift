@@ -11,29 +11,41 @@
 import CoreData
 
 @objc(Exercise)
-public class Exercise: NSManagedObject, Codable {
-    private enum CodingKeys: String, CodingKey { case urlRep }
+public class Exercise: NSManagedObject {
+//    private enum CodingKeys: String, CodingKey { case urlRep }
+//
+//    // Encode to URL representation
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(uriRepresentationString, forKey: .urlRep)
+//    }
+//
+//    // Decode from URL representation
+//    public required convenience init(from decoder: Decoder) throws {
+//        guard let context = decoder.userInfo[.managedObjectContext] as? NSManagedObjectContext
+//        else { throw DecoderConfigurationError.missingManagedObjectContext }
 
-    // Encode to URL representation
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(uriRepresentationString, forKey: .urlRep)
-    }
+//        let context = PersistenceManager.shared.container.viewContext
+//
+//        self.init(context: context)
 
-    // Decode from URL representation
-    public required convenience init(from decoder: Decoder) throws {
-        guard let context = decoder.userInfo[.managedObjectContext] as? NSManagedObjectContext
-        else { throw DecoderConfigurationError.missingManagedObjectContext }
+//        self.init()
+        
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        let urlRep = try container.decode(URL.self, forKey: .urlRep)
+//
+//        guard let exerciseID = NSManagedObject.getObjectID(context, forURIRepresentation: urlRep)
+//              //let routine = context.object(with: mobjectID) as? Routine
+//        else { throw DecodingError.valueNotFound(Routine.Type.self,
+//                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
+//                                                                       debugDescription: "Record not found")) }
+        
+//        guard let exercise = NSManagedObject.get(context, forURIRepresentation: urlRep) as? Exercise
+//        else { throw DecodingError.valueNotFound(Routine.Type.self,
+//                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
+//                                                                       debugDescription: "Record not found")) }
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let urlRep = try container.decode(URL.self, forKey: .urlRep)
-
-        guard let exercise = NSManagedObject.get(context, forURIRepresentation: urlRep) as? Exercise
-        else { throw DecodingError.valueNotFound(Routine.Type.self,
-                                                 DecodingError.Context(codingPath: [CodingKeys.urlRep],
-                                                                       debugDescription: "Record not found")) }
-
-        self.init(entity: exercise.entity, insertInto: context)
+//        self.init(entity: exerciseID.entity, insertInto: context)
 
         //        self.init(context: context)
 
@@ -56,7 +68,7 @@ public class Exercise: NSManagedObject, Codable {
 //        else { print("Error: unable to get Routine!") }
 //
 //        self.init(entity: exercise, insertInto: context)
-    }
+//    }
 }
 
 extension Exercise: UserOrdered {}
