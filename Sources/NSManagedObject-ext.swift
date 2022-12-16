@@ -39,8 +39,3 @@ public extension NSManagedObject {
         return nil
     }
 }
-
-// NOTE: to support encoding/decoding url representation of Routine/Exercise into the app state
-extension CodingUserInfoKey {
-    static let managedObjectContext = CodingUserInfoKey(rawValue: "managedObjectContext")!
-}
