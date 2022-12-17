@@ -19,7 +19,7 @@ extension Exercise: UserOrdered {}
 /// Codable for use in NavigationStack, State, and UserActivity.
 /// Identifiable for use in .sheet and .fullScreenCover.
 /// RawRepresentable so that it can be stored in SceneStorage or AppStorage.
-/// Typed to Routine for use as a navigationDestination.
+/// Typed to Exercise for use as a navigationDestination.
 public typealias ExerciseUriRep = UriRep<Exercise>
 public extension Exercise {
     var uriRep: ExerciseUriRep {
