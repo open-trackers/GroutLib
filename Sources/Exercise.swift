@@ -30,11 +30,15 @@ public extension Exercise {
 
 public extension Exercise {
     // NOTE: does NOT save to context
-    static func create(_ viewContext: NSManagedObjectContext, userOrder: Int16) -> Exercise {
-        let nu = Exercise(context: viewContext)
+    static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Exercise {
+        let nu = Exercise(context: context)
         nu.userOrder = userOrder
         nu.name = "New Exercise"
         return nu
+    }
+    
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Exercise? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? Exercise
     }
 
     // @NSManaged public var name: String?

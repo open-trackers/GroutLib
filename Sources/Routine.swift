@@ -30,11 +30,15 @@ public extension Routine {
 
 public extension Routine {
     // NOTE: does NOT save to context
-    static func create(_ viewContext: NSManagedObjectContext, userOrder: Int16) -> Routine {
-        let nu = Routine(context: viewContext)
+    static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Routine {
+        let nu = Routine(context: context)
         nu.userOrder = userOrder
         nu.name = "New Routine"
         return nu
+    }
+    
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Routine? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? Routine
     }
 
     var wrappedName: String {
@@ -49,12 +53,12 @@ public extension Routine {
     }
 
     // NOTE: does NOT save to context
-    internal func clearCompletions(_ viewContext: NSManagedObjectContext) throws {
+    internal func clearCompletions(_ context: NSManagedObjectContext) throws {
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.predicate = NSPredicate(format: "routine = %@", self)
 
         do {
-            let exercises: [Exercise] = try viewContext.fetch(req) as [Exercise]
+            let exercises: [Exercise] = try context.fetch(req) as [Exercise]
             exercises.forEach { exercise in
                 exercise.lastCompletedAt = nil
             }
@@ -65,8 +69,8 @@ public extension Routine {
     }
 
     // NOTE: does NOT save context
-    func start(_ viewContext: NSManagedObjectContext, startDate: Date = Date.now) throws -> Date {
-        try clearCompletions(viewContext)
+    func start(_ context: NSManagedObjectContext, startDate: Date = Date.now) throws -> Date {
+        try clearCompletions(context)
         return startDate
     }
 
@@ -112,7 +116,7 @@ public extension Routine {
         ])
     }
 
-    func getNextIncomplete(_ viewContext: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> Exercise? {
+    func getNextIncomplete(_ context: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> Exercise? {
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.sortDescriptors = Routine.exerciseSort
         req.fetchLimit = 1
@@ -120,18 +124,18 @@ public extension Routine {
         do {
             if let _userOrder = userOrder {
                 req.predicate = nextTrailing(from: _userOrder)
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
+                if let next = (try context.fetch(req) as [Exercise]).first {
                     return next
                 }
 
                 req.predicate = nextLeading(to: _userOrder)
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
+                if let next = (try context.fetch(req) as [Exercise]).first {
                     return next
                 }
             } else {
                 // start from beginning
                 req.predicate = incompletePredicate
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
+                if let next = (try context.fetch(req) as [Exercise]).first {
                     return next
                 }
             }
