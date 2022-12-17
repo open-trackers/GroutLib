@@ -18,19 +18,11 @@ extension Exercise: UserOrdered {}
 /// Struct providing archivable reference to the managed object.
 /// Codable for use in NavigationStack, State, and UserActivity.
 /// Identifiable for use in .sheet and .fullScreenCover.
+/// RawRepresentable so that it can be stored in SceneStorage or AppStorage.
 /// Typed to Routine for use as a navigationDestination.
+public typealias ExerciseUriRep = UriRep<Exercise>
 public extension Exercise {
-    struct UriRep: Hashable, Codable, Identifiable {
-        public var id: Int
-        public var value: URL
-        
-        public init(value: URL) {
-            self.value = value
-            self.id = value.hashValue
-        }
-    }
-
-    var uriRep: UriRep {
+    var uriRep: ExerciseUriRep {
         UriRep(value: uriRepresentation)
     }
 }
