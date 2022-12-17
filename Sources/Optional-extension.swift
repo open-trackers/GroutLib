@@ -20,7 +20,7 @@ extension Optional: RawRepresentable where Wrapped: Codable {
         }
         self = result
     }
-    
+
     public var rawValue: String {
         guard let data = try? JSONEncoder().encode(self),
               let string = String(data: data, encoding: .utf8)
@@ -30,4 +30,3 @@ extension Optional: RawRepresentable where Wrapped: Codable {
         return string
     }
 }
-

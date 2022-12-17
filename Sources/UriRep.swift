@@ -8,8 +8,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 /// Strongly-typed wrapper for an NSManagedObject uri representation.
 ///

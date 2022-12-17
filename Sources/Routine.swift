@@ -35,7 +35,7 @@ public extension Routine {
         nu.name = "New Routine"
         return nu
     }
-    
+
     static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Routine? {
         NSManagedObject.get(context, forURIRepresentation: url) as? Routine
     }

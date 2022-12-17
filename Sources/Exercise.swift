@@ -35,7 +35,7 @@ public extension Exercise {
         nu.name = "New Exercise"
         return nu
     }
-    
+
     static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Exercise? {
         NSManagedObject.get(context, forURIRepresentation: url) as? Exercise
     }
