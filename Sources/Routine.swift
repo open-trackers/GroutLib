@@ -17,10 +17,17 @@ extension Routine: UserOrdered {}
 
 /// Struct providing archivable reference to the managed object.
 /// Codable for use in NavigationStack, State, and UserActivity.
+/// Identifiable for use in .sheet and .fullScreenCover.
 /// Typed to Routine for use as a navigationDestination.
 public extension Routine {
-    struct UriRep: Hashable, Codable {
+    struct UriRep: Hashable, Codable, Identifiable {
+        public var id: Int
         public var value: URL
+        
+        public init(value: URL) {
+            self.value = value
+            self.id = value.hashValue
+        }
     }
 
     var uriRep: UriRep {
