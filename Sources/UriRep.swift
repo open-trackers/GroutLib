@@ -1,5 +1,5 @@
 //
-//  Routine-UriRep.swift
+//  UriRep.swift
 //
 // Copyright 2022  OpenAlloc LLC
 //
@@ -11,6 +11,8 @@
 import Foundation
 import CoreData
 
+/// Strongly-typed wrapper for an NSManagedObject uri representation.
+///
 /// Struct providing archivable reference to the managed object (Routine or Exercise).
 /// Codable for use in NavigationStack, State, and UserActivity.
 /// Identifiable for use in .sheet and .fullScreenCover.

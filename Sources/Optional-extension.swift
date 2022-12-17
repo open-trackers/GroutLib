@@ -10,16 +10,6 @@
 
 import Foundation
 
-
-//extension RawRepresentable {
-//    public init?(rawValue optionalRawValue: RawValue?) {
-//        guard let rawValue = optionalRawValue,
-//              let value = Self(rawValue: rawValue)
-//        else { return nil }
-//        self = value
-//    }
-//}
-
 // via markiv on StackOverflow
 extension Optional: RawRepresentable where Wrapped: Codable {
     public init?(rawValue: String) {
@@ -32,7 +22,6 @@ extension Optional: RawRepresentable where Wrapped: Codable {
     }
     
     public var rawValue: String {
-        //value.absoluteString
         guard let data = try? JSONEncoder().encode(self),
               let string = String(data: data, encoding: .utf8)
         else {
