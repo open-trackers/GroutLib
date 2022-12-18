@@ -18,7 +18,7 @@ import Foundation
 /// Identifiable for use in .sheet and .fullScreenCover.
 /// RawRepresentable so that it can be stored in SceneStorage or AppStorage.
 /// Typed for use as a navigationDestination.
-public struct UriRep<T: NSManagedObject>: Hashable, Codable, Identifiable, RawRepresentable {
+public struct UriRep<T>: Hashable, Codable, Identifiable, RawRepresentable {
     public let value: URL
 
     public init(value: URL) {
