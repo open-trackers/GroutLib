@@ -68,8 +68,8 @@ public extension Routine {
     }
 
     // NOTE: does NOT save context
-    func start(_ context: NSManagedObjectContext, resuming: Bool, startDate: Date = Date.now) throws -> Date {
-        if !resuming {
+    func start(_ context: NSManagedObjectContext, clearData: Bool, startDate: Date = Date.now) throws -> Date {
+        if clearData {
             try clearCompletions(context)
         }
         return startDate
