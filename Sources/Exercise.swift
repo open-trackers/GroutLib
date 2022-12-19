@@ -20,12 +20,12 @@ extension Exercise: UserOrdered {}
 /// Identifiable for use in .sheet and .fullScreenCover.
 /// RawRepresentable so that it can be stored in SceneStorage or AppStorage.
 /// Typed to Exercise for use as a navigationDestination.
-//public typealias ExerciseUriRep = UriRep<Exercise>
-//public extension Exercise {
+// public typealias ExerciseUriRep = UriRep<Exercise>
+// public extension Exercise {
 //    var uriRep: ExerciseUriRep {
 //        UriRep(value: uriRepresentation)
 //    }
-//}
+// }
 
 public extension Exercise {
     // NOTE: does NOT save to context

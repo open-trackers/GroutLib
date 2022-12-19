@@ -20,12 +20,12 @@ extension Routine: UserOrdered {}
 /// Identifiable for use in .sheet and .fullScreenCover.
 /// RawRepresentable so that it can be stored in SceneStorage or AppStorage.
 /// Typed to Routine for use as a navigationDestination.
-//public typealias RoutineUriRep = UriRep<Routine>
-//public extension Routine {
+// public typealias RoutineUriRep = UriRep<Routine>
+// public extension Routine {
 //    var uriRep: RoutineUriRep {
 //        UriRep(value: uriRepresentation)
 //    }
-//}
+// }
 
 public extension Routine {
     // NOTE: does NOT save to context
