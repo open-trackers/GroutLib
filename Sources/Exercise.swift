@@ -46,3 +46,26 @@ public extension Exercise {
         set { name = newValue }
     }
 }
+
+public extension Exercise {
+    var isStepFractional: Bool {
+        intensityStep.truncatingRemainder(dividingBy: 1) >= 0.1
+    }
+
+    func formatIntensity(_ intensity: Float) -> String {
+        let specifier = isStepFractional ? "%0.1f" : "%0.0f"
+        return String(format: specifier, intensity)
+    }
+
+    var isDone: Bool {
+        lastCompletedAt != nil
+    }
+
+//    var canAdvance: Bool {
+//        !isDone && !atMax
+//    }
+
+//    var atMax: Bool {
+//        intensityMaxValue <= lastIntensity
+//    }
+}
