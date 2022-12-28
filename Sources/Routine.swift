@@ -118,25 +118,33 @@ public extension Routine {
     }
 
     func getNextIncomplete(_ context: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> Exercise? {
+        print("\(#function) userOrder=\(userOrder ?? -2000)")
+
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.sortDescriptors = Routine.exerciseSort
         req.fetchLimit = 1
 
         do {
             if let _userOrder = userOrder {
+                print("\(#function) next trailing")
                 req.predicate = nextTrailing(from: _userOrder)
                 if let next = (try context.fetch(req) as [Exercise]).first {
+                    print("\(#function) next trailing found \(next.wrappedName) \(next.uriRepresentationString.suffix(4))")
                     return next
                 }
 
+                print("\(#function) next leading")
                 req.predicate = nextLeading(to: _userOrder)
                 if let next = (try context.fetch(req) as [Exercise]).first {
+                    print("\(#function) next leading found \(next.wrappedName) \(next.uriRepresentationString.suffix(4))")
                     return next
                 }
             } else {
+                print("\(#function) start from beginning")
                 // start from beginning
                 req.predicate = incompletePredicate
                 if let next = (try context.fetch(req) as [Exercise]).first {
+                    print("\(#function) from beginning found \(next.wrappedName) \(next.uriRepresentationString.suffix(4))")
                     return next
                 }
             }
