@@ -11,12 +11,17 @@
 import CoreData
 
 public extension NSManagedObject {
+    var uriRepresentation: URL {
+        objectID.uriRepresentation()
+    }
+
     var uriRepresentationString: String {
         uriRepresentation.absoluteString
     }
 
-    var uriRepresentation: URL {
-        objectID.uriRepresentation()
+    /// return p1 from long-url/p1
+    var uriRepresentationSuffix: String? {
+        uriRepresentation.suffix
     }
 
     static func getObjectID(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> NSManagedObjectID? {

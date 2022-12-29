@@ -130,14 +130,14 @@ public extension Routine {
                 print("\(#function) next trailing")
                 req.predicate = nextTrailing(from: _userOrder)
                 if let next = (try context.fetch(req) as [Exercise]).first {
-                    print("\(#function) next trailing found \(next.uriRepresentationString.suffix(4))")
+                    print("\(#function) next trailing found \(next.uriRepresentationSuffix ?? "")")
                     return next.objectID
                 }
 
                 print("\(#function) next leading")
                 req.predicate = nextLeading(to: _userOrder)
                 if let next = (try context.fetch(req) as [Exercise]).first {
-                    print("\(#function) next leading found \(next.uriRepresentationString.suffix(4))")
+                    print("\(#function) next leading found \(next.uriRepresentationSuffix ?? "")")
                     return next.objectID
                 }
             } else {
@@ -145,7 +145,7 @@ public extension Routine {
                 // start from beginning
                 req.predicate = incompletePredicate
                 if let next = (try context.fetch(req) as [Exercise]).first {
-                    print("\(#function) from beginning found \(next.uriRepresentationString.suffix(4))")
+                    print("\(#function) from beginning found \(next.uriRepresentationSuffix ?? "")")
                     return next.objectID
                 }
             }

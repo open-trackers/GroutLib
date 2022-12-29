@@ -15,4 +15,12 @@ extension URL: Identifiable {
     public var id: Int {
         hashValue
     }
+
+    /// returns last path component, if any.
+    ///
+    /// e.g., "e" from uri://a/b/c/d/e
+    ///
+    public var suffix: String? {
+        pathComponents.last
+    }
 }
