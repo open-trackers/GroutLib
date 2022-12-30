@@ -15,11 +15,8 @@ public extension NSManagedObject {
         objectID.uriRepresentation()
     }
 
-    var uriRepresentationString: String {
-        uriRepresentation.absoluteString
-    }
-
-    /// return p1 from long-url/p1
+    /// Return last path component as a string, if any.
+    /// e.g., p1 from uri://blah/a/b/c/p1
     var uriRepresentationSuffix: String? {
         uriRepresentation.suffix
     }

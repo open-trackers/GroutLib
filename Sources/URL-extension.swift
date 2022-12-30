@@ -16,7 +16,7 @@ extension URL: Identifiable {
         hashValue
     }
 
-    /// returns last path component, if any.
+    /// returns last path component as a String, if any.
     ///
     /// e.g., "e" from uri://a/b/c/d/e
     ///
