@@ -11,10 +11,15 @@
 import Foundation
 
 public func isFractional(value: Float, accuracy: Float = 0.1) -> Bool {
-    let remainder = abs(value.truncatingRemainder(dividingBy: 1))
-    let multiplier = 1 / accuracy
-    let rounded = (multiplier * remainder).rounded(.toNearestOrEven)
-    let result = (1 <= rounded && rounded <= (multiplier - 1))
-    //print("\(result) value=\(value) remainder=\(remainder) rounded=\(rounded)")
-    return result
+    
+    let v = abs(value)
+    let f = floor(v)
+    let remainder = v - f   // 0.0 ... 1.0
+    let adjrem = remainder > 0.5 ? 1.0 - remainder : remainder   // 0.0 ... 0.5
+    
+    if adjrem >= accuracy { return true }
+    
+    // it may be close, so see if it's within +/- 1% of accuracy
+    let diff2 = abs(adjrem - accuracy)
+    return diff2 < (accuracy / 100)
 }
