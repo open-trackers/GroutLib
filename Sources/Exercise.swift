@@ -40,12 +40,17 @@ public extension Exercise {
         isFractional(value: intensityStep, accuracy: 0.1)
     }
 
-    func formatIntensity(_ intensity: Float) -> String {
-        let specifier = isStepFractional ? "%0.1f" : "%0.0f"
-        return String(format: specifier, intensity)
-    }
-
     var isDone: Bool {
         lastCompletedAt != nil
+    }
+
+    /// Format an intensity value, such as lastIntensity and intensityStep.
+    func formatIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
+        let suffix: String = {
+            let abbrev = Units(rawValue: self.units)?.abbreviation ?? ""
+            return withUnits ? " \(abbrev)" : ""
+        }()
+        let specifier = "%0.\(isStepFractional ? 1 : 0)f\(suffix)"
+        return String(format: specifier, intensityValue)
     }
 }
