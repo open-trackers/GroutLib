@@ -21,6 +21,7 @@ public extension Routine {
         let nu = Routine(context: context)
         nu.userOrder = userOrder
         nu.name = "New Routine"
+        nu.archiveID = UUID()
         return nu
     }
 

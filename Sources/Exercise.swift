@@ -21,6 +21,7 @@ public extension Exercise {
         let nu = Exercise(context: context)
         nu.userOrder = userOrder
         nu.name = "New Exercise"
+        nu.archiveID = UUID()
         return nu
     }
 
