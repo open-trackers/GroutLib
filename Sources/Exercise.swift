@@ -36,7 +36,7 @@ public extension Exercise {
 
 public extension Exercise {
     var isStepFractional: Bool {
-        intensityStep.truncatingRemainder(dividingBy: 1) >= 0.1
+        isFractional(value: intensityStep, accuracy: 0.1)
     }
 
     func formatIntensity(_ intensity: Float) -> String {
