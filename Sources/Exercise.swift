@@ -36,21 +36,25 @@ public extension Exercise {
 }
 
 public extension Exercise {
-    var isStepFractional: Bool {
-        isFractional(value: intensityStep, accuracy: 0.1)
+    /// true if both intensity and its step are whole numbers (or close to it)
+    private var isIntensityFractional: Bool {
+        let accuracy: Float = 0.1
+        return
+            isFractional(value: intensityStep, accuracy: accuracy) ||
+            isFractional(value: lastIntensity, accuracy: accuracy)
     }
 
     var isDone: Bool {
         lastCompletedAt != nil
     }
 
-    /// Format an intensity value, such as lastIntensity and intensityStep.
+    /// Format an intensity value, such as lastIntensity and intensityStep, with optional units
     func formatIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
         let suffix: String = {
             let abbrev = Units(rawValue: self.units)?.abbreviation ?? ""
             return withUnits ? " \(abbrev)" : ""
         }()
-        let specifier = "%0.\(isStepFractional ? 1 : 0)f\(suffix)"
+        let specifier = "%0.\(isIntensityFractional ? 1 : 0)f\(suffix)"
         return String(format: specifier, intensityValue)
     }
 }
