@@ -52,8 +52,10 @@ public extension Exercise {
     func formatIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
         let suffix: String = {
             guard withUnits,
-                  let abbrev = Units(rawValue: self.units)?.abbreviation
+                  let units = Units(rawValue: self.units),
+                  units != .none
             else { return "" }
+            let abbrev = units.abbreviation
             return " \(abbrev)"
         }()
         let specifier = "%0.\(isIntensityFractional ? 1 : 0)f\(suffix)"
