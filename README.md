@@ -1,21 +1,21 @@
 # GroutLib
 
-Shared data layer and business logic for the Gym Routine Tracker, presently available as a WatchOS app.
+Shared data layer and business logic for the Gym Routine Tracker, presently available as an iOS app and independent WatchOS app.
 
-If there are ever iOS or macOS implementations, they should include this package.
+If there is ever a macOS implementations, it should include this package.
 
 All code licensed with Mozilla Public License 2.0.
 
 ## See Also
 
-* [Gym Routine Tracker](https://gym-routine-tracker.github.io/) - WatchOS implementation of the Gym Routine Tracker
+* [Gym Routine Tracker](https://gym-routine-tracker.github.io/) - WatchOS and iOS implementations of the Gym Routine Tracker
 
 * [FlowAllocator](https://openalloc.github.io/FlowAllocator/index.html) - portfolio rebalancing tool for macOS
 * [FlowWorth](https://openalloc.github.io/FlowWorth/index.html) - portfolio valuation and tracking tool for macOS
 
 ## License
 
-Copyright 2022 OpenAlloc LLC
+Copyright 2022, 2023 OpenAlloc LLC
 
 All application code is licensed under the [Mozilla Public License 2](https://www.mozilla.org/en-US/MPL/2.0/), except where noted in individual modules.
 

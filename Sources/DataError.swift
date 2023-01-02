@@ -1,5 +1,5 @@
 //
-//  ExerciseTests.swift
+//  DataError.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -10,11 +10,13 @@
 
 import CoreData
 
-@testable import GroutLib
-import XCTest
+/// Data layer errors
+public enum DataError: Error, Equatable {
+    case fetchError(msg: String)
 
-final class ExerciseTests: XCTestCase {
-    func testNothing() throws {
-        XCTAssertTrue(true)
+    var description: String {
+        switch self {
+        case let .fetchError(msg): return "Data fetch error: \(msg)"
+        }
     }
 }

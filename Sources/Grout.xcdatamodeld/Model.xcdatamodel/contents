@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="class">
+    <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="category">
+        <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="intensityStep" optional="YES" attributeType="Float" defaultValueString="5" usesScalarValueType="YES"/>
         <attribute name="invertedIntensity" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastCompletedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -14,7 +15,8 @@
         <attribute name="userOrder" optional="YES" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="routine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Routine" inverseName="exercises" inverseEntity="Routine"/>
     </entity>
-    <entity name="Routine" representedClassName="Routine" syncable="YES" codeGenerationType="class">
+    <entity name="Routine" representedClassName="Routine" syncable="YES" codeGenerationType="category">
+        <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="imageName" optional="YES" attributeType="String"/>
         <attribute name="lastDuration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lastStartedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

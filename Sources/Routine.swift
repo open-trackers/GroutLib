@@ -1,7 +1,7 @@
 //
 //  Routine.swift
 //
-// Copyright 2022  OpenAlloc LLC
+// Copyright 2022, 2023  OpenAlloc LLC
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,15 +10,23 @@
 
 import CoreData
 
+@objc(Routine)
+public class Routine: NSManagedObject {}
+
 extension Routine: UserOrdered {}
 
 public extension Routine {
     // NOTE: does NOT save to context
-    static func create(_ viewContext: NSManagedObjectContext, userOrder: Int16) -> Routine {
-        let nu = Routine(context: viewContext)
+    static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Routine {
+        let nu = Routine(context: context)
         nu.userOrder = userOrder
         nu.name = "New Routine"
+        nu.archiveID = UUID()
         return nu
+    }
+
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Routine? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? Routine
     }
 
     var wrappedName: String {
@@ -28,17 +36,13 @@ public extension Routine {
 }
 
 public extension Routine {
-    var anyExerciseCompleted: Bool {
-        exercises?.first(where: { ($0 as? Exercise)?.lastCompletedAt != nil }) != nil
-    }
-
     // NOTE: does NOT save to context
-    internal func clearCompletions(_ viewContext: NSManagedObjectContext) throws {
+    internal func clearCompletions(_ context: NSManagedObjectContext) throws {
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.predicate = NSPredicate(format: "routine = %@", self)
 
         do {
-            let exercises: [Exercise] = try viewContext.fetch(req) as [Exercise]
+            let exercises: [Exercise] = try context.fetch(req) as [Exercise]
             exercises.forEach { exercise in
                 exercise.lastCompletedAt = nil
             }
@@ -49,8 +53,10 @@ public extension Routine {
     }
 
     // NOTE: does NOT save context
-    func start(_ viewContext: NSManagedObjectContext, startDate: Date = Date.now) throws -> Date {
-        try clearCompletions(viewContext)
+    func start(_ context: NSManagedObjectContext, clearData: Bool, startDate: Date = Date.now) throws -> Date {
+        if clearData {
+            try clearCompletions(context)
+        }
         return startDate
     }
 
@@ -63,6 +69,10 @@ public extension Routine {
         lastStartedAt = startedAt
         lastDuration = now.timeIntervalSince(startedAt)
         return true
+    }
+
+    internal var anyExerciseCompleted: Bool {
+        exercises?.first(where: { ($0 as? Exercise)?.lastCompletedAt != nil }) != nil
     }
 }
 
@@ -96,27 +106,36 @@ public extension Routine {
         ])
     }
 
-    func getNextIncomplete(_ viewContext: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> Exercise? {
+    func getNextIncomplete(_ context: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> NSManagedObjectID? {
+        // print("\(#function) userOrder=\(userOrder ?? -2000)")
+
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.sortDescriptors = Routine.exerciseSort
+        req.returnsObjectsAsFaults = false
         req.fetchLimit = 1
 
         do {
             if let _userOrder = userOrder {
+                // print("\(#function) next trailing")
                 req.predicate = nextTrailing(from: _userOrder)
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
-                    return next
+                if let next = (try context.fetch(req) as [Exercise]).first {
+                    // print("\(#function) next trailing found \(next.uriRepresentationSuffix ?? "")")
+                    return next.objectID
                 }
 
+                // print("\(#function) next leading")
                 req.predicate = nextLeading(to: _userOrder)
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
-                    return next
+                if let next = (try context.fetch(req) as [Exercise]).first {
+                    // print("\(#function) next leading found \(next.uriRepresentationSuffix ?? "")")
+                    return next.objectID
                 }
             } else {
+                // print("\(#function) start from beginning")
                 // start from beginning
                 req.predicate = incompletePredicate
-                if let next = (try viewContext.fetch(req) as [Exercise]).first {
-                    return next
+                if let next = (try context.fetch(req) as [Exercise]).first {
+                    // print("\(#function) from beginning found \(next.uriRepresentationSuffix ?? "")")
+                    return next.objectID
                 }
             }
         } catch {
