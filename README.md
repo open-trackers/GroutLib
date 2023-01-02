@@ -1,6 +1,6 @@
 # GroutLib
 
-Shared data layer and business logic for the Gym Routine Tracker, presently available as independenty WatchOS and iOS apps.
+Shared data layer and business logic for the Gym Routine Tracker, presently available as an iOS app and independent WatchOS app.
 
 If there is ever a macOS implementations, it should include this package.
 
