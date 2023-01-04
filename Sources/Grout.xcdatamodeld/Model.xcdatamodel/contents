@@ -46,4 +46,10 @@
         <attribute name="userOrder" optional="YES" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Exercise" inverseName="routine" inverseEntity="Exercise"/>
     </entity>
+    <configuration name="Archive" usedWithCloudKit="YES">
+        <memberEntity name="AExercise"/>
+        <memberEntity name="AExerciseRun"/>
+        <memberEntity name="ARoutine"/>
+        <memberEntity name="ARoutineRun"/>
+    </configuration>
 </model>

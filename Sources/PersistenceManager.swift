@@ -43,6 +43,24 @@ public struct PersistenceManager {
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
+        
+//        let configs = container.managedObjectModel.configurations
+//        ([String]) $R0 = 2 values {
+//          [0] = "Archive"
+//          [1] = "PF_DEFAULT_CONFIGURATION_NAME"
+//        }
+        
+        if container.persistentStoreDescriptions.count < 2 {
+            print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
+            let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+            let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
+            let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
+            archiveStoreDescription.configuration = "Archive"
+            archiveStoreDescription.isReadOnly = false
+            archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
+            container.persistentStoreDescriptions.append(archiveStoreDescription)
+        }
+        
         container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
