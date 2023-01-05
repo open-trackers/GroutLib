@@ -1,12 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Reed Esau on 1/3/23.
 //
 
 import CoreData
 
+/// Archive representation of a Routine record
 public extension ARoutine {
     // NOTE: does NOT save to context
     static func create(_ context: NSManagedObjectContext, name: String, archiveID: UUID) -> ARoutine {
@@ -22,8 +23,8 @@ public extension ARoutine {
         req.returnsObjectsAsFaults = false
 
         do {
-            let aroutines = try context.fetch(req) as [ARoutine]
-            return aroutines.first
+            let results = try context.fetch(req) as [ARoutine]
+            return results.first
         } catch {
             let nserror = error as NSError
             throw DataError.fetchError(msg: nserror.localizedDescription)

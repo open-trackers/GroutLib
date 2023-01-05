@@ -66,8 +66,16 @@ public extension Routine {
         guard anyExerciseCompleted,
               startedAt < now
         else { return false }
+
+        let duration = now.timeIntervalSince(startedAt)
+
+        // archive the run for charting
+        logRun(startedAt: startedAt, duration: duration)
+
+        // update the attributes with fresh data
         lastStartedAt = startedAt
-        lastDuration = now.timeIntervalSince(startedAt)
+        lastDuration = duration
+
         return true
     }
 
@@ -143,6 +151,43 @@ public extension Routine {
             throw DataError.fetchError(msg: nserror.localizedDescription)
         }
 
+        return nil
+    }
+}
+
+extension Routine {
+    /// log the run of the routine to the archive
+    /// NOTE: does not save context
+    func logRun(startedAt: Date, duration: TimeInterval) {
+        guard let moc = managedObjectContext,
+              let aroutine = getOrCreateARoutine(moc)
+        else {
+            print("ERROR: could not log routine run to archive")
+            return
+        }
+
+        _ = ARoutineRun.create(moc,
+                               aroutine: aroutine,
+                               startedAt: startedAt,
+                               duration: duration)
+        print(">>>>> Created ARoutineRun")
+    }
+
+    func getOrCreateARoutine(_ moc: NSManagedObjectContext) -> ARoutine? {
+        if archiveID == nil {
+            archiveID = UUID()
+        }
+
+        if let archiveID {
+            if let aroutine = try? ARoutine.get(moc, forArchiveID: archiveID) {
+                print(">>>> FOUND EXISTING AROUTINE")
+                // found existing routine
+                return aroutine
+            } else {
+                print(">>>> CREATING NEW AROUTINE")
+                return ARoutine.create(moc, name: wrappedName, archiveID: archiveID)
+            }
+        }
         return nil
     }
 }
