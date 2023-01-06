@@ -89,6 +89,48 @@ public struct PersistenceManager {
             try ctx.save()
         }
     }
+
+    static func getTestContainer() throws -> NSPersistentContainer {
+        // NOTE: not using inMemory storage, for two reasons:
+        // (1) We're using two stores, where /dev/null may not be usable for both
+        // (2) Batch delete may not be supported for inMemory
+
+        let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+        let defaultURL = defaultDirectoryURL.appendingPathComponent("TestGrout.sqlite")
+        let archiveURL = defaultDirectoryURL.appendingPathComponent("TestGroutArchive.sqlite")
+
+        let modelName = PersistenceManager.modelName
+        let bundle = Bundle.module
+        let modelURL = bundle.url(forResource: modelName, withExtension: ".momd")!
+        let model = NSManagedObjectModel(contentsOf: modelURL)!
+
+        let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
+
+        let defaultDescription = NSPersistentStoreDescription()
+        defaultDescription.url = defaultURL
+
+        let archiveDescription = NSPersistentStoreDescription()
+        archiveDescription.url = archiveURL
+        archiveDescription.configuration = "Archive"
+
+        container.persistentStoreDescriptions = [defaultDescription, archiveDescription]
+
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        }
+
+        // clear all data that persisted from earlier tests
+        try container.viewContext.deleter(entityName: "Exercise")
+        try container.viewContext.deleter(entityName: "Routine")
+        try container.viewContext.deleter(entityName: "ZExercise")
+        try container.viewContext.deleter(entityName: "ZRoutine")
+        try container.viewContext.deleter(entityName: "ZExerciseRun")
+        try container.viewContext.deleter(entityName: "ZRoutineRun")
+
+        return container
+    }
 }
 
 //// For use with Xcode Previews, provides some data to work with for examples

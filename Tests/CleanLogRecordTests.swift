@@ -1,5 +1,5 @@
 //
-//  ZUtilsTests.swift
+//  CleanLogRecordTests.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -13,7 +13,7 @@ import CoreData
 @testable import GroutLib
 import XCTest
 
-final class ZUtilsTests: TestBase {
+final class CleanLogRecordTests: TestBase {
     func testRoutineKeepAt() throws {
         let uuid = UUID()
         let startDate = Date.now
@@ -101,6 +101,4 @@ final class ZUtilsTests: TestBase {
         XCTAssertNil(try ZExercise.get(testContext, forArchiveID: eUUID))
         XCTAssertEqual(0, try ZExerciseRun.count(testContext))
     }
-
-    func testTransferToArchive() throws {}
 }
