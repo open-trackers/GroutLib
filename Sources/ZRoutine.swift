@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ZRoutine.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -37,11 +37,9 @@ extension ZRoutine {
     // NOTE: does NOT save to context
     static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String) throws -> ZRoutine {
         if let zRoutine = try ZRoutine.get(context, forArchiveID: routineArchiveID) {
-            print(">>>> FOUND EXISTING AROUTINE")
             // found existing routine
             return zRoutine
         } else {
-            print(">>>> CREATING NEW AROUTINE")
             return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID)
         }
     }

@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ZExercise.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -38,11 +38,9 @@ extension ZExercise {
     // NOTE: does NOT save to context
     static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseArchiveID: UUID, exerciseName: String) throws -> ZExercise {
         if let zExercise = try ZExercise.get(context, forArchiveID: exerciseArchiveID) {
-            print(">>>> FOUND EXISTING AEXERCISE")
             // found existing zExercise
             return zExercise
         } else {
-            print(">>>> CREATING NEW AEXERCISE")
             return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID)
         }
     }
