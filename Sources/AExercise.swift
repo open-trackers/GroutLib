@@ -32,9 +32,8 @@ public extension AExercise {
         }
     }
 
-    static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, archiveID: UUID, name: String) -> AExercise {
-        
-        if let aexercise = try? AExercise.get(context, forArchiveID: archiveID) {
+    static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, archiveID: UUID, name: String) throws -> AExercise {
+        if let aexercise = try AExercise.get(context, forArchiveID: archiveID) {
             print(">>>> FOUND EXISTING AEXERCISE")
             // found existing aexercise
             return aexercise

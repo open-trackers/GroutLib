@@ -62,7 +62,7 @@ public extension Routine {
 
     // Returns true if routine is updated.
     // NOTE: does NOT save context
-    func stop(_ context: NSManagedObjectContext, startedAt: Date, now: Date = Date.now) -> Bool {
+    func stop(_ context: NSManagedObjectContext, startedAt: Date, now: Date = Date.now) throws -> Bool {
         guard anyExerciseCompleted,
               startedAt < now
         else { return false }
@@ -70,7 +70,7 @@ public extension Routine {
         let duration = now.timeIntervalSince(startedAt)
 
         // archive the run for charting
-        logRun(context, startedAt: startedAt, duration: duration)
+        try logRun(context, startedAt: startedAt, duration: duration)
 
         // update the attributes with fresh data
         lastStartedAt = startedAt
@@ -158,19 +158,17 @@ public extension Routine {
 extension Routine {
     /// log the run of the routine to the archive
     /// NOTE: does not save context
-    func logRun(_ context: NSManagedObjectContext, startedAt: Date, duration: TimeInterval) {
-        
-        if self.archiveID == nil {
-            self.archiveID = UUID()
+    func logRun(_ context: NSManagedObjectContext, startedAt: Date, duration: TimeInterval) throws {
+        if archiveID == nil {
+            archiveID = UUID()
         }
-        
-        let aroutine = ARoutine.getOrCreate(context, archiveID: self.archiveID!, name: self.wrappedName)
-        
+
+        let aroutine = try ARoutine.getOrCreate(context, archiveID: archiveID!, name: wrappedName)
+
         _ = ARoutineRun.create(context,
                                aroutine: aroutine,
                                startedAt: startedAt,
                                duration: duration)
-        print(">>>>> Created ARoutineRun")
+        print("\(#function) Created ARoutineRun")
     }
-
 }

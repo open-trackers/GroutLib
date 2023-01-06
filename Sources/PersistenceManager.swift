@@ -51,16 +51,16 @@ public struct PersistenceManager {
 //        }
 
         #if os(iOS)
-        if container.persistentStoreDescriptions.count < 2 {
-            print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
-            let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
-            let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
-            let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
-            archiveStoreDescription.configuration = "Archive"
-            archiveStoreDescription.isReadOnly = false
-            archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
-            container.persistentStoreDescriptions.append(archiveStoreDescription)
-        }
+            if container.persistentStoreDescriptions.count < 2 {
+                print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
+                let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+                let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
+                let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
+                archiveStoreDescription.configuration = "Archive"
+                archiveStoreDescription.isReadOnly = false
+                archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
+                container.persistentStoreDescriptions.append(archiveStoreDescription)
+            }
         #endif
 
         container.loadPersistentStores(completionHandler: { _, error in

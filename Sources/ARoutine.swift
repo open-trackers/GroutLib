@@ -31,9 +31,8 @@ public extension ARoutine {
         }
     }
 
-    static func getOrCreate(_ context: NSManagedObjectContext, archiveID: UUID, name: String) -> ARoutine {
-        
-        if let aroutine = try? ARoutine.get(context, forArchiveID: archiveID) {
+    static func getOrCreate(_ context: NSManagedObjectContext, archiveID: UUID, name: String) throws -> ARoutine {
+        if let aroutine = try ARoutine.get(context, forArchiveID: archiveID) {
             print(">>>> FOUND EXISTING AROUTINE")
             // found existing routine
             return aroutine
