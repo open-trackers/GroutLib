@@ -1,8 +1,11 @@
 //
 //  File.swift
 //
+// Copyright 2022, 2023  OpenAlloc LLC
 //
-//  Created by Reed Esau on 1/3/23.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
 
 import CoreData
@@ -10,10 +13,10 @@ import CoreData
 /// Archive representation of a Routine record
 extension ARoutine {
     // NOTE: does NOT save to context
-    static func create(_ context: NSManagedObjectContext, name: String, archiveID: UUID) -> ARoutine {
+    static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID) -> ARoutine {
         let nu = ARoutine(context: context)
-        nu.name = name
-        nu.routineArchiveID = archiveID
+        nu.name = routineName
+        nu.routineArchiveID = routineArchiveID
         return nu
     }
 
@@ -39,7 +42,7 @@ extension ARoutine {
             return aroutine
         } else {
             print(">>>> CREATING NEW AROUTINE")
-            return ARoutine.create(context, name: routineName, archiveID: routineArchiveID)
+            return ARoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID)
         }
     }
 

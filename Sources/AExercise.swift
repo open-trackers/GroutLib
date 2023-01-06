@@ -1,8 +1,11 @@
 //
 //  File.swift
 //
+// Copyright 2022, 2023  OpenAlloc LLC
 //
-//  Created by Reed Esau on 1/4/23.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
 
 import CoreData
@@ -10,10 +13,10 @@ import CoreData
 /// Archive representation of a Exercise record
 extension AExercise {
     // NOTE: does NOT save to context
-    static func create(_ context: NSManagedObjectContext, aroutine: ARoutine, name: String, archiveID: UUID) -> AExercise {
+    static func create(_ context: NSManagedObjectContext, aroutine: ARoutine, exerciseName: String, exerciseArchiveID: UUID) -> AExercise {
         let nu = AExercise(context: context)
-        nu.name = name
-        nu.exerciseArchiveID = archiveID
+        nu.name = exerciseName
+        nu.exerciseArchiveID = exerciseArchiveID
         nu.aRoutine = aroutine
         return nu
     }
@@ -40,7 +43,7 @@ extension AExercise {
             return aexercise
         } else {
             print(">>>> CREATING NEW AEXERCISE")
-            return AExercise.create(context, aroutine: aroutine, name: exerciseName, archiveID: exerciseArchiveID)
+            return AExercise.create(context, aroutine: aroutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID)
         }
     }
 
