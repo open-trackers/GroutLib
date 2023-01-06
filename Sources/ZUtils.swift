@@ -10,7 +10,24 @@
 
 import CoreData
 
+/// Ensure all the records have archiveIDs
+/// Does NOT save context
+public func updateArchiveIDs(routines: [Routine]) {
+    for routine in routines {
+        if let _ = routine.archiveID { continue }
+        routine.archiveID = UUID()
+        // logger.notice("\(#function): added archiveID to \(routine.wrappedName)")
+        guard let exercises = routine.exercises?.allObjects as? [Exercise] else { continue }
+        for exercise in exercises {
+            if let _ = exercise.archiveID { continue }
+            exercise.archiveID = UUID()
+            // logger.notice("\(#function): added archiveID to \(exercise.wrappedName)")
+        }
+    }
+}
+
 /// Delete all `Z` records prior to a specified date.
+/// NOTE Does NOT save to context
 public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
     try context.deleter(entityName: "ZExerciseRun",
                         predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
