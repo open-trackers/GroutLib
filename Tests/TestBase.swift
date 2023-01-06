@@ -20,7 +20,6 @@ class TestBase: XCTestCase {
     lazy var df = ISO8601DateFormatter()
 
     override func setUp() {
-        
         testContainer = {
             let modelName = PersistenceManager.modelName
             let bundle = Bundle.module
@@ -37,7 +36,7 @@ class TestBase: XCTestCase {
             }
             return container
         }()
-        
+
         testContext = testContainer.viewContext
     }
 
