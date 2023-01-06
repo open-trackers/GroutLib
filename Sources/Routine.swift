@@ -170,10 +170,10 @@ extension Routine {
                        startedAt: Date,
                        duration: TimeInterval) throws
     {
-        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name)
+        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name)
 
-        _ = ARoutineRun.create(context,
-                               aroutine: aroutine,
+        _ = ZRoutineRun.create(context,
+                               zRoutine: zRoutine,
                                startedAt: startedAt,
                                duration: duration)
     }

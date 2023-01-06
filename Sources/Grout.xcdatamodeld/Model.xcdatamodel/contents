@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="AExercise" representedClassName="AExercise" syncable="YES" codeGenerationType="class">
-        <attribute name="exerciseArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="aExerciseRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="AExerciseRun" inverseName="aExercise" inverseEntity="AExerciseRun"/>
-        <relationship name="aRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ARoutine" inverseName="aExercise" inverseEntity="ARoutine"/>
-    </entity>
-    <entity name="AExerciseRun" representedClassName="AExerciseRun" syncable="YES" codeGenerationType="class">
-        <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="intensity" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <relationship name="aExercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AExercise" inverseName="aExerciseRuns" inverseEntity="AExercise"/>
-    </entity>
-    <entity name="ARoutine" representedClassName="ARoutine" syncable="YES" codeGenerationType="class">
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="routineArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="aExercise" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="AExercise" inverseName="aRoutine" inverseEntity="AExercise"/>
-        <relationship name="aRoutineRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ARoutineRun" inverseName="aRoutine" inverseEntity="ARoutineRun"/>
-    </entity>
-    <entity name="ARoutineRun" representedClassName="ARoutineRun" syncable="YES" codeGenerationType="class">
-        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="startedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="aRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ARoutine" inverseName="aRoutineRuns" inverseEntity="ARoutine"/>
-    </entity>
     <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="category">
         <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="intensityStep" optional="YES" attributeType="Float" defaultValueString="5" usesScalarValueType="YES"/>
@@ -46,10 +24,32 @@
         <attribute name="userOrder" optional="YES" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Exercise" inverseName="routine" inverseEntity="Exercise"/>
     </entity>
+    <entity name="ZExercise" representedClassName="ZExercise" syncable="YES" codeGenerationType="class">
+        <attribute name="exerciseArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="zExerciseRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZExerciseRun" inverseName="zExercise" inverseEntity="ZExerciseRun"/>
+        <relationship name="zRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutine" inverseName="zExercise" inverseEntity="ZRoutine"/>
+    </entity>
+    <entity name="ZExerciseRun" representedClassName="ZExerciseRun" syncable="YES" codeGenerationType="class">
+        <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="intensity" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="zExercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZExercise" inverseName="zExerciseRuns" inverseEntity="ZExercise"/>
+    </entity>
+    <entity name="ZRoutine" representedClassName="ZRoutine" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="routineArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="zExercise" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZExercise" inverseName="zRoutine" inverseEntity="ZExercise"/>
+        <relationship name="zRoutineRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZRoutineRun" inverseName="zRoutine" inverseEntity="ZRoutineRun"/>
+    </entity>
+    <entity name="ZRoutineRun" representedClassName="ZRoutineRun" syncable="YES" codeGenerationType="class">
+        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="startedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="zRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutine" inverseName="zRoutineRuns" inverseEntity="ZRoutine"/>
+    </entity>
     <configuration name="Archive" usedWithCloudKit="YES">
-        <memberEntity name="AExercise"/>
-        <memberEntity name="AExerciseRun"/>
-        <memberEntity name="ARoutine"/>
-        <memberEntity name="ARoutineRun"/>
+        <memberEntity name="ZExercise"/>
+        <memberEntity name="ZExerciseRun"/>
+        <memberEntity name="ZRoutine"/>
+        <memberEntity name="ZRoutineRun"/>
     </configuration>
 </model>

@@ -118,12 +118,12 @@ extension Exercise {
                        completedAt: Date,
                        intensity: Float) throws
     {
-        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
+        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
 
-        let aexercise = try AExercise.getOrCreate(context, aroutine: aroutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName)
+        let zExercise = try ZExercise.getOrCreate(context, zRoutine: zRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName)
 
-        _ = AExerciseRun.create(context,
-                                aexercise: aexercise,
+        _ = ZExerciseRun.create(context,
+                                zExercise: zExercise,
                                 completedAt: completedAt,
                                 intensity: intensity)
     }

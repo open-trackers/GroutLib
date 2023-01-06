@@ -10,32 +10,32 @@
 
 import CoreData
 
-public extension ARoutineRun {
+public extension ZRoutineRun {
     // NOTE: does NOT save to context
-    static func create(_ context: NSManagedObjectContext, aroutine: ARoutine, startedAt: Date, duration: Double) -> ARoutineRun {
-        let nu = ARoutineRun(context: context)
-        nu.aRoutine = aroutine
+    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: Double) -> ZRoutineRun {
+        let nu = ZRoutineRun(context: context)
+        nu.zRoutine = zRoutine
         nu.startedAt = startedAt
         nu.duration = duration
         return nu
     }
 
-//    static func get(_ context: NSManagedObjectContext, forArchiveID archiveID: UUID) throws -> ARoutineRun? {
-//        let req = NSFetchRequest<ARoutineRun>(entityName: "ARoutineRun")
+//    static func get(_ context: NSManagedObjectContext, forArchiveID archiveID: UUID) throws -> ZRoutineRun? {
+//        let req = NSFetchRequest<ZRoutineRun>(entityName: "ZRoutineRun")
 //        req.predicate = NSPredicate(format: "routineArchiveID = %@", archiveID.uuidString)
 //        req.returnsObjectsAsFaults = false
 //
 //        do {
-//            let ARoutineRuns = try context.fetch(req) as [ARoutineRun]
-//            return ARoutineRuns.first
+//            let ZRoutineRuns = try context.fetch(req) as [ZRoutineRun]
+//            return ZRoutineRuns.first
 //        } catch {
 //            let nserror = error as NSError
 //            throw DataError.fetchError(msg: nserror.localizedDescription)
 //        }
 //    }
 
-//    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ARoutineRun? {
-//        NSManagedObject.get(context, forURIRepresentation: url) as? ARoutineRun
+//    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutineRun? {
+//        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutineRun
 //    }
 
 //    var wrappedName: String {
