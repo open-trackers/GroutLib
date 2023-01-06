@@ -11,7 +11,7 @@
 import CoreData
 
 /// Ensure all the records have archiveIDs
-/// Does NOT save context
+/// NOTE Does NOT save to context
 public func updateArchiveIDs(routines: [Routine]) {
     for routine in routines {
         if let _ = routine.archiveID { continue }
