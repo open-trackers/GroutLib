@@ -14,5 +14,22 @@ import CoreData
 import XCTest
 
 final class TransferToArchiveTests: TestBase {
-    func testRoutineKeepAt() throws {}
+    func testTransferRoutineRun() throws {
+        let uuid = UUID()
+        let startDate = Date.now
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid)
+        let _ = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
+        try testContext.save()
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertEqual(1, try ZRoutineRun.count(testContext))
+
+        try transferToArchive(testContext)
+        try testContext.save()
+
+        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertEqual(0, try ZRoutineRun.count(testContext))
+
+        // TODO: verify in archive
+    }
 }

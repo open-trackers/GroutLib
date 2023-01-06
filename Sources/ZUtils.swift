@@ -41,3 +41,6 @@ public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) 
     try context.deleter(entityName: "ZRoutine",
                         predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }
+
+/// NOTE Does NOT save to context
+public func transferToArchive(_: NSManagedObjectContext) throws {}
