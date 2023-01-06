@@ -13,25 +13,6 @@ import CoreData
 @testable import GroutLib
 import XCTest
 
-class TestCoreDataStack: NSObject {
-    lazy var persistentContainer: NSPersistentContainer = {
-        let modelName = "Grout"
-        let bundle = Bundle.module
-        let modelURL = bundle.url(forResource: modelName, withExtension: ".momd")!
-        let model = NSManagedObjectModel(contentsOf: modelURL)!
-        let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
-        let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
-        container.persistentStoreDescriptions = [description]
-        container.loadPersistentStores { _, error in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        }
-        return container
-    }()
-}
-
 class TestBase: XCTestCase {
     var testContainer: NSPersistentContainer!
     var testContext: NSManagedObjectContext!
@@ -39,7 +20,24 @@ class TestBase: XCTestCase {
     lazy var df = ISO8601DateFormatter()
 
     override func setUp() {
-        testContainer = TestCoreDataStack().persistentContainer
+        
+        testContainer = {
+            let modelName = PersistenceManager.modelName
+            let bundle = Bundle.module
+            let modelURL = bundle.url(forResource: modelName, withExtension: ".momd")!
+            let model = NSManagedObjectModel(contentsOf: modelURL)!
+            let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
+            let description = NSPersistentStoreDescription()
+            description.url = URL(fileURLWithPath: "/dev/null")
+            container.persistentStoreDescriptions = [description]
+            container.loadPersistentStores { _, error in
+                if let error = error as NSError? {
+                    fatalError("Unresolved error \(error), \(error.userInfo)")
+                }
+            }
+            return container
+        }()
+        
         testContext = testContainer.viewContext
     }
 

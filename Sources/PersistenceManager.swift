@@ -12,7 +12,7 @@ import CoreData
 import os
 
 public struct PersistenceManager {
-    let modelName = "Grout"
+    static let modelName = "Grout"
 
     public static let shared = PersistenceManager()
 
@@ -35,9 +35,9 @@ public struct PersistenceManager {
 
     public init(inMemory: Bool = false) {
         let bundle = Bundle.module
-        let modelURL = bundle.url(forResource: modelName, withExtension: ".momd")!
+        let modelURL = bundle.url(forResource: PersistenceManager.modelName, withExtension: ".momd")!
         let model = NSManagedObjectModel(contentsOf: modelURL)!
-        container = NSPersistentCloudKitContainer(name: modelName, managedObjectModel: model)
+        container = NSPersistentCloudKitContainer(name: PersistenceManager.modelName, managedObjectModel: model)
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
