@@ -46,9 +46,8 @@ public extension Routine {
             exercises.forEach { exercise in
                 exercise.lastCompletedAt = nil
             }
-        } catch {
-            let nserror = error as NSError
-            throw DataError.fetchError(msg: nserror.localizedDescription)
+        } catch let error as NSError {
+            throw DataError.fetchError(msg: error.localizedDescription)
         }
     }
 
@@ -152,9 +151,8 @@ public extension Routine {
                     return next.objectID
                 }
             }
-        } catch {
-            let nserror = error as NSError
-            throw DataError.fetchError(msg: nserror.localizedDescription)
+        } catch let error as NSError {
+            throw DataError.fetchError(msg: error.localizedDescription)
         }
 
         return nil

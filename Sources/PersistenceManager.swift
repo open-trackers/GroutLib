@@ -25,10 +25,8 @@ public struct PersistenceManager {
         let result = PersistenceManager(inMemory: true)
 //        do {
 //            try result.container.persistentStoreCoordinator.destroyPersistentStore(at: result.container.persistentStoreDescriptions.first!.url!, type: .sqlite, options: nil)
-//        } catch {
-//            if let error = error as NSError? {
-//                Self.logger.error("\(#function): preview, \(error) \(error.userInfo)")
-//            }
+//        } catch let error as NSError {
+//            Self.logger.error("\(#function): preview, \(error) \(error.userInfo)")
 //        }
         return result
     }()
@@ -50,18 +48,18 @@ public struct PersistenceManager {
 //          [1] = "PF_DEFAULT_CONFIGURATION_NAME"
 //        }
 
-        #if os(iOS)
-            if container.persistentStoreDescriptions.count < 2 {
-                print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
-                let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
-                let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
-                let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
-                archiveStoreDescription.configuration = "Archive"
-                archiveStoreDescription.isReadOnly = false
-                archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
-                container.persistentStoreDescriptions.append(archiveStoreDescription)
-            }
-        #endif
+//        #if os(iOS)
+//            if container.persistentStoreDescriptions.count < 2 {
+//                print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
+//                let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+//                let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
+//                let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
+//                archiveStoreDescription.configuration = "Archive"
+//                archiveStoreDescription.isReadOnly = false
+//                archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
+//                container.persistentStoreDescriptions.append(archiveStoreDescription)
+//            }
+//        #endif
 
         container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {
@@ -83,20 +81,44 @@ public struct PersistenceManager {
         container.viewContext.automaticallyMergesChangesFromParent = true
     }
 
+    /// Save context if changes pending, with optional force.
     public func save(forced: Bool = false) throws {
         let ctx = container.viewContext
         if forced || ctx.hasChanges {
-//            do {
             Self.logger.notice("\(#function) saving context, forced=\(forced)")
             try ctx.save()
-//            } catch {
-//                // Replace this implementation with code to handle the error appropriately.
-//                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//                if let error = error as NSError? {
-//                    Self.logger.error("\(#function): saving context, \(error) \(error.userInfo)")
-//                    fatalError("Unresolved error \(error), \(error.userInfo)")
-//                }
-//            }
         }
     }
 }
+
+
+//// For use with Xcode Previews, provides some data to work with for examples
+//static var preview: StorageProvider = {
+//
+//    // Create an instance of the provider that runs in memory only
+//    let storageProvider = StorageProvider(inMemory: true)
+//
+//    // Add a few test movies
+//    let titles = [
+//                "The Godfather",
+//                "The Shawshank Redemption",
+//                "Schindler's List",
+//                "Raging Bull",
+//                "Casablanca",
+//                "Citizen Kane",
+//                ]
+//
+//    for title in titles {
+//        storageProvider.saveMovie(named: title)
+//    }
+//
+//    // Now save these movies in the Core Data store
+//    do {
+//        try storageProvider.persistentContainer.viewContext.save()
+//    } catch {
+//        // Something went wrong 😭
+//        print("Failed to save test movies: \(error)")
+//    }
+//
+//    return storageProvider
+//}()

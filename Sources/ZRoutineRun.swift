@@ -20,19 +20,11 @@ public extension ZRoutineRun {
         return nu
     }
 
-//    static func get(_ context: NSManagedObjectContext, forArchiveID archiveID: UUID) throws -> ZRoutineRun? {
-//        let req = NSFetchRequest<ZRoutineRun>(entityName: "ZRoutineRun")
-//        req.predicate = NSPredicate(format: "routineArchiveID = %@", archiveID.uuidString)
-//        req.returnsObjectsAsFaults = false
-//
-//        do {
-//            let ZRoutineRuns = try context.fetch(req) as [ZRoutineRun]
-//            return ZRoutineRuns.first
-//        } catch {
-//            let nserror = error as NSError
-//            throw DataError.fetchError(msg: nserror.localizedDescription)
-//        }
-//    }
+    static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {
+        let req = NSFetchRequest<NSFetchRequestResult>(entityName: "ZRoutineRun")
+        if let predicate { req.predicate = predicate }
+        return try context.count(for: req)
+    }
 
 //    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutineRun? {
 //        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutineRun

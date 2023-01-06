@@ -11,16 +11,18 @@
 import CoreData
 
 
+/// Delete all `Z` records prior to a specified date.
 public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
     
-    let req = NSFetchRequest<ZRoutineRun>(entityName: "ZRoutineRun")
-    req.predicate = NSPredicate(format: "startedAt < %@", keepSince as NSDate)
+    try context.deleter(entityName: "ZExerciseRun",
+                        predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
 
-    do {
-        let rr: [ZRoutineRun] = try context.fetch(req) as [ZRoutineRun]
-        rr.forEach { context.delete($0) }
-    } catch {
-        let nserror = error as NSError
-        throw DataError.fetchError(msg: nserror.localizedDescription)
-    }
+    try context.deleter(entityName: "ZExercise",
+                        predicate: NSPredicate(format: "zExerciseRuns.@count == 0"))
+
+    try context.deleter(entityName: "ZRoutineRun",
+                        predicate: NSPredicate(format: "startedAt < %@", keepSince as NSDate))
+
+    try context.deleter(entityName: "ZRoutine",
+                        predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }
