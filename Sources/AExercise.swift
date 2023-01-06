@@ -32,6 +32,18 @@ public extension AExercise {
         }
     }
 
+    static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, archiveID: UUID, name: String) -> AExercise {
+        
+        if let aexercise = try? AExercise.get(context, forArchiveID: archiveID) {
+            print(">>>> FOUND EXISTING AEXERCISE")
+            // found existing aexercise
+            return aexercise
+        } else {
+            print(">>>> CREATING NEW AEXERCISE")
+            return AExercise.create(context, aroutine: aroutine, name: name, archiveID: archiveID)
+        }
+    }
+
 //    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ARoutine? {
 //        NSManagedObject.get(context, forURIRepresentation: url) as? ARoutine
 //    }

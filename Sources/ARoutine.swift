@@ -31,6 +31,18 @@ public extension ARoutine {
         }
     }
 
+    static func getOrCreate(_ context: NSManagedObjectContext, archiveID: UUID, name: String) -> ARoutine {
+        
+        if let aroutine = try? ARoutine.get(context, forArchiveID: archiveID) {
+            print(">>>> FOUND EXISTING AROUTINE")
+            // found existing routine
+            return aroutine
+        } else {
+            print(">>>> CREATING NEW AROUTINE")
+            return ARoutine.create(context, name: name, archiveID: archiveID)
+        }
+    }
+
 //    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ARoutine? {
 //        NSManagedObject.get(context, forURIRepresentation: url) as? ARoutine
 //    }
