@@ -20,6 +20,7 @@ class TestBase: XCTestCase {
     lazy var df = ISO8601DateFormatter()
 
     override func setUpWithError() throws {
+        try super.setUpWithError()
         testContainer = try PersistenceManager.getTestContainer()
         testContext = testContainer.viewContext
     }

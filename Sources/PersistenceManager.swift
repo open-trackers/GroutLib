@@ -16,28 +16,15 @@ public struct PersistenceManager {
 
     public static let shared = PersistenceManager()
 
-    public static let logger = Logger(
+    static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
         category: String(describing: PersistenceManager.self)
     )
 
-    public static var preview: PersistenceManager = {
-        let result = PersistenceManager(inMemory: true)
-//        do {
-//            try result.container.persistentStoreCoordinator.destroyPersistentStore(at: result.container.persistentStoreDescriptions.first!.url!, type: .sqlite, options: nil)
-//        } catch {
-//            Self.logger.error("\(#function): preview, \(error) \(error.userInfo)")
-//        }
-        return result
-    }()
-
     public let container: NSPersistentCloudKitContainer
 
     public init(inMemory: Bool = false) {
-        let bundle = Bundle.module
-        let modelURL = bundle.url(forResource: PersistenceManager.modelName, withExtension: ".momd")!
-        let model = NSManagedObjectModel(contentsOf: modelURL)!
-        container = NSPersistentCloudKitContainer(name: PersistenceManager.modelName, managedObjectModel: model)
+        container = NSPersistentCloudKitContainer(name: PersistenceManager.modelName, managedObjectModel: PersistenceManager.model)
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
@@ -48,18 +35,11 @@ public struct PersistenceManager {
 //          [1] = "PF_DEFAULT_CONFIGURATION_NAME"
 //        }
 
-//        #if os(iOS)
-//            if container.persistentStoreDescriptions.count < 2 {
-//                print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
-//                let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
-//                let archiveStoreURL = defaultDirectoryURL.appendingPathComponent("GroutArchive.sqlite")
-//                let archiveStoreDescription = NSPersistentStoreDescription(url: archiveStoreURL)
-//                archiveStoreDescription.configuration = "Archive"
-//                archiveStoreDescription.isReadOnly = false
-//                archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
-//                container.persistentStoreDescriptions.append(archiveStoreDescription)
-//            }
-//        #endif
+        if container.persistentStoreDescriptions.count < 2 {
+            print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
+            let archiveDescription = PersistenceManager.getArchiveStoreDescription(isCloud: true, isTest: false)
+            container.persistentStoreDescriptions.append(archiveDescription)
+        }
 
         container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {
@@ -90,30 +70,60 @@ public struct PersistenceManager {
         }
     }
 
+    static var model: NSManagedObjectModel {
+        let bundle = Bundle.module
+        let modelURL = bundle.url(forResource: PersistenceManager.modelName, withExtension: ".momd")!
+        return NSManagedObjectModel(contentsOf: modelURL)!
+    }
+
+    // TODO: rethink this
+    public static var preview: PersistenceManager = .init(inMemory: true)
+
+    static func getDefaultStoreDescription(isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
+        getStoreDescription(configurationName: nil, isCloud: isCloud, isTest: isTest)
+    }
+
+    static func getArchiveStoreDescription(isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
+        getStoreDescription(configurationName: "Archive", isCloud: isCloud, isTest: isTest)
+    }
+
+    // specific nil configurationName for default configuration
+    static func getStoreDescription(configurationName: String?, isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
+        let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+        let fileName = "\(isTest ? "Test" : "")Grout\(configurationName ?? "")"
+        let archiveStoreURL = defaultDirectoryURL.appendingPathComponent(fileName).appendingPathExtension("sqlite")
+        let desc = NSPersistentStoreDescription(url: archiveStoreURL)
+
+        desc.configuration = configurationName // nil for default
+//        desc.isReadOnly = false
+//        desc.type = NSSQLiteStoreType
+//        desc.shouldInferMappingModelAutomatically = true
+//        desc.shouldMigrateStoreAutomatically = true
+//        desc.shouldAddStoreAsynchronously = false
+//        desc.setOption(true as NSNumber, forKey: NSSQLiteAnalyzeOption)
+//        desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        if isCloud {
+            let suffix: String = {
+                guard let name = configurationName else { return "" }
+                return ".\(name.lowercased())"
+            }()
+            let identifier = "iCloud.org.openalloc.grout\(suffix)"
+            desc.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: identifier)
+        }
+        return desc
+    }
+
     static func getTestContainer() throws -> NSPersistentContainer {
         // NOTE: not using inMemory storage, for two reasons:
         // (1) We're using two stores, where /dev/null may not be usable for both
         // (2) Batch delete may not be supported for inMemory
 
-        let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
-        let defaultURL = defaultDirectoryURL.appendingPathComponent("TestGrout.sqlite")
-        let archiveURL = defaultDirectoryURL.appendingPathComponent("TestGroutArchive.sqlite")
+        let container = NSPersistentContainer(name: PersistenceManager.modelName, managedObjectModel: model)
 
-        let modelName = PersistenceManager.modelName
-        let bundle = Bundle.module
-        let modelURL = bundle.url(forResource: modelName, withExtension: ".momd")!
-        let model = NSManagedObjectModel(contentsOf: modelURL)!
-
-        let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
-
-        let defaultDescription = NSPersistentStoreDescription()
-        defaultDescription.url = defaultURL
-
-        let archiveDescription = NSPersistentStoreDescription()
-        archiveDescription.url = archiveURL
-        archiveDescription.configuration = "Archive"
-
-        container.persistentStoreDescriptions = [defaultDescription, archiveDescription]
+        container.persistentStoreDescriptions = [
+            getDefaultStoreDescription(isCloud: false, isTest: true),
+            getArchiveStoreDescription(isCloud: false, isTest: true),
+        ]
 
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
@@ -122,44 +132,11 @@ public struct PersistenceManager {
         }
 
         // clear all data that persisted from earlier tests
-        try container.viewContext.deleter(entityName: "Exercise")
-        try container.viewContext.deleter(entityName: "Routine")
-        try container.viewContext.deleter(entityName: "ZExercise")
-        try container.viewContext.deleter(entityName: "ZRoutine")
-        try container.viewContext.deleter(entityName: "ZExerciseRun")
-        try container.viewContext.deleter(entityName: "ZRoutineRun")
+        try container.managedObjectModel.entities.forEach {
+            guard let name = $0.name else { return }
+            try container.viewContext.deleter(entityName: name)
+        }
 
         return container
     }
 }
-
-//// For use with Xcode Previews, provides some data to work with for examples
-// static var preview: StorageProvider = {
-//
-//    // Create an instance of the provider that runs in memory only
-//    let storageProvider = StorageProvider(inMemory: true)
-//
-//    // Add a few test movies
-//    let titles = [
-//                "The Godfather",
-//                "The Shawshank Redemption",
-//                "Schindler's List",
-//                "Raging Bull",
-//                "Casablanca",
-//                "Citizen Kane",
-//                ]
-//
-//    for title in titles {
-//        storageProvider.saveMovie(named: title)
-//    }
-//
-//    // Now save these movies in the Core Data store
-//    do {
-//        try storageProvider.persistentContainer.viewContext.save()
-//    } catch {
-//        // Something went wrong 😭
-//        print("Failed to save test movies: \(error)")
-//    }
-//
-//    return storageProvider
-// }()
