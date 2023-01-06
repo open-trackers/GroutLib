@@ -81,8 +81,14 @@ public extension Exercise {
         let intensity = lastIntensity
         let completedAt = now
 
+        guard let routineArchiveID = routine?.archiveID
+        else {
+            print("\(#function): missing routine archive id")
+            return
+        }
+
         // archive the run for charting
-        try logRun(context, completedAt: completedAt, intensity: intensity)
+        try logRun(context, routineArchiveID: routineArchiveID, completedAt: completedAt, intensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -95,19 +101,19 @@ public extension Exercise {
 extension Exercise {
     /// log the run of the exercise to the archive
     /// NOTE: does not save context
-    func logRun(_ context: NSManagedObjectContext, completedAt: Date, intensity: Float) throws {
+    func logRun(_ context: NSManagedObjectContext, routineArchiveID: UUID, completedAt: Date, intensity: Float) throws {
         if archiveID == nil {
             archiveID = UUID()
         }
 
-        let aroutine = try ARoutine.getOrCreate(context, archiveID: archiveID!, name: wrappedName)
+        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName)
 
-        let aexercise = try AExercise.getOrCreate(context, aroutine: aroutine, archiveID: archiveID!, name: wrappedName)
+        let aexercise = try AExercise.getOrCreate(context, aroutine: aroutine, exerciseArchiveID: archiveID!, exerciseName: wrappedName)
 
         _ = AExerciseRun.create(context,
                                 aexercise: aexercise,
                                 completedAt: completedAt,
                                 intensity: intensity)
-        print("\(#function) >>>>> Created AExerciseRun")
+        print("\(#function): >>>>> Created AExerciseRun")
     }
 }

@@ -163,7 +163,7 @@ extension Routine {
             archiveID = UUID()
         }
 
-        let aroutine = try ARoutine.getOrCreate(context, archiveID: archiveID!, name: wrappedName)
+        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: archiveID!, routineName: wrappedName)
 
         _ = ARoutineRun.create(context,
                                aroutine: aroutine,

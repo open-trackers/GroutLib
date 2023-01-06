@@ -18,9 +18,9 @@ public extension AExercise {
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forArchiveID archiveID: UUID) throws -> AExercise? {
+    static func get(_ context: NSManagedObjectContext, forArchiveID exerciseArchiveID: UUID) throws -> AExercise? {
         let req = NSFetchRequest<AExercise>(entityName: "AExercise")
-        req.predicate = NSPredicate(format: "exerciseArchiveID = %@", archiveID.uuidString)
+        req.predicate = NSPredicate(format: "exerciseArchiveID = %@", exerciseArchiveID.uuidString)
         req.returnsObjectsAsFaults = false
 
         do {
@@ -32,14 +32,14 @@ public extension AExercise {
         }
     }
 
-    static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, archiveID: UUID, name: String) throws -> AExercise {
-        if let aexercise = try AExercise.get(context, forArchiveID: archiveID) {
+    static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, exerciseArchiveID: UUID, exerciseName: String) throws -> AExercise {
+        if let aexercise = try AExercise.get(context, forArchiveID: exerciseArchiveID) {
             print(">>>> FOUND EXISTING AEXERCISE")
             // found existing aexercise
             return aexercise
         } else {
             print(">>>> CREATING NEW AEXERCISE")
-            return AExercise.create(context, aroutine: aroutine, name: name, archiveID: archiveID)
+            return AExercise.create(context, aroutine: aroutine, name: exerciseName, archiveID: exerciseArchiveID)
         }
     }
 

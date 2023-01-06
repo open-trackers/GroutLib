@@ -17,9 +17,9 @@ public extension ARoutine {
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forArchiveID archiveID: UUID) throws -> ARoutine? {
+    static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID) throws -> ARoutine? {
         let req = NSFetchRequest<ARoutine>(entityName: "ARoutine")
-        req.predicate = NSPredicate(format: "routineArchiveID = %@", archiveID.uuidString)
+        req.predicate = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
         req.returnsObjectsAsFaults = false
 
         do {
@@ -31,14 +31,14 @@ public extension ARoutine {
         }
     }
 
-    static func getOrCreate(_ context: NSManagedObjectContext, archiveID: UUID, name: String) throws -> ARoutine {
-        if let aroutine = try ARoutine.get(context, forArchiveID: archiveID) {
+    static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String) throws -> ARoutine {
+        if let aroutine = try ARoutine.get(context, forArchiveID: routineArchiveID) {
             print(">>>> FOUND EXISTING AROUTINE")
             // found existing routine
             return aroutine
         } else {
             print(">>>> CREATING NEW AROUTINE")
-            return ARoutine.create(context, name: name, archiveID: archiveID)
+            return ARoutine.create(context, name: routineName, archiveID: routineArchiveID)
         }
     }
 
