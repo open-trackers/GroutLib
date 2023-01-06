@@ -8,7 +8,7 @@
 import CoreData
 
 /// Archive representation of a Exercise record
-public extension AExercise {
+extension AExercise {
     // NOTE: does NOT save to context
     static func create(_ context: NSManagedObjectContext, aroutine: ARoutine, name: String, archiveID: UUID) -> AExercise {
         let nu = AExercise(context: context)
@@ -32,6 +32,7 @@ public extension AExercise {
         }
     }
 
+    // NOTE: does NOT save to context
     static func getOrCreate(_ context: NSManagedObjectContext, aroutine: ARoutine, exerciseArchiveID: UUID, exerciseName: String) throws -> AExercise {
         if let aexercise = try AExercise.get(context, forArchiveID: exerciseArchiveID) {
             print(">>>> FOUND EXISTING AEXERCISE")

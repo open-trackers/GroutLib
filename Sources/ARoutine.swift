@@ -8,7 +8,7 @@
 import CoreData
 
 /// Archive representation of a Routine record
-public extension ARoutine {
+extension ARoutine {
     // NOTE: does NOT save to context
     static func create(_ context: NSManagedObjectContext, name: String, archiveID: UUID) -> ARoutine {
         let nu = ARoutine(context: context)
@@ -31,6 +31,7 @@ public extension ARoutine {
         }
     }
 
+    // NOTE: does NOT save to context
     static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String) throws -> ARoutine {
         if let aroutine = try ARoutine.get(context, forArchiveID: routineArchiveID) {
             print(">>>> FOUND EXISTING AROUTINE")

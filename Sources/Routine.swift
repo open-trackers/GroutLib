@@ -73,8 +73,8 @@ public extension Routine {
 
         // archive the run for charting
         try Routine.logRun(context,
-                           routineArchiveID: archiveID!,
-                           routineName: wrappedName,
+                           archiveID: archiveID!,
+                           name: wrappedName,
                            startedAt: startedAt,
                            duration: duration)
 
@@ -165,12 +165,12 @@ extension Routine {
     /// log the run of the routine to the archive
     /// NOTE: does not save context
     static func logRun(_ context: NSManagedObjectContext,
-                       routineArchiveID: UUID,
-                       routineName: String,
+                       archiveID: UUID,
+                       name: String,
                        startedAt: Date,
                        duration: TimeInterval) throws
     {
-        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
+        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name)
 
         _ = ARoutineRun.create(context,
                                aroutine: aroutine,

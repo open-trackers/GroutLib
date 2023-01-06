@@ -126,6 +126,5 @@ extension Exercise {
                                 aexercise: aexercise,
                                 completedAt: completedAt,
                                 intensity: intensity)
-        print("\(#function): >>>>> Created AExerciseRun")
     }
 }
