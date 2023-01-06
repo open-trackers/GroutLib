@@ -101,4 +101,6 @@ final class ZUtilsTests: TestBase {
         XCTAssertNil(try ZExercise.get(testContext, forArchiveID: eUUID))
         XCTAssertEqual(0, try ZExerciseRun.count(testContext))
     }
+
+    func testTransferToArchive() throws {}
 }

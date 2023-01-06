@@ -54,9 +54,9 @@ public extension NSManagedObjectContext {
         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
     }
 
-    func deleter(entityName: String, predicate: NSPredicate) throws {
+    func deleter(entityName: String, predicate: NSPredicate? = nil) throws {
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-        req.predicate = predicate
+        if let predicate { req.predicate = predicate }
         let breq = NSBatchDeleteRequest(fetchRequest: req)
         try executeAndMergeChanges(using: breq)
     }
