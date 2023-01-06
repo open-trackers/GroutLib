@@ -43,6 +43,5 @@ class TestBase: XCTestCase {
         testContext = testContainer.viewContext
     }
 
-    override func tearDown() {
-    }
+    override func tearDown() {}
 }

@@ -91,9 +91,8 @@ public struct PersistenceManager {
     }
 }
 
-
 //// For use with Xcode Previews, provides some data to work with for examples
-//static var preview: StorageProvider = {
+// static var preview: StorageProvider = {
 //
 //    // Create an instance of the provider that runs in memory only
 //    let storageProvider = StorageProvider(inMemory: true)
@@ -121,4 +120,4 @@ public struct PersistenceManager {
 //    }
 //
 //    return storageProvider
-//}()
+// }()

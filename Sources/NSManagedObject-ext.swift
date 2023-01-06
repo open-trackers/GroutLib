@@ -42,19 +42,19 @@ public extension NSManagedObject {
     }
 }
 
-extension NSManagedObjectContext {
+public extension NSManagedObjectContext {
     // via avanderlee
     /// Executes the given `NSBatchDeleteRequest` and directly merges the changes to bring the given managed object context up to date.
-    public func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
+    func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
         batchDeleteRequest.resultType = .resultTypeObjectIDs
         let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
         let changes: [AnyHashable: Any] = [
-            NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? []
+            NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? [],
         ]
         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
     }
-    
-    public func deleter(entityName: String, predicate: NSPredicate) throws {
+
+    func deleter(entityName: String, predicate: NSPredicate) throws {
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         req.predicate = predicate
         let breq = NSBatchDeleteRequest(fetchRequest: req)

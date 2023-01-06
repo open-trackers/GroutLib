@@ -19,11 +19,10 @@ extension ZExerciseRun {
         nu.intensity = intensity
         return nu
     }
-    
+
     static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: "ZExerciseRun")
         if let predicate { req.predicate = predicate }
         return try context.count(for: req)
     }
-
 }

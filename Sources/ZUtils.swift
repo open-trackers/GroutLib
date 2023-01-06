@@ -10,10 +10,8 @@
 
 import CoreData
 
-
 /// Delete all `Z` records prior to a specified date.
 public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
-    
     try context.deleter(entityName: "ZExerciseRun",
                         predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
 
