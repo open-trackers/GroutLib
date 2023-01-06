@@ -81,14 +81,23 @@ public extension Exercise {
         let intensity = lastIntensity
         let completedAt = now
 
-        guard let routineArchiveID = routine?.archiveID
+        guard let routineArchiveID = routine?.archiveID,
+              let routineName = routine?.name
         else {
-            print("\(#function): missing routine archive id")
+            print("\(#function): missing routine details")
             return
         }
 
+        if archiveID == nil { archiveID = UUID() }
+
         // archive the run for charting
-        try logRun(context, routineArchiveID: routineArchiveID, completedAt: completedAt, intensity: intensity)
+        try Exercise.logRun(context,
+                            routineArchiveID: routineArchiveID,
+                            routineName: routineName,
+                            exerciseArchiveID: archiveID!,
+                            exerciseName: wrappedName,
+                            completedAt: completedAt,
+                            intensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -101,14 +110,17 @@ public extension Exercise {
 extension Exercise {
     /// log the run of the exercise to the archive
     /// NOTE: does not save context
-    func logRun(_ context: NSManagedObjectContext, routineArchiveID: UUID, completedAt: Date, intensity: Float) throws {
-        if archiveID == nil {
-            archiveID = UUID()
-        }
+    static func logRun(_ context: NSManagedObjectContext,
+                       routineArchiveID: UUID,
+                       routineName: String,
+                       exerciseArchiveID: UUID,
+                       exerciseName: String,
+                       completedAt: Date,
+                       intensity: Float) throws
+    {
+        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
 
-        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName)
-
-        let aexercise = try AExercise.getOrCreate(context, aroutine: aroutine, exerciseArchiveID: archiveID!, exerciseName: wrappedName)
+        let aexercise = try AExercise.getOrCreate(context, aroutine: aroutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName)
 
         _ = AExerciseRun.create(context,
                                 aexercise: aexercise,

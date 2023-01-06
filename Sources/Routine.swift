@@ -69,8 +69,14 @@ public extension Routine {
 
         let duration = now.timeIntervalSince(startedAt)
 
+        if archiveID == nil { archiveID = UUID() }
+
         // archive the run for charting
-        try logRun(context, startedAt: startedAt, duration: duration)
+        try Routine.logRun(context,
+                           routineArchiveID: archiveID!,
+                           routineName: wrappedName,
+                           startedAt: startedAt,
+                           duration: duration)
 
         // update the attributes with fresh data
         lastStartedAt = startedAt
@@ -158,17 +164,17 @@ public extension Routine {
 extension Routine {
     /// log the run of the routine to the archive
     /// NOTE: does not save context
-    func logRun(_ context: NSManagedObjectContext, startedAt: Date, duration: TimeInterval) throws {
-        if archiveID == nil {
-            archiveID = UUID()
-        }
-
-        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: archiveID!, routineName: wrappedName)
+    static func logRun(_ context: NSManagedObjectContext,
+                       routineArchiveID: UUID,
+                       routineName: String,
+                       startedAt: Date,
+                       duration: TimeInterval) throws
+    {
+        let aroutine = try ARoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
 
         _ = ARoutineRun.create(context,
                                aroutine: aroutine,
                                startedAt: startedAt,
                                duration: duration)
-        print("\(#function) Created ARoutineRun")
     }
 }
