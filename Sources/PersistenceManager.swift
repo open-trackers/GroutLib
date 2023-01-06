@@ -25,7 +25,7 @@ public struct PersistenceManager {
         let result = PersistenceManager(inMemory: true)
 //        do {
 //            try result.container.persistentStoreCoordinator.destroyPersistentStore(at: result.container.persistentStoreDescriptions.first!.url!, type: .sqlite, options: nil)
-//        } catch let error as NSError {
+//        } catch {
 //            Self.logger.error("\(#function): preview, \(error) \(error.userInfo)")
 //        }
         return result

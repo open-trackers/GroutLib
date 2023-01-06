@@ -28,7 +28,7 @@ extension ZRoutine {
         do {
             let results = try context.fetch(req) as [ZRoutine]
             return results.first
-        } catch let error as NSError {
+        } catch {
             throw DataError.fetchError(msg: error.localizedDescription)
         }
     }

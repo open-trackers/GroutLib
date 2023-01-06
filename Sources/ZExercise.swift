@@ -29,7 +29,7 @@ extension ZExercise {
         do {
             let results = try context.fetch(req) as [ZExercise]
             return results.first
-        } catch let error as NSError {
+        } catch {
             throw DataError.fetchError(msg: error.localizedDescription)
         }
     }
