@@ -62,7 +62,7 @@ public extension Routine {
 
     // Returns true if routine is updated.
     // NOTE: does NOT save context
-    func stop(startedAt: Date, now: Date = Date.now) -> Bool {
+    func stop(_ context: NSManagedObjectContext, startedAt: Date, now: Date = Date.now) -> Bool {
         guard anyExerciseCompleted,
               startedAt < now
         else { return false }
@@ -70,7 +70,7 @@ public extension Routine {
         let duration = now.timeIntervalSince(startedAt)
 
         // archive the run for charting
-        logRun(startedAt: startedAt, duration: duration)
+        logRun(context, startedAt: startedAt, duration: duration)
 
         // update the attributes with fresh data
         lastStartedAt = startedAt
@@ -158,34 +158,33 @@ public extension Routine {
 extension Routine {
     /// log the run of the routine to the archive
     /// NOTE: does not save context
-    func logRun(startedAt: Date, duration: TimeInterval) {
-        guard let moc = managedObjectContext,
-              let aroutine = getOrCreateARoutine(moc)
+    func logRun(_ context: NSManagedObjectContext, startedAt: Date, duration: TimeInterval) {
+        guard let aroutine = getOrCreateARoutine(context)
         else {
             print("ERROR: could not log routine run to archive")
             return
         }
 
-        _ = ARoutineRun.create(moc,
+        _ = ARoutineRun.create(context,
                                aroutine: aroutine,
                                startedAt: startedAt,
                                duration: duration)
         print(">>>>> Created ARoutineRun")
     }
 
-    func getOrCreateARoutine(_ moc: NSManagedObjectContext) -> ARoutine? {
+    func getOrCreateARoutine(_ context: NSManagedObjectContext) -> ARoutine? {
         if archiveID == nil {
             archiveID = UUID()
         }
 
         if let archiveID {
-            if let aroutine = try? ARoutine.get(moc, forArchiveID: archiveID) {
+            if let aroutine = try? ARoutine.get(context, forArchiveID: archiveID) {
                 print(">>>> FOUND EXISTING AROUTINE")
                 // found existing routine
                 return aroutine
             } else {
                 print(">>>> CREATING NEW AROUTINE")
-                return ARoutine.create(moc, name: wrappedName, archiveID: archiveID)
+                return ARoutine.create(context, name: wrappedName, archiveID: archiveID)
             }
         }
         return nil

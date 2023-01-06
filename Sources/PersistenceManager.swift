@@ -50,6 +50,7 @@ public struct PersistenceManager {
 //          [1] = "PF_DEFAULT_CONFIGURATION_NAME"
 //        }
 
+        #if os(iOS)
         if container.persistentStoreDescriptions.count < 2 {
             print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
             let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
@@ -60,6 +61,7 @@ public struct PersistenceManager {
             archiveStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.org.openalloc.grout.archive")
             container.persistentStoreDescriptions.append(archiveStoreDescription)
         }
+        #endif
 
         container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {

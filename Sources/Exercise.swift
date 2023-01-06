@@ -77,12 +77,12 @@ public extension Exercise {
     }
 
     // NOTE: does NOT save context
-    func markDone(withAdvance: Bool, now: Date = Date.now) {
+    func markDone(_ context: NSManagedObjectContext, withAdvance: Bool, now: Date = Date.now) {
         let intensity = lastIntensity
         let completedAt = now
 
         // archive the run for charting
-        logRun(completedAt: completedAt, intensity: intensity)
+        logRun(context, completedAt: completedAt, intensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -95,16 +95,15 @@ public extension Exercise {
 extension Exercise {
     /// log the run of the exercise to the archive
     /// NOTE: does not save context
-    func logRun(completedAt: Date, intensity: Float) {
-        guard let moc = managedObjectContext,
-              let aroutine = routine?.getOrCreateARoutine(moc),
-              let aexercise = getOrCreateAExercise(moc, aroutine: aroutine)
+    func logRun(_ context: NSManagedObjectContext, completedAt: Date, intensity: Float) {
+        guard let aroutine = routine?.getOrCreateARoutine(context),
+              let aexercise = getOrCreateAExercise(context, aroutine: aroutine)
         else {
             print("ERROR: could not log exercise run to archive")
             return
         }
 
-        _ = AExerciseRun.create(moc,
+        _ = AExerciseRun.create(context,
                                 aexercise: aexercise,
                                 completedAt: completedAt,
                                 intensity: intensity)
