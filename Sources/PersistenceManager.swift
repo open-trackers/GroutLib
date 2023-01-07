@@ -114,7 +114,8 @@ public struct PersistenceManager {
                 guard let name = configurationName else { return "" }
                 return ".\(name.lowercased())"
             }()
-            let identifier = "iCloud.org.openalloc.grout\(suffix)"
+            let prefix = "iCloud.org.openalloc.grout"
+            let identifier = "\(prefix)\(suffix)"
             desc.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: identifier)
         }
         return desc
