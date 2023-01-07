@@ -11,13 +11,23 @@
 import CoreData
 
 public extension ZRoutineRun {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: Double) -> ZRoutineRun {
         let nu = ZRoutineRun(context: context)
         nu.zRoutine = zRoutine
         nu.startedAt = startedAt
         nu.duration = duration
         return nu
+    }
+
+    /// Shallow copy of self to specified store.
+    /// Does not delete self.
+    /// Does NOT save context.
+    func copy(_ context: NSManagedObjectContext, nuRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws {
+        guard let startedAt
+        else { throw DataError.moveError(msg: "missing startedAt") }
+        let nu = ZRoutineRun.create(context, zRoutine: nuRoutine, startedAt: startedAt, duration: duration)
+        context.assign(nu, to: nuStore)
     }
 
     static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {

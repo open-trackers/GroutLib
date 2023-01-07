@@ -16,7 +16,7 @@ public class Exercise: NSManagedObject {}
 extension Exercise: UserOrdered {}
 
 public extension Exercise {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Exercise {
         let nu = Exercise(context: context)
         nu.userOrder = userOrder

@@ -16,7 +16,7 @@ public class Routine: NSManagedObject {}
 extension Routine: UserOrdered {}
 
 public extension Routine {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Routine {
         let nu = Routine(context: context)
         nu.userOrder = userOrder
@@ -36,7 +36,7 @@ public extension Routine {
 }
 
 public extension Routine {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     internal func clearCompletions(_ context: NSManagedObjectContext) throws {
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.predicate = NSPredicate(format: "routine = %@", self)

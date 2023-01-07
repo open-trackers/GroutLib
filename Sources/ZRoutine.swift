@@ -12,12 +12,22 @@ import CoreData
 
 /// Archive representation of a Routine record
 extension ZRoutine {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID) -> ZRoutine {
         let nu = ZRoutine(context: context)
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
         return nu
+    }
+    
+    /// Shallow copy of self to specified store.
+    /// Does not delete self.
+    /// Does NOT save context.
+    func copy(_ context: NSManagedObjectContext, toStore nuStore: NSPersistentStore) throws {
+        guard let routineArchiveID
+        else { throw DataError.moveError(msg: "missing routineArchiveID") }
+        let nu = ZRoutine.create(context, routineName: wrappedName, routineArchiveID: routineArchiveID)
+        context.assign(nu, to: nuStore)
     }
 
     static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID) throws -> ZRoutine? {
@@ -33,7 +43,7 @@ extension ZRoutine {
         }
     }
 
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String) throws -> ZRoutine {
         if let zRoutine = try ZRoutine.get(context, forArchiveID: routineArchiveID) {
             // found existing routine

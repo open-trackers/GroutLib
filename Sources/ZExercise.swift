@@ -12,13 +12,23 @@ import CoreData
 
 /// Archive representation of a Exercise record
 extension ZExercise {
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseName: String, exerciseArchiveID: UUID) -> ZExercise {
         let nu = ZExercise(context: context)
         nu.name = exerciseName
         nu.exerciseArchiveID = exerciseArchiveID
         nu.zRoutine = zRoutine
         return nu
+    }
+    
+    /// Shallow copy of self to specified store.
+    /// Does not delete self.
+    /// Does NOT save context.
+    func copy(_ context: NSManagedObjectContext, nuRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws {
+        guard let exerciseArchiveID
+        else { throw DataError.moveError(msg: "missing exerciseArchiveID") }
+        let nu = ZExercise.create(context, zRoutine: nuRoutine, exerciseName: wrappedName, exerciseArchiveID: exerciseArchiveID)
+        context.assign(nu, to: nuStore)
     }
 
     static func get(_ context: NSManagedObjectContext, forArchiveID exerciseArchiveID: UUID) throws -> ZExercise? {
@@ -34,7 +44,7 @@ extension ZExercise {
         }
     }
 
-    // NOTE: does NOT save to context
+    // NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseArchiveID: UUID, exerciseName: String) throws -> ZExercise {
         if let zExercise = try ZExercise.get(context, forArchiveID: exerciseArchiveID) {
             // found existing zExercise

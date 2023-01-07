@@ -11,7 +11,7 @@
 import CoreData
 
 /// Ensure all the records have archiveIDs
-/// NOTE Does NOT save to context
+/// NOTE Does NOT save context
 public func updateArchiveIDs(routines: [Routine]) {
     for routine in routines {
         if let _ = routine.archiveID { continue }
@@ -27,7 +27,7 @@ public func updateArchiveIDs(routines: [Routine]) {
 }
 
 /// Delete all `Z` records prior to a specified date.
-/// NOTE Does NOT save to context
+/// NOTE Does NOT save context
 public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
     try context.deleter(entityName: "ZExerciseRun",
                         predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
@@ -42,10 +42,10 @@ public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) 
                         predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }
 
-/// NOTE Does NOT save to context
+/// NOTE Does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext) throws {
     // search through each Z record on MAIN store
-    // clone to ARCHIVE, using context.assign
+    // clone to ARCHIVE, using object create and context.assign
 
     // identifier "568DF589-04FE-4B1B-A5AE-61BEE2EFB2EB"
     // URL  "file:///Users/reede/Library/Application%20Support/xctest/TestGroutArchive.sqlite"
@@ -59,19 +59,34 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
         throw DataError.fetchError(msg: "Archive store not found")
     }
 
-    let req = NSFetchRequest<ZExercise>(entityName: "ZExercise")
+    var recordsToDelete = [NSManagedObjectID]()
+    
+    let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
     req.affectedStores = [mainStore]
-    // req.predicate = NSPredicate(format: "routine = %@", self)
-
     do {
-        let results: [ZExercise] = try context.fetch(req) as [ZExercise]
-        results.forEach {
-            // TODO: deletion before?
-            context.assign($0, to: archiveStore) // Specifies the store in which a newly inserted object will be saved.
-            // TODO: is deletion needed here too?
-            // TODO: do the Z.create methods need to explicitly assign to the correct store?
+        let results: [ZRoutine] = try context.fetch(req) as [ZRoutine]
+        try results.forEach {
+            try $0.copy(context, toStore: archiveStore)
+            recordsToDelete.append($0.objectID)
         }
     } catch {
         throw DataError.fetchError(msg: error.localizedDescription)
     }
+    
+    let req2 = NSFetchRequest<ZExercise>(entityName: "ZExercise")
+    req2.affectedStores = [mainStore]
+    do {
+        let results: [ZExercise] = try context.fetch(req2) as [ZExercise]
+        try results.forEach {
+            
+            let nuRoutine = ZRoutine(context: context)  //TODO search for existing, and abort if missing
+            
+            try $0.copy(context, nuRoutine: nuRoutine, toStore: archiveStore)
+            recordsToDelete.append($0.objectID)
+        }
+    } catch {
+        throw DataError.fetchError(msg: error.localizedDescription)
+    }
+    
+    //TODO batch delete of recordsToDelete
 }

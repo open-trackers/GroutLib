@@ -14,11 +14,13 @@ import CoreData
 public enum DataError: Error, Equatable {
     case fetchError(msg: String)
     case missingArchiveID(msg: String)
+    case moveError(msg: String)
 
     var description: String {
         switch self {
         case let .fetchError(msg): return "Data fetch error: \(msg)"
         case let .missingArchiveID(msg): return "Missing archiveID: \(msg)"
+        case let .moveError(msg): return "Move error: \(msg)"
         }
     }
 }
