@@ -25,7 +25,7 @@ public extension ZRoutineRun {
     /// Does NOT save context.
     func copy(_ context: NSManagedObjectContext, nuRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws {
         guard let startedAt
-        else { throw DataError.moveError(msg: "missing startedAt") }
+        else { throw DataError.copyError(msg: "missing startedAt") }
         let nu = ZRoutineRun.create(context, zRoutine: nuRoutine, startedAt: startedAt, duration: duration)
         context.assign(nu, to: nuStore)
     }

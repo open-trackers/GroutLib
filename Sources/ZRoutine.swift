@@ -25,11 +25,30 @@ extension ZRoutine {
     /// Does NOT save context.
     func copy(_ context: NSManagedObjectContext, toStore nuStore: NSPersistentStore) throws {
         guard let routineArchiveID
-        else { throw DataError.moveError(msg: "missing routineArchiveID") }
+        else { throw DataError.copyError(msg: "missing routineArchiveID") }
         let nu = ZRoutine.create(context, routineName: wrappedName, routineArchiveID: routineArchiveID)
         context.assign(nu, to: nuStore)
     }
 
+    /// Copy each ZRoutine to archive, where one doesn't already exist.
+    /// Does not delete self.
+    /// Does NOT save context.
+    static func copyAll(_ context: NSManagedObjectContext, fromStore mainStore: NSPersistentStore, toStore nuStore: NSPersistentStore) throws -> [NSManagedObjectID] {
+        var copiedObjects = [NSManagedObjectID]()
+        let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
+        req.affectedStores = [mainStore]
+        do {
+            let results: [ZRoutine] = try context.fetch(req) as [ZRoutine]
+            try results.forEach {
+                try $0.copy(context, toStore: nuStore)
+                copiedObjects.append($0.objectID)
+            }
+        } catch {
+            throw DataError.fetchError(msg: error.localizedDescription)
+        }
+        return copiedObjects
+    }
+    
     static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID) throws -> ZRoutine? {
         let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
         req.predicate = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)

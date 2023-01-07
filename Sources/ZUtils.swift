@@ -59,34 +59,28 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
         throw DataError.fetchError(msg: "Archive store not found")
     }
 
-    var recordsToDelete = [NSManagedObjectID]()
-    
-    let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
-    req.affectedStores = [mainStore]
+//    var recordsToDelete = [NSManagedObjectID]()
+
     do {
-        let results: [ZRoutine] = try context.fetch(req) as [ZRoutine]
-        try results.forEach {
-            try $0.copy(context, toStore: archiveStore)
-            recordsToDelete.append($0.objectID)
-        }
+        _ = try ZRoutine.copyAll(context, fromStore: mainStore, toStore: archiveStore)
     } catch {
-        throw DataError.fetchError(msg: error.localizedDescription)
+        throw DataError.transferError(msg: error.localizedDescription)
     }
     
-    let req2 = NSFetchRequest<ZExercise>(entityName: "ZExercise")
-    req2.affectedStores = [mainStore]
-    do {
-        let results: [ZExercise] = try context.fetch(req2) as [ZExercise]
-        try results.forEach {
-            
-            let nuRoutine = ZRoutine(context: context)  //TODO search for existing, and abort if missing
-            
-            try $0.copy(context, nuRoutine: nuRoutine, toStore: archiveStore)
-            recordsToDelete.append($0.objectID)
-        }
-    } catch {
-        throw DataError.fetchError(msg: error.localizedDescription)
-    }
+    // copy each ZExercise to archive, where one doesn't already exist
+//    let req2 = NSFetchRequest<ZExercise>(entityName: "ZExercise")
+//    req2.affectedStores = [mainStore]
+//    do {
+//        let results: [ZExercise] = try context.fetch(req2) as [ZExercise]
+//        try results.forEach {
+//
+//            let nuRoutine = ZRoutine(context: context)  //TODO search for existing, and abort if missing
+//
+//            try $0.copy(context, nuRoutine: nuRoutine, toStore: archiveStore)
+//        }
+//    } catch {
+//        throw DataError.fetchError(msg: error.localizedDescription)
+//    }
     
     //TODO batch delete of recordsToDelete
 }

@@ -26,7 +26,7 @@ extension ZExercise {
     /// Does NOT save context.
     func copy(_ context: NSManagedObjectContext, nuRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws {
         guard let exerciseArchiveID
-        else { throw DataError.moveError(msg: "missing exerciseArchiveID") }
+        else { throw DataError.copyError(msg: "missing exerciseArchiveID") }
         let nu = ZExercise.create(context, zRoutine: nuRoutine, exerciseName: wrappedName, exerciseArchiveID: exerciseArchiveID)
         context.assign(nu, to: nuStore)
     }
