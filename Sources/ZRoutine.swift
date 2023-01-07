@@ -13,46 +13,61 @@ import CoreData
 /// Archive representation of a Routine record
 extension ZRoutine {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID) -> ZRoutine {
+    static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID, inStore: NSPersistentStore? = nil) -> ZRoutine {
         let nu = ZRoutine(context: context)
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
+        if let inStore {
+            context.assign(nu, to: inStore)
+        }
         return nu
     }
-    
+
     /// Shallow copy of self to specified store.
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, toStore nuStore: NSPersistentStore) throws {
+    func copy(_ context: NSManagedObjectContext, toStore dstStore: NSPersistentStore) throws {
         guard let routineArchiveID
         else { throw DataError.copyError(msg: "missing routineArchiveID") }
         let nu = ZRoutine.create(context, routineName: wrappedName, routineArchiveID: routineArchiveID)
-        context.assign(nu, to: nuStore)
+        context.assign(nu, to: dstStore)
     }
 
-    /// Copy each ZRoutine to archive, where one doesn't already exist.
-    /// Does not delete self.
+    /// Copy each ZRoutine to alternative store, where one doesn't already exist in that store.
+    /// Does not delete records.
     /// Does NOT save context.
-    static func copyAll(_ context: NSManagedObjectContext, fromStore mainStore: NSPersistentStore, toStore nuStore: NSPersistentStore) throws -> [NSManagedObjectID] {
+    /// Returns list of ids of objects copied from source store.
+    static func copyAll(_ context: NSManagedObjectContext,
+                        fromStore srcStore: NSPersistentStore,
+                        toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
+    {
         var copiedObjects = [NSManagedObjectID]()
-        let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
-        req.affectedStores = [mainStore]
-        do {
-            let results: [ZRoutine] = try context.fetch(req) as [ZRoutine]
-            try results.forEach {
-                try $0.copy(context, toStore: nuStore)
-                copiedObjects.append($0.objectID)
+        try context.fetcher(ZRoutine.self, inStore: srcStore) { zRoutine in
+            guard let routineArchiveID = zRoutine.routineArchiveID
+            else { throw DataError.missingArchiveID(msg: "For zRoutine \(zRoutine.wrappedName)'") }
+
+            if try get(context, forArchiveID: routineArchiveID, inStore: dstStore) != nil {
+                print("Found existing zRoutine \(zRoutine.wrappedName)")
+                return true
             }
-        } catch {
-            throw DataError.fetchError(msg: error.localizedDescription)
+
+            try zRoutine.copy(context, toStore: dstStore)
+
+            copiedObjects.append(zRoutine.objectID)
+            print("Copied routine \(zRoutine.wrappedName)")
+
+            return true
         }
         return copiedObjects
     }
-    
-    static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID) throws -> ZRoutine? {
+
+    static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZRoutine? {
         let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
         req.predicate = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
         req.returnsObjectsAsFaults = false
+        if let inStore {
+            req.affectedStores = [inStore]
+        }
 
         do {
             let results = try context.fetch(req) as [ZRoutine]
@@ -63,12 +78,12 @@ extension ZRoutine {
     }
 
     // NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String) throws -> ZRoutine {
-        if let zRoutine = try ZRoutine.get(context, forArchiveID: routineArchiveID) {
+    static func getOrCreate(_ context: NSManagedObjectContext, routineArchiveID: UUID, routineName: String, inStore: NSPersistentStore? = nil) throws -> ZRoutine {
+        if let zRoutine = try ZRoutine.get(context, forArchiveID: routineArchiveID, inStore: inStore) {
             // found existing routine
             return zRoutine
         } else {
-            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID)
+            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, inStore: inStore)
         }
     }
 

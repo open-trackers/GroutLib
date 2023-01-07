@@ -61,3 +61,25 @@ public extension NSManagedObjectContext {
         try executeAndMergeChanges(using: breq)
     }
 }
+
+public extension NSManagedObjectContext {
+    /// Convenient wrapper for iterating over results from simple fetch request.
+    /// Will continue iterating so long as callback returns true
+    func fetcher<T: NSFetchRequestResult>(_: T.Type,
+                                          predicate: NSPredicate? = nil,
+                                          inStore: NSPersistentStore? = nil,
+                                          _ each: @escaping (T) throws -> Bool) throws
+    {
+        let req = NSFetchRequest<T>()
+        if let predicate {
+            req.predicate = predicate
+        }
+        if let inStore {
+            req.affectedStores = [inStore]
+        }
+        let results: [T] = try fetch(req) as [T]
+        try results.forEach {
+            guard try each($0) else { return }
+        }
+    }
+}

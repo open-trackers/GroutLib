@@ -66,7 +66,7 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
     } catch {
         throw DataError.transferError(msg: error.localizedDescription)
     }
-    
+
     // copy each ZExercise to archive, where one doesn't already exist
 //    let req2 = NSFetchRequest<ZExercise>(entityName: "ZExercise")
 //    req2.affectedStores = [mainStore]
@@ -81,6 +81,6 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
 //    } catch {
 //        throw DataError.fetchError(msg: error.localizedDescription)
 //    }
-    
-    //TODO batch delete of recordsToDelete
+
+    // TODO: batch delete of recordsToDelete
 }
