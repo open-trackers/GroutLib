@@ -13,6 +13,9 @@ import os
 
 import Collections
 
+// NOTE that we're using two stores with a single configuration,
+// where the Z* records on 'main' store on watch will transferred
+// to the 'archive' store on iOS, to reduce watch storage needs.
 public struct PersistenceManager {
     static let modelName = "Grout"
 
@@ -92,9 +95,6 @@ public struct PersistenceManager {
         return container
     }
 
-    // NOTE that we're using two stores with a single configuration,
-    // where the Z* records on 'main' store on watch will transferred
-    // to the 'archive' store on iOS, to reduce watch storage needs.
     static func getStoreDescription(suffix: String?, isCloud: Bool, isTest: Bool, inMemory: Bool = false) -> NSPersistentStoreDescription {
         let url: URL = {
             // NOTE used exclusively by preview; may need rethinking
@@ -111,6 +111,7 @@ public struct PersistenceManager {
         }()
 
         let desc = NSPersistentStoreDescription(url: url)
+        desc.isReadOnly = false
 
         if isCloud {
             let suffix2: String = {
