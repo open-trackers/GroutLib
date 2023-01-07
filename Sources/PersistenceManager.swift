@@ -14,12 +14,12 @@ import os
 public struct PersistenceManager {
     static let modelName = "Grout"
 
-#if os(watchOS)
-    static let includeArchiveStore = false
-#else
-    static let includeArchiveStore = true
-#endif
-    
+    #if os(watchOS)
+        static let includeArchiveStore = false
+    #else
+        static let includeArchiveStore = true
+    #endif
+
     public static let shared = PersistenceManager(withArchiveStore: includeArchiveStore)
 
     static let logger = Logger(
