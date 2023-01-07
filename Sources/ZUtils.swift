@@ -44,13 +44,23 @@ public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) 
 
 /// NOTE Does NOT save to context
 public func transferToArchive(_ context: NSManagedObjectContext) throws {
-    guard let archiveStore = // context.persistentStoreCoordinator?.persistentStore(for: <#T##URL#>)
-        context.persistentStoreCoordinator?.persistentStores.first(where: { $0.configurationName == "Archive" })
+    // search through each Z record on MAIN store
+    // clone to ARCHIVE, using context.assign
+
+    // identifier "568DF589-04FE-4B1B-A5AE-61BEE2EFB2EB"
+    // URL  "file:///Users/reede/Library/Application%20Support/xctest/TestGroutArchive.sqlite"
+
+    guard let mainURL = PersistenceManager.stores[.main]?.url,
+          let archiveURL = PersistenceManager.stores[.archive]?.url,
+          let psc = context.persistentStoreCoordinator,
+          let mainStore = psc.persistentStore(for: mainURL),
+          let archiveStore = psc.persistentStore(for: archiveURL)
     else {
         throw DataError.fetchError(msg: "Archive store not found")
     }
 
     let req = NSFetchRequest<ZExercise>(entityName: "ZExercise")
+    req.affectedStores = [mainStore]
     // req.predicate = NSPredicate(format: "routine = %@", self)
 
     do {

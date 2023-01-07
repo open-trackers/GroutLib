@@ -11,16 +11,19 @@
 import CoreData
 import os
 
+import Collections
+
 public struct PersistenceManager {
     static let modelName = "Grout"
 
-    #if os(watchOS)
-        static let includeArchiveStore = false
-    #else
-        static let includeArchiveStore = true
-    #endif
+    public enum StoreType: Hashable {
+        case main
+        case archive
+    }
 
-    public static let shared = PersistenceManager(withArchiveStore: includeArchiveStore)
+    public typealias StoresDict = OrderedDictionary<StoreType, NSPersistentStoreDescription>
+    public static var stores = StoresDict()
+    public static let shared = PersistenceManager()
 
     static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
@@ -29,43 +32,10 @@ public struct PersistenceManager {
 
     public let container: NSPersistentCloudKitContainer
 
-    public init(withArchiveStore: Bool = false, inMemory: Bool = false) {
-        container = NSPersistentCloudKitContainer(name: PersistenceManager.modelName, managedObjectModel: PersistenceManager.model)
-
-        container.persistentStoreDescriptions = [
-            PersistenceManager.getDefaultStoreDescription(isCloud: true, isTest: false),
-        ]
-
-        // NOTE the watch won't get the archive store
-        if withArchiveStore {
-            container.persistentStoreDescriptions.append(
-                PersistenceManager.getArchiveStoreDescription(isCloud: true, isTest: false)
-            )
-        }
-
-        // NOTE used exclusively by preview; may need rethinking
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
-        }
-
-        container.loadPersistentStores(completionHandler: { _, error in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                Self.logger.error("\(#function): loading persistent stores, \(error) \(error.userInfo)")
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        container.viewContext.automaticallyMergesChangesFromParent = true
+    public init(inMemory: Bool = false) {
+        container = PersistenceManager.getContainer(isCloud: true,
+                                                    isTest: false,
+                                                    inMemory: inMemory) as! NSPersistentCloudKitContainer
     }
 
     /// Save context if changes pending, with optional force.
@@ -86,38 +56,72 @@ public struct PersistenceManager {
     // TODO: rethink this
     public static var preview: PersistenceManager = .init(inMemory: true)
 
-    static func getDefaultStoreDescription(isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
-        getStoreDescription(configurationName: nil, isCloud: isCloud, isTest: isTest)
+    static func getContainer(isCloud: Bool, isTest: Bool, inMemory: Bool) -> NSPersistentContainer {
+        let container = isCloud
+            ? NSPersistentCloudKitContainer(name: modelName, managedObjectModel: model)
+            : NSPersistentContainer(name: modelName, managedObjectModel: model)
+
+        stores[.main] = getStoreDescription(suffix: nil, isCloud: isCloud, isTest: isTest, inMemory: inMemory)
+
+        #if !os(watchOS)
+            // NOTE the watch won't get the archive store
+            stores[.archive] = getStoreDescription(suffix: "archive", isCloud: isCloud, isTest: isTest)
+        #endif
+
+        container.persistentStoreDescriptions = stores.values.map { $0 }
+
+        container.loadPersistentStores(completionHandler: { _, error in
+            if let error = error as NSError? {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+
+                /*
+                 Typical reasons for an error here include:
+                 * The parent directory does not exist, cannot be created, or disallows writing.
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
+                Self.logger.error("\(#function): loading persistent stores, \(error) \(error.userInfo)")
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        container.viewContext.automaticallyMergesChangesFromParent = true
+
+        return container
     }
 
-    static func getArchiveStoreDescription(isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
-        getStoreDescription(configurationName: "Archive", isCloud: isCloud, isTest: isTest)
-    }
+    // NOTE that we're using two stores with a single configuration,
+    // where the Z* records on 'main' store on watch will transferred
+    // to the 'archive' store on iOS, to reduce watch storage needs.
+    static func getStoreDescription(suffix: String?, isCloud: Bool, isTest: Bool, inMemory: Bool = false) -> NSPersistentStoreDescription {
+        let url: URL = {
+            // NOTE used exclusively by preview; may need rethinking
+            if inMemory {
+                return URL(fileURLWithPath: "/dev/null")
+            }
 
-    // specific nil configurationName for default configuration
-    static func getStoreDescription(configurationName: String?, isCloud: Bool, isTest: Bool) -> NSPersistentStoreDescription {
-        let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
-        let fileName = "\(isTest ? "Test" : "")Grout\(configurationName ?? "")"
-        let archiveStoreURL = defaultDirectoryURL.appendingPathComponent(fileName).appendingPathExtension("sqlite")
-        let desc = NSPersistentStoreDescription(url: archiveStoreURL)
+            let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
+            let prefix = isTest ? "Test" : ""
+            let netSuffix = suffix?.capitalized ?? ""
+            let baseFileName = "\(prefix)Grout\(netSuffix)"
 
-        desc.configuration = configurationName // nil for default
-//        desc.isReadOnly = false
-//        desc.type = NSSQLiteStoreType
-//        desc.shouldInferMappingModelAutomatically = true
-//        desc.shouldMigrateStoreAutomatically = true
-//        desc.shouldAddStoreAsynchronously = false
-//        desc.setOption(true as NSNumber, forKey: NSSQLiteAnalyzeOption)
-//        desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+            return defaultDirectoryURL.appendingPathComponent(baseFileName).appendingPathExtension("sqlite")
+        }()
+
+        let desc = NSPersistentStoreDescription(url: url)
+
         if isCloud {
-            let suffix: String = {
-                guard let name = configurationName else { return "" }
+            let suffix2: String = {
+                guard let name = suffix else { return "" }
                 return ".\(name.lowercased())"
             }()
             let prefix = "iCloud.org.openalloc.grout"
-            let identifier = "\(prefix)\(suffix)"
+            let identifier = "\(prefix)\(suffix2)"
             desc.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: identifier)
         }
+
         return desc
     }
 
@@ -126,18 +130,7 @@ public struct PersistenceManager {
         // (1) We're using two stores, where /dev/null may not be usable for both
         // (2) Batch delete may not be supported for inMemory
 
-        let container = NSPersistentContainer(name: PersistenceManager.modelName, managedObjectModel: model)
-
-        container.persistentStoreDescriptions = [
-            getDefaultStoreDescription(isCloud: false, isTest: true),
-            getArchiveStoreDescription(isCloud: false, isTest: true),
-        ]
-
-        container.loadPersistentStores { _, error in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        }
+        let container = getContainer(isCloud: false, isTest: true, inMemory: false)
 
         // clear all data that persisted from earlier tests
         try container.managedObjectModel.entities.forEach {

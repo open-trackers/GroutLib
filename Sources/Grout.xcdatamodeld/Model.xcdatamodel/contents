@@ -46,10 +46,4 @@
         <attribute name="startedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="zRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutine" inverseName="zRoutineRuns" inverseEntity="ZRoutine"/>
     </entity>
-    <configuration name="Archive" usedWithCloudKit="YES">
-        <memberEntity name="ZExercise"/>
-        <memberEntity name="ZExerciseRun"/>
-        <memberEntity name="ZRoutine"/>
-        <memberEntity name="ZRoutineRun"/>
-    </configuration>
 </model>
