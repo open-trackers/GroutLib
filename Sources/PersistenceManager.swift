@@ -14,7 +14,13 @@ import os
 public struct PersistenceManager {
     static let modelName = "Grout"
 
-    public static let shared = PersistenceManager()
+#if os(watchOS)
+    static let includeArchiveStore = false
+#else
+    static let includeArchiveStore = true
+#endif
+    
+    public static let shared = PersistenceManager(withArchiveStore: includeArchiveStore)
 
     static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
@@ -23,22 +29,23 @@ public struct PersistenceManager {
 
     public let container: NSPersistentCloudKitContainer
 
-    public init(inMemory: Bool = false) {
+    public init(withArchiveStore: Bool = false, inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: PersistenceManager.modelName, managedObjectModel: PersistenceManager.model)
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+
+        container.persistentStoreDescriptions = [
+            PersistenceManager.getDefaultStoreDescription(isCloud: true, isTest: false),
+        ]
+
+        // NOTE the watch won't get the archive store
+        if withArchiveStore {
+            container.persistentStoreDescriptions.append(
+                PersistenceManager.getArchiveStoreDescription(isCloud: true, isTest: false)
+            )
         }
 
-//        let configs = container.managedObjectModel.configurations
-//        ([String]) $R0 = 2 values {
-//          [0] = "Archive"
-//          [1] = "PF_DEFAULT_CONFIGURATION_NAME"
-//        }
-
-        if container.persistentStoreDescriptions.count < 2 {
-            print(">>>>>> LOADING ARCHIVE STORE DESCRIPTION")
-            let archiveDescription = PersistenceManager.getArchiveStoreDescription(isCloud: true, isTest: false)
-            container.persistentStoreDescriptions.append(archiveDescription)
+        // NOTE used exclusively by preview; may need rethinking
+        if inMemory {
+            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
 
         container.loadPersistentStores(completionHandler: { _, error in
@@ -114,7 +121,7 @@ public struct PersistenceManager {
     }
 
     static func getTestContainer() throws -> NSPersistentContainer {
-        // NOTE: not using inMemory storage, for two reasons:
+        // NOTE: not using inMemory storage for testing, for two reasons:
         // (1) We're using two stores, where /dev/null may not be usable for both
         // (2) Batch delete may not be supported for inMemory
 
