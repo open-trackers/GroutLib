@@ -41,7 +41,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertFalse(archiveStore.isReadOnly)
     }
 
-    func testShallowCopyRoutine() throws {
+    func testRoutine() throws {
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
         try testContext.save()
 
@@ -55,7 +55,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
     }
 
-    func testShallowCopyRoutineRunWithRoutine() throws {
+    func testRoutineWithRoutineRun() throws {
         let startedAt = Date()
         let duration: TimeInterval = 30.0
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
@@ -85,7 +85,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
     }
 
-    func testShallowCopyExerciseWithRoutine() throws {
+    func testRoutineWithExercise() throws {
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
         try testContext.save()
@@ -113,7 +113,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
     }
 
-    func testShallowCopyExerciseRunWithExerciseAndRoutine() throws {
+    func testRoutineWithExerciseAndExerciseRun() throws {
         let completedAt = Date()
         let intensity: Float = 30.0
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
