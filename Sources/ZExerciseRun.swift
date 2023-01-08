@@ -46,14 +46,14 @@ extension ZExerciseRun {
     static func getOrCreate(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, inStore: NSPersistentStore? = nil) throws -> ZExerciseRun {
         guard let archiveID = zExercise.exerciseArchiveID
         else { throw DataError.missingArchiveID(msg: "ZExercise missing archiveID") }
-        
+
         if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
             return nu
         } else {
             return ZExerciseRun.create(context, zExercise: zExercise, completedAt: completedAt, intensity: intensity, inStore: inStore)
         }
     }
-    
+
     static func count(_ context: NSManagedObjectContext,
                       predicate: NSPredicate? = nil,
                       inStore: NSPersistentStore? = nil) throws -> Int

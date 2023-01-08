@@ -54,7 +54,7 @@ public extension ZRoutineRun {
             return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, inStore: inStore)
         }
     }
-    
+
     static func count(_ context: NSManagedObjectContext,
                       predicate: NSPredicate? = nil,
                       inStore: NSPersistentStore? = nil) throws -> Int
