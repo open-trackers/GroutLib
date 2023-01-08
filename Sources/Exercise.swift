@@ -77,7 +77,10 @@ public extension Exercise {
     }
 
     // NOTE: does NOT save context
-    func markDone(_ context: NSManagedObjectContext, withAdvance: Bool, now: Date = Date.now) throws {
+    func markDone(_ context: NSManagedObjectContext,
+                  withAdvance: Bool,
+                  now: Date = Date.now) throws
+    {
         let intensity = lastIntensity
         let completedAt = now
 
@@ -90,13 +93,13 @@ public extension Exercise {
         if archiveID == nil { archiveID = UUID() }
 
         // log the run for charting
-        try Exercise.logRun(context,
-                            routineArchiveID: routineArchiveID,
-                            routineName: routineName,
-                            exerciseArchiveID: archiveID!,
-                            exerciseName: wrappedName,
-                            completedAt: completedAt,
-                            intensity: intensity)
+        _ = try Exercise.logRun(context,
+                                routineArchiveID: routineArchiveID,
+                                routineName: routineName,
+                                exerciseArchiveID: archiveID!,
+                                exerciseName: wrappedName,
+                                completedAt: completedAt,
+                                intensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -116,15 +119,21 @@ extension Exercise {
                        exerciseArchiveID: UUID,
                        exerciseName: String,
                        completedAt: Date,
-                       intensity: Float) throws
+                       intensity: Float) throws -> ZExerciseRun
     {
-        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName)
+        guard let mainStore = PersistenceManager.getStore(context, .main)
+        else {
+            throw DataError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
+        }
 
-        let zExercise = try ZExercise.getOrCreate(context, zRoutine: zRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName)
+        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName, inStore: mainStore)
 
-        _ = ZExerciseRun.create(context,
-                                zExercise: zExercise,
-                                completedAt: completedAt,
-                                intensity: intensity)
+        let zExercise = try ZExercise.getOrCreate(context, zRoutine: zRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName, inStore: mainStore)
+
+        return try ZExerciseRun.getOrCreate(context,
+                                            zExercise: zExercise,
+                                            completedAt: completedAt,
+                                            intensity: intensity,
+                                            inStore: mainStore)
     }
 }

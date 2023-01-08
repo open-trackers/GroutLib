@@ -23,13 +23,10 @@ final class DeepCopyTests: TestBase {
     override func setUpWithError() throws {
         try super.setUpWithError()
 
-        guard let mainURL = PersistenceManager.stores[.main]?.url,
-              let archiveURL = PersistenceManager.stores[.archive]?.url,
-              let psc = testContext.persistentStoreCoordinator,
-              let mainStore = psc.persistentStore(for: mainURL),
-              let archiveStore = psc.persistentStore(for: archiveURL)
+        guard let mainStore = PersistenceManager.getStore(testContext, .main),
+              let archiveStore = PersistenceManager.getStore(testContext, .archive)
         else {
-            throw DataError.fetchError(msg: "Archive store not found")
+            throw DataError.invalidStoreConfiguration(msg: "setup")
         }
 
         self.mainStore = mainStore

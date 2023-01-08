@@ -26,16 +26,13 @@ internal enum ZType {
 internal typealias ZTypeObjectIDs = [ZType: [NSManagedObjectID]]
 
 /// Transfers all 'Z' records in .main store to .archive store.
-/// NOTE Does save context
+/// NOTE Does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext) throws {
     logger.debug("\(#function)")
-    guard let mainURL = PersistenceManager.stores[.main]?.url,
-          let archiveURL = PersistenceManager.stores[.archive]?.url,
-          let psc = context.persistentStoreCoordinator,
-          let mainStore = psc.persistentStore(for: mainURL),
-          let archiveStore = psc.persistentStore(for: archiveURL)
+    guard let mainStore = PersistenceManager.getStore(context, .main),
+          let archiveStore = PersistenceManager.getStore(context, .archive)
     else {
-        throw DataError.transferError(msg: "Unexpected store configuration.")
+        throw DataError.invalidStoreConfiguration(msg: "transfer to archive")
     }
 
     do {

@@ -14,7 +14,7 @@ import os
 import Collections
 
 // NOTE that we're using two stores with a single configuration,
-// where the Z* records on 'main' store on watch will transferred
+// where the Z* records on 'main' store eventually will be transferred
 // to the 'archive' store on iOS, to reduce watch storage needs.
 public struct PersistenceManager {
     static let modelName = "Grout"
@@ -53,14 +53,34 @@ public struct PersistenceManager {
         }
     }
 
+//    public static func getMainStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
+//        PersistenceManager.getStore(context, .main)
+//    }
+//
+//    public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
+//        PersistenceManager.getStore(context, .archive)
+//    }
+
+    // TODO: rethink this
+    public static var preview: PersistenceManager = .init(inMemory: true)
+
+    // MARK: - Internal
+
+    static func getStore(_ context: NSManagedObjectContext, _ storeType: StoreType) -> NSPersistentStore? {
+        guard let url = PersistenceManager.stores[storeType]?.url,
+              let psc = context.persistentStoreCoordinator,
+              let store = psc.persistentStore(for: url)
+        else {
+            return nil
+        }
+        return store
+    }
+
     static var model: NSManagedObjectModel {
         let bundle = Bundle.module
         let modelURL = bundle.url(forResource: PersistenceManager.modelName, withExtension: ".momd")!
         return NSManagedObjectModel(contentsOf: modelURL)!
     }
-
-    // TODO: rethink this
-    public static var preview: PersistenceManager = .init(inMemory: true)
 
     static func getContainer(isCloud: Bool,
                              isTest: Bool,

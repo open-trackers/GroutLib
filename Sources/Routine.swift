@@ -55,7 +55,10 @@ public extension Routine {
 
     // Returns true if routine is updated.
     // NOTE: does NOT save context
-    func stop(_ context: NSManagedObjectContext, startedAt: Date, now: Date = Date.now) throws -> Bool {
+    func stop(_ context: NSManagedObjectContext,
+              startedAt: Date,
+              now: Date = Date.now) throws -> Bool
+    {
         guard anyExerciseCompleted,
               startedAt < now
         else { return false }
@@ -65,11 +68,11 @@ public extension Routine {
         if archiveID == nil { archiveID = UUID() }
 
         // log the run for charting
-        try Routine.logRun(context,
-                           archiveID: archiveID!,
-                           name: wrappedName,
-                           startedAt: startedAt,
-                           duration: duration)
+        _ = try Routine.logRun(context,
+                               archiveID: archiveID!,
+                               name: wrappedName,
+                               startedAt: startedAt,
+                               duration: duration)
 
         // update the attributes with fresh data
         lastStartedAt = startedAt
@@ -163,13 +166,19 @@ extension Routine {
                        archiveID: UUID,
                        name: String,
                        startedAt: Date,
-                       duration: TimeInterval) throws
+                       duration: TimeInterval) throws -> ZRoutineRun
     {
-        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name)
+        guard let mainStore = PersistenceManager.getStore(context, .main)
+        else {
+            throw DataError.invalidStoreConfiguration(msg: "Cannot log routine run.")
+        }
 
-        _ = ZRoutineRun.create(context,
-                               zRoutine: zRoutine,
-                               startedAt: startedAt,
-                               duration: duration)
+        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name, inStore: mainStore)
+
+        return try ZRoutineRun.getOrCreate(context,
+                                           zRoutine: zRoutine,
+                                           startedAt: startedAt,
+                                           duration: duration,
+                                           inStore: mainStore)
     }
 }
