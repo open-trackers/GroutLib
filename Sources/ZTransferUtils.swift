@@ -35,15 +35,11 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
         throw DataError.invalidStoreConfiguration(msg: "transfer to archive")
     }
 
-    do {
-        let dict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
-        try dict.values.forEach { objectIDs in
-            if objectIDs.count > 0 {
-                try context.deleter(objectIDs: objectIDs)
-            }
+    let dict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
+    try dict.values.forEach { objectIDs in
+        if objectIDs.count > 0 {
+            try context.deleter(objectIDs: objectIDs)
         }
-    } catch {
-        throw DataError.transferError(msg: error.localizedDescription)
     }
 }
 
