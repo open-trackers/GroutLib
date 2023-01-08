@@ -34,6 +34,10 @@ final class CopyTests: TestBase {
         self.archiveStore = archiveStore
     }
     
+    func testReadOnly() throws {
+        XCTAssertFalse(mainStore.isReadOnly)
+        XCTAssertFalse(archiveStore.isReadOnly)
+    }
     
     func testCopyRoutine() throws {
         let uuid = UUID()

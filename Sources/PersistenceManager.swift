@@ -59,7 +59,9 @@ public struct PersistenceManager {
     // TODO: rethink this
     public static var preview: PersistenceManager = .init(inMemory: true)
 
-    static func getContainer(isCloud: Bool, isTest: Bool, inMemory: Bool) -> NSPersistentContainer {
+    static func getContainer(isCloud: Bool,
+                             isTest: Bool,
+                             inMemory: Bool) -> NSPersistentContainer {
         let container = isCloud
             ? NSPersistentCloudKitContainer(name: modelName, managedObjectModel: model)
             : NSPersistentContainer(name: modelName, managedObjectModel: model)
@@ -71,7 +73,7 @@ public struct PersistenceManager {
             stores[.archive] = getStoreDescription(suffix: "archive", isCloud: isCloud, isTest: isTest)
         #endif
 
-        container.persistentStoreDescriptions = stores.values.map { $0 }
+        container.persistentStoreDescriptions = stores.values.elements
 
         container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {
@@ -95,7 +97,10 @@ public struct PersistenceManager {
         return container
     }
 
-    static func getStoreDescription(suffix: String?, isCloud: Bool, isTest: Bool, inMemory: Bool = false) -> NSPersistentStoreDescription {
+    static func getStoreDescription(suffix: String?,
+                                    isCloud: Bool,
+                                    isTest: Bool,
+                                    inMemory: Bool = false) -> NSPersistentStoreDescription {
         let url: URL = {
             // NOTE used exclusively by preview; may need rethinking
             if inMemory {
@@ -111,7 +116,7 @@ public struct PersistenceManager {
         }()
 
         let desc = NSPersistentStoreDescription(url: url)
-        desc.isReadOnly = false
+        desc.isReadOnly = false     // TODO shouldn't be necessary!
 
         if isCloud {
             let suffix2: String = {
