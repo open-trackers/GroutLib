@@ -71,14 +71,10 @@ public extension NSManagedObjectContext {
                                           inStore: NSPersistentStore? = nil,
                                           _ each: @escaping (T) throws -> Bool) throws
     {
-        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
-        request.sortDescriptors = sortDescriptors
-        if let predicate {
-            request.predicate = predicate
-        }
-        if let inStore {
-            request.affectedStores = [inStore]
-        }
+        let request = try getRequest(T.self,
+                                     predicate: predicate,
+                                     sortDescriptors: sortDescriptors,
+                                     inStore: inStore)
         for result in try fetch(request) as [T] {
             guard try each(result) else { break }
         }
@@ -89,17 +85,39 @@ public extension NSManagedObjectContext {
                                                sortDescriptors: [NSSortDescriptor] = [],
                                                inStore: NSPersistentStore? = nil) throws -> T?
     {
-        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
-        request.sortDescriptors = sortDescriptors
+        let request = try getRequest(T.self,
+                                     predicate: predicate,
+                                     sortDescriptors: sortDescriptors,
+                                     inStore: inStore)
         request.fetchLimit = 1
         // req.returnsObjectsAsFaults = false   //TODO does this matter?
+        let results: [T] = try fetch(request) as [T]
+        return results.first
+    }
+
+    func counter<T: NSFetchRequestResult>(_: T.Type,
+                                          predicate: NSPredicate? = nil,
+                                          inStore: NSPersistentStore? = nil) throws -> Int
+    {
+        let request = try getRequest(T.self,
+                                     predicate: predicate,
+                                     inStore: inStore)
+        return try count(for: request)
+    }
+
+    internal func getRequest<T: NSFetchRequestResult>(_: T.Type,
+                                                      predicate: NSPredicate? = nil,
+                                                      sortDescriptors: [NSSortDescriptor] = [],
+                                                      inStore: NSPersistentStore? = nil) throws -> NSFetchRequest<T>
+    {
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        request.sortDescriptors = sortDescriptors
         if let predicate {
             request.predicate = predicate
         }
         if let inStore {
             request.affectedStores = [inStore]
         }
-        let results: [T] = try fetch(request) as [T]
-        return results.first
+        return request
     }
 }

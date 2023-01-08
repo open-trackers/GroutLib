@@ -34,6 +34,11 @@ public extension ZRoutineRun {
         return nu
     }
 
+//    static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZRoutine? {
+//        let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
+//        return try context.firstFetcher(predicate: pred, inStore: inStore)
+//    }
+
     static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: "ZRoutineRun")
         if let predicate { req.predicate = predicate }
