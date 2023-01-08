@@ -26,12 +26,10 @@ public extension ZRoutineRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    internal func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws -> ZRoutineRun {
+    internal func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZRoutineRun {
         guard let startedAt
         else { throw DataError.copyError(msg: "missing startedAt") }
-        let nu = ZRoutineRun.create(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration)
-        context.assign(nu, to: nuStore)
-        return nu
+        return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -45,6 +43,18 @@ public extension ZRoutineRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
+    // NOTE: does NOT save context
+    static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: TimeInterval, inStore: NSPersistentStore? = nil) throws -> ZRoutineRun {
+        guard let archiveID = zRoutine.routineArchiveID
+        else { throw DataError.missingArchiveID(msg: "ZRoutine missing archiveID") }
+
+        if let nu = try ZRoutineRun.get(context, forArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
+            return nu
+        } else {
+            return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, inStore: inStore)
+        }
+    }
+    
     static func count(_ context: NSManagedObjectContext,
                       predicate: NSPredicate? = nil,
                       inStore: NSPersistentStore? = nil) throws -> Int

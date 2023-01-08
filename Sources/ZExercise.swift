@@ -31,43 +31,8 @@ extension ZExercise {
     func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZExercise {
         guard let exerciseArchiveID
         else { throw DataError.copyError(msg: "missing exerciseArchiveID") }
-        let nu = ZExercise.create(context, zRoutine: dstRoutine, exerciseName: wrappedName, exerciseArchiveID: exerciseArchiveID)
-        context.assign(nu, to: dstStore)
+        let nu = try ZExercise.getOrCreate(context, zRoutine: dstRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: wrappedName, inStore: dstStore)
         return nu
-    }
-
-    /// Copy each ZExercise to alternative store, where one doesn't already exist in that store.
-    /// Does not delete records.
-    /// Does NOT save context.
-    /// May create ZRoutine record in destination store if doesn't already exist.
-    /// Returns list of ids of objects copied from source store.
-    static func copyAll(_ context: NSManagedObjectContext,
-                        fromStore srcStore: NSPersistentStore,
-                        toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
-    {
-        var copiedObjects = [NSManagedObjectID]()
-        try context.fetcher(ZExercise.self, inStore: srcStore) { zExercise in
-            guard let exerciseArchiveID = zExercise.exerciseArchiveID,
-                  let routine = zExercise.zRoutine,
-                  let routineArchiveID = routine.routineArchiveID
-            else { throw DataError.missingArchiveID(msg: "For zExercise \(zExercise.wrappedName)'") }
-
-            if try get(context, forArchiveID: exerciseArchiveID, inStore: dstStore) != nil {
-                print("Found existing zExercise \(zExercise.wrappedName)")
-                return true
-            }
-
-            // create ZRoutine record in destination store if doesn't already exist
-            let nuRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routine.wrappedName, inStore: dstStore)
-
-            _ = try zExercise.shallowCopy(context, dstRoutine: nuRoutine, toStore: dstStore)
-
-            copiedObjects.append(zExercise.objectID)
-            print("Copied exercise \(zExercise.wrappedName)")
-
-            return true
-        }
-        return copiedObjects
     }
 
     static func get(_ context: NSManagedObjectContext, forArchiveID exerciseArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZExercise? {
@@ -77,9 +42,8 @@ extension ZExercise {
 
     // NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseArchiveID: UUID, exerciseName: String, inStore: NSPersistentStore? = nil) throws -> ZExercise {
-        if let zExercise = try ZExercise.get(context, forArchiveID: exerciseArchiveID, inStore: inStore) {
-            // found existing zExercise
-            return zExercise
+        if let nu = try ZExercise.get(context, forArchiveID: exerciseArchiveID, inStore: inStore) {
+            return nu
         } else {
             return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, inStore: inStore)
         }

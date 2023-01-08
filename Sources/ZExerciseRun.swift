@@ -26,12 +26,10 @@ extension ZExerciseRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    func shallowCopy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore nuStore: NSPersistentStore) throws -> ZExerciseRun {
+    func shallowCopy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore dstStore: NSPersistentStore) throws -> ZExerciseRun {
         guard let completedAt
         else { throw DataError.copyError(msg: "missing completedAt") }
-        let nu = ZExerciseRun.create(context, zExercise: dstExercise, completedAt: completedAt, intensity: intensity)
-        context.assign(nu, to: nuStore)
-        return nu
+        return try ZExerciseRun.getOrCreate(context, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -44,6 +42,18 @@ extension ZExerciseRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
+    // NOTE: does NOT save context
+    static func getOrCreate(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, inStore: NSPersistentStore? = nil) throws -> ZExerciseRun {
+        guard let archiveID = zExercise.exerciseArchiveID
+        else { throw DataError.missingArchiveID(msg: "ZExercise missing archiveID") }
+        
+        if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
+            return nu
+        } else {
+            return ZExerciseRun.create(context, zExercise: zExercise, completedAt: completedAt, intensity: intensity, inStore: inStore)
+        }
+    }
+    
     static func count(_ context: NSManagedObjectContext,
                       predicate: NSPredicate? = nil,
                       inStore: NSPersistentStore? = nil) throws -> Int
