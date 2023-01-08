@@ -71,37 +71,35 @@ public extension NSManagedObjectContext {
                                           inStore: NSPersistentStore? = nil,
                                           _ each: @escaping (T) throws -> Bool) throws
     {
-        let req = NSFetchRequest<T>(entityName: String(describing: T.self))
-        req.sortDescriptors = sortDescriptors
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        request.sortDescriptors = sortDescriptors
         if let predicate {
-            req.predicate = predicate
+            request.predicate = predicate
         }
         if let inStore {
-            req.affectedStores = [inStore]
+            request.affectedStores = [inStore]
         }
-        let results: [T] = try fetch(req) as [T]
-        try results.forEach {
-            guard try each($0) else { return }
+        for result in try fetch(request) as [T] {
+            guard try each(result) else { break }
         }
     }
 
     /// Convenient wrapper for retrieving one record
-    func firstFetcher<T: NSFetchRequestResult>( // _: T.Type,
-        predicate: NSPredicate? = nil,
-        sortDescriptors: [NSSortDescriptor] = [],
-        inStore: NSPersistentStore? = nil
-    ) throws -> T? {
-        let req = NSFetchRequest<T>(entityName: String(describing: T.self))
-        req.sortDescriptors = sortDescriptors
-        req.fetchLimit = 1
+    func firstFetcher<T: NSFetchRequestResult>(predicate: NSPredicate? = nil,
+                                               sortDescriptors: [NSSortDescriptor] = [],
+                                               inStore: NSPersistentStore? = nil) throws -> T?
+    {
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        request.sortDescriptors = sortDescriptors
+        request.fetchLimit = 1
         // req.returnsObjectsAsFaults = false   //TODO does this matter?
         if let predicate {
-            req.predicate = predicate
+            request.predicate = predicate
         }
         if let inStore {
-            req.affectedStores = [inStore]
+            request.affectedStores = [inStore]
         }
-        let results: [T] = try fetch(req) as [T]
+        let results: [T] = try fetch(request) as [T]
         return results.first
     }
 }
