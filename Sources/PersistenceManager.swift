@@ -116,8 +116,8 @@ public struct PersistenceManager {
         }()
 
         let desc = NSPersistentStoreDescription(url: url)
-        desc.isReadOnly = false     // TODO shouldn't be necessary!
-
+        //desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        
         if isCloud {
             let suffix2: String = {
                 guard let name = suffix else { return "" }

@@ -48,7 +48,7 @@ final class CopyTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: archiveStore))
 
         try r.copy(testContext, toStore: archiveStore)
-        //try testContext.save()
+        try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: mainStore))
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: archiveStore))
