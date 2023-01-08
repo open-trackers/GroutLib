@@ -38,16 +38,10 @@ public extension Routine {
 public extension Routine {
     // NOTE: does NOT save context
     internal func clearCompletions(_ context: NSManagedObjectContext) throws {
-        let req = NSFetchRequest<Exercise>(entityName: "Exercise")
-        req.predicate = NSPredicate(format: "routine = %@", self)
-
-        do {
-            let exercises: [Exercise] = try context.fetch(req) as [Exercise]
-            exercises.forEach { exercise in
-                exercise.lastCompletedAt = nil
-            }
-        } catch {
-            throw DataError.fetchError(msg: error.localizedDescription)
+        let predicate = NSPredicate(format: "routine = %@", self)
+        try context.fetcher(Exercise.self, predicate: predicate) { exercise in
+            exercise.lastCompletedAt = nil
+            return true
         }
     }
 
@@ -121,6 +115,8 @@ public extension Routine {
 
     func getNextIncomplete(_ context: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> NSManagedObjectID? {
         // print("\(#function) userOrder=\(userOrder ?? -2000)")
+
+        // let req = try context.getRequest(Exercise.self, sortDescriptors: Routine.exerciseSort)
 
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
         req.sortDescriptors = Routine.exerciseSort
