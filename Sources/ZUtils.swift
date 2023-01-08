@@ -99,7 +99,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 }
 
 /// Transfers all 'Z' records in .main store to .archive store.
-/// NOTE Does NOT save context
+/// NOTE Does save context
 public func transferToArchive(_ context: NSManagedObjectContext) throws {
     print("\(#function)")
     guard let mainURL = PersistenceManager.stores[.main]?.url,
@@ -114,8 +114,10 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
     do {
         let srcObjectIDs = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
         print("\(#function): \(srcObjectIDs.count) srcObjectIDs found")
+        try context.save() // TODO: is this necessary?
         if srcObjectIDs.count > 0 {
             try context.deleter(objectIDs: srcObjectIDs)
+            try context.save() // TODO: is this necessary?
         }
     } catch {
         throw DataError.transferError(msg: error.localizedDescription)
