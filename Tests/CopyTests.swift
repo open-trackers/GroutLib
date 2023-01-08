@@ -49,7 +49,7 @@ final class CopyTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try sr.copy(testContext, toStore: archiveStore)
+        _ = try sr.copy(testContext, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
@@ -68,13 +68,13 @@ final class CopyTests: TestBase {
         XCTAssertNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
 
         // routine needs to get to archive first
-        try sr.copy(testContext, toStore: archiveStore)
+        _ = try sr.copy(testContext, toStore: archiveStore)
         try testContext.save()
         guard let dr = try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore)
         else { XCTFail(); return }
         
         // now the exercise
-        try se.copy(testContext, dstRoutine: dr, toStore: archiveStore)
+        _ = try se.copy(testContext, dstRoutine: dr, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
