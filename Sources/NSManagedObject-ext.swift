@@ -61,6 +61,8 @@ public extension NSManagedObjectContext {
         try executeAndMergeChanges(using: breq)
     }
 
+    /// NOTE that objectIDs must all be from the same entityType, or you'll
+    /// get the "mismatched objectIDs in batch delete initializer" runtime error.
     func deleter(objectIDs: [NSManagedObjectID]) throws {
         let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
         try executeAndMergeChanges(using: breq)

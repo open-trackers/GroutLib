@@ -42,15 +42,29 @@ public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) 
                         predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }
 
+internal enum ZType {
+    case zroutine
+    case zroutinerun
+    case zexercise
+    case zexerciserun
+}
+
+internal typealias ZTypeObjectIDs = [ZType: [NSManagedObjectID]]
+
 /// Deep copy of all routines and their children from the source store to specified destination store
 /// Returning list of the objectIDs of the records copied FROM the SOURCE store.
 /// Does not delete any records.
 /// Does NOT save context.
 internal func deepCopy(_ context: NSManagedObjectContext,
                        fromStore srcStore: NSPersistentStore,
-                       toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
+                       toStore dstStore: NSPersistentStore) throws -> ZTypeObjectIDs
 {
-    var copiedObjects = [NSManagedObjectID]()
+    var copiedObjects = ZTypeObjectIDs()
+
+    func append(_ ztype: ZType, _ objectID: NSManagedObjectID) {
+        copiedObjects[ztype, default: [NSManagedObjectID]()]
+            .append(objectID)
+    }
 
     // recursively copy the routine and its children to the archive
     try context.fetcher(ZRoutine.self, inStore: srcStore) { zRoutine in
@@ -63,7 +77,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
             _ = try zRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
-            copiedObjects.append(zRoutineRun.objectID)
+            append(.zroutinerun, zRoutineRun.objectID)
             print("Copied zRoutineRun \(zRoutine.wrappedName) startedAt=\(String(describing: zRoutineRun.startedAt))")
             return true
         }
@@ -78,18 +92,18 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
                 _ = try zExerciseRun.shallowCopy(context, dstExercise: dExercise, toStore: dstStore)
 
-                copiedObjects.append(zExerciseRun.objectID)
+                append(.zexerciserun, zExerciseRun.objectID)
                 print("Copied zExerciseRun \(zExercise.wrappedName) completedAt=\(String(describing: zExerciseRun.completedAt))")
                 return true
             }
 
-            copiedObjects.append(zExercise.objectID)
+            append(.zexercise, zExercise.objectID)
             print("Copied zExercise \(zExercise.wrappedName)")
 
             return true
         }
 
-        copiedObjects.append(zRoutine.objectID)
+        append(.zroutine, zRoutine.objectID)
         print("Copied zRoutine \(zRoutine.wrappedName)")
 
         return true
@@ -112,12 +126,14 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
     }
 
     do {
-        let srcObjectIDs = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
-        print("\(#function): \(srcObjectIDs.count) srcObjectIDs found")
-        try context.save() // TODO: is this necessary?
-        if srcObjectIDs.count > 0 {
-            try context.deleter(objectIDs: srcObjectIDs)
-            try context.save() // TODO: is this necessary?
+        let srcObjectIdDict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
+        // print("\(#function): \(srcObjectIdDict.count) srcObjectIDs found")
+        // try context.save() // TODO: is this necessary?
+        if srcObjectIdDict.count > 0 {
+            try srcObjectIdDict.values.forEach {
+                try context.deleter(objectIDs: $0)
+            }
+            // try context.save() // TODO: is this necessary?
         }
     } catch {
         throw DataError.transferError(msg: error.localizedDescription)
