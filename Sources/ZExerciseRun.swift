@@ -34,9 +34,22 @@ extension ZExerciseRun {
         return nu
     }
 
-    static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {
-        let req = NSFetchRequest<NSFetchRequestResult>(entityName: "ZExerciseRun")
-        if let predicate { req.predicate = predicate }
-        return try context.count(for: req)
+    // NOTE UNTESTED
+    static func get(_ context: NSManagedObjectContext,
+                    forArchiveID archiveID: UUID,
+                    startedAt: Date,
+                    inStore: NSPersistentStore? = nil) throws -> ZExerciseRun?
+    {
+        let pred = NSPredicate(format: "exerciseArchiveID = %@ AND startedAt = %@",
+                               archiveID.uuidString,
+                               startedAt as NSDate)
+        return try context.firstFetcher(predicate: pred, inStore: inStore)
+    }
+
+    static func count(_ context: NSManagedObjectContext,
+                      predicate: NSPredicate? = nil,
+                      inStore: NSPersistentStore? = nil) throws -> Int
+    {
+        try context.counter(ZExerciseRun.self, predicate: predicate, inStore: inStore)
     }
 }

@@ -93,7 +93,7 @@ final class ShallowCopyTests: TestBase {
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
-        // XCTAssertNotNil(try ZExerciseRun.get(testContext, forURIRepresentation: su.uriRepresentation))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, forURIRepresentation: su.uriRepresentation))
 
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))

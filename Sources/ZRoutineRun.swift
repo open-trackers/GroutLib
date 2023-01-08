@@ -34,15 +34,23 @@ public extension ZRoutineRun {
         return nu
     }
 
-//    static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZRoutine? {
-//        let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
-//        return try context.firstFetcher(predicate: pred, inStore: inStore)
-//    }
+    // NOTE UNTESTED
+    static func get(_ context: NSManagedObjectContext,
+                    forArchiveID archiveID: UUID,
+                    startedAt: Date,
+                    inStore: NSPersistentStore? = nil) throws -> ZRoutineRun?
+    {
+        let pred = NSPredicate(format: "routineArchiveID = %@ AND startedAt = %@",
+                               archiveID.uuidString,
+                               startedAt as NSDate)
+        return try context.firstFetcher(predicate: pred, inStore: inStore)
+    }
 
-    static func count(_ context: NSManagedObjectContext, predicate: NSPredicate? = nil) throws -> Int {
-        let req = NSFetchRequest<NSFetchRequestResult>(entityName: "ZRoutineRun")
-        if let predicate { req.predicate = predicate }
-        return try context.count(for: req)
+    static func count(_ context: NSManagedObjectContext,
+                      predicate: NSPredicate? = nil,
+                      inStore: NSPersistentStore? = nil) throws -> Int
+    {
+        try context.counter(ZRoutineRun.self, predicate: predicate, inStore: inStore)
     }
 
 //    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutineRun? {
