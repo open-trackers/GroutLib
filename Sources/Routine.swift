@@ -70,7 +70,7 @@ public extension Routine {
 
         if archiveID == nil { archiveID = UUID() }
 
-        // archive the run for charting
+        // log the run for charting
         try Routine.logRun(context,
                            archiveID: archiveID!,
                            name: wrappedName,
@@ -160,7 +160,8 @@ public extension Routine {
 }
 
 extension Routine {
-    /// log the run of the routine to the archive
+    /// log the run of the routine to the main store
+    /// (These will later be transferred to the archive store on iOS devices)
     /// NOTE: does not save context
     static func logRun(_ context: NSManagedObjectContext,
                        archiveID: UUID,

@@ -84,13 +84,12 @@ public extension Exercise {
         guard let routineArchiveID = routine?.archiveID,
               let routineName = routine?.name
         else {
-            print("\(#function): missing routine details")
-            return
+            throw DataError.missingArchiveID(msg: "missing routine details")
         }
 
         if archiveID == nil { archiveID = UUID() }
 
-        // archive the run for charting
+        // log the run for charting
         try Exercise.logRun(context,
                             routineArchiveID: routineArchiveID,
                             routineName: routineName,
@@ -108,7 +107,8 @@ public extension Exercise {
 }
 
 extension Exercise {
-    /// log the run of the exercise to the archive
+    /// log the run of the exercise to the main store
+    /// (These will later be transferred to the archive store on iOS devices)
     /// NOTE: does not save context
     static func logRun(_ context: NSManagedObjectContext,
                        routineArchiveID: UUID,
