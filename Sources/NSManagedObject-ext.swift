@@ -67,10 +67,12 @@ public extension NSManagedObjectContext {
     /// Will continue iterating so long as callback returns true
     func fetcher<T: NSFetchRequestResult>(_: T.Type,
                                           predicate: NSPredicate? = nil,
+                                          sortDescriptors: [NSSortDescriptor] = [],
                                           inStore: NSPersistentStore? = nil,
                                           _ each: @escaping (T) throws -> Bool) throws
     {
-        let req = NSFetchRequest<T>()
+        let req = NSFetchRequest<T>(entityName: String(describing: T.self))
+        req.sortDescriptors = sortDescriptors
         if let predicate {
             req.predicate = predicate
         }
@@ -81,5 +83,25 @@ public extension NSManagedObjectContext {
         try results.forEach {
             guard try each($0) else { return }
         }
+    }
+
+    /// Convenient wrapper for retrieving one record
+    func firstFetcher<T: NSFetchRequestResult>( // _: T.Type,
+        predicate: NSPredicate? = nil,
+        sortDescriptors: [NSSortDescriptor] = [],
+        inStore: NSPersistentStore? = nil
+    ) throws -> T? {
+        let req = NSFetchRequest<T>(entityName: String(describing: T.self))
+        req.sortDescriptors = sortDescriptors
+        req.fetchLimit = 1
+        // req.returnsObjectsAsFaults = false   //TODO does this matter?
+        if let predicate {
+            req.predicate = predicate
+        }
+        if let inStore {
+            req.affectedStores = [inStore]
+        }
+        let results: [T] = try fetch(req) as [T]
+        return results.first
     }
 }

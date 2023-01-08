@@ -61,7 +61,8 @@ public struct PersistenceManager {
 
     static func getContainer(isCloud: Bool,
                              isTest: Bool,
-                             inMemory: Bool) -> NSPersistentContainer {
+                             inMemory: Bool) -> NSPersistentContainer
+    {
         let container = isCloud
             ? NSPersistentCloudKitContainer(name: modelName, managedObjectModel: model)
             : NSPersistentContainer(name: modelName, managedObjectModel: model)
@@ -100,7 +101,8 @@ public struct PersistenceManager {
     static func getStoreDescription(suffix: String?,
                                     isCloud: Bool,
                                     isTest: Bool,
-                                    inMemory: Bool = false) -> NSPersistentStoreDescription {
+                                    inMemory: Bool = false) -> NSPersistentStoreDescription
+    {
         let url: URL = {
             // NOTE used exclusively by preview; may need rethinking
             if inMemory {
@@ -116,8 +118,8 @@ public struct PersistenceManager {
         }()
 
         let desc = NSPersistentStoreDescription(url: url)
-        //desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-        
+        // desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+
         if isCloud {
             let suffix2: String = {
                 guard let name = suffix else { return "" }

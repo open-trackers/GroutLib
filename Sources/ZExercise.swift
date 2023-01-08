@@ -71,19 +71,8 @@ extension ZExercise {
     }
 
     static func get(_ context: NSManagedObjectContext, forArchiveID exerciseArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZExercise? {
-        let req = NSFetchRequest<ZExercise>(entityName: "ZExercise")
-        req.predicate = NSPredicate(format: "exerciseArchiveID = %@", exerciseArchiveID.uuidString)
-        req.returnsObjectsAsFaults = false
-        if let inStore {
-            req.affectedStores = [inStore]
-        }
-
-        do {
-            let results = try context.fetch(req) as [ZExercise]
-            return results.first
-        } catch {
-            throw DataError.fetchError(msg: error.localizedDescription)
-        }
+        let pred = NSPredicate(format: "exerciseArchiveID = %@", exerciseArchiveID.uuidString)
+        return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
     // NOTE: does NOT save context

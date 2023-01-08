@@ -63,19 +63,8 @@ extension ZRoutine {
     }
 
     static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZRoutine? {
-        let req = NSFetchRequest<ZRoutine>(entityName: "ZRoutine")
-        req.predicate = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
-        req.returnsObjectsAsFaults = false
-        if let inStore {
-            req.affectedStores = [inStore]
-        }
-
-        do {
-            let results = try context.fetch(req) as [ZRoutine]
-            return results.first
-        } catch {
-            throw DataError.fetchError(msg: error.localizedDescription)
-        }
+        let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
+        return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
     // NOTE: does NOT save context
