@@ -62,7 +62,7 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
 //    var recordsToDelete = [NSManagedObjectID]()
 
     do {
-        _ = try ZRoutine.copyAll(context, fromStore: mainStore, toStore: archiveStore)
+        _ = try ZRoutine.deepCopy(context, fromStore: mainStore, toStore: archiveStore)
     } catch {
         throw DataError.transferError(msg: error.localizedDescription)
     }

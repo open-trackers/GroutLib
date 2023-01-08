@@ -1,5 +1,5 @@
 //
-//  TransferTests.swift
+//  DeepCopyTests.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -13,7 +13,7 @@ import CoreData
 @testable import GroutLib
 import XCTest
 
-final class TransferTests: TestBase {
+final class DeepCopyTests: TestBase {
     var mainStore: NSPersistentStore!
     var archiveStore: NSPersistentStore!
 
@@ -36,7 +36,21 @@ final class TransferTests: TestBase {
         self.archiveStore = archiveStore
     }
 
-    func testRoutine() throws {}
+    func testRoutine() throws {
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        try testContext.save()
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+
+        let objectIDs = try ZRoutine.deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
+        try testContext.save()
+
+        XCTAssertEqual([sr.objectID], objectIDs)
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+    }
 
     func testRoutineWithRoutineRun() throws {}
 

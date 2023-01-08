@@ -34,31 +34,59 @@ extension ZRoutine {
         return nu
     }
 
-    /// Copy each ZRoutine to alternative store, where one doesn't already exist in that store.
-    /// Does not delete records.
+    /// Deep copy of all routines and their children from the source store to specified destination store
+    /// Returning list of the objectIDs of the records copied FROM the SOURCE store.
+    /// Does not delete any records.
     /// Does NOT save context.
-    /// Returns list of ids of objects copied from source store.
-    static func copyAll(_ context: NSManagedObjectContext,
-                        fromStore srcStore: NSPersistentStore,
-                        toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
+    static func deepCopy(_ context: NSManagedObjectContext,
+                         fromStore srcStore: NSPersistentStore,
+                         toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
     {
         var copiedObjects = [NSManagedObjectID]()
-        try context.fetcher(ZRoutine.self, inStore: srcStore) { zRoutine in
-            guard let routineArchiveID = zRoutine.routineArchiveID
-            else { throw DataError.missingArchiveID(msg: "For zRoutine \(zRoutine.wrappedName)'") }
 
-            if try get(context, forArchiveID: routineArchiveID, inStore: dstStore) != nil {
-                print("Found existing zRoutine \(zRoutine.wrappedName)")
+        // recursively copy the routine and its children to the archive
+        try context.fetcher(ZRoutine.self, inStore: srcStore) { zRoutine in
+
+            let dRoutine = try zRoutine.shallowCopy(context, toStore: dstStore)
+
+            let routinePred = NSPredicate(format: "zRoutine = %@", zRoutine)
+
+            try context.fetcher(ZRoutineRun.self, predicate: routinePred, inStore: srcStore) { zRoutineRun in
+
+                _ = try zRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
+
+                copiedObjects.append(zRoutineRun.objectID)
+                print("Copied zRoutineRun \(zRoutine.wrappedName) startedAt=\(String(describing: zRoutineRun.startedAt))")
                 return true
             }
 
-            _ = try zRoutine.shallowCopy(context, toStore: dstStore)
+            try context.fetcher(ZExercise.self, predicate: routinePred, inStore: srcStore) { zExercise in
+
+                let dExercise = try zExercise.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
+
+                let exercisePred = NSPredicate(format: "zExercise = %@", zExercise)
+
+                try context.fetcher(ZExerciseRun.self, predicate: exercisePred, inStore: srcStore) { zExerciseRun in
+
+                    _ = try zExerciseRun.shallowCopy(context, dstExercise: dExercise, toStore: dstStore)
+
+                    copiedObjects.append(zExerciseRun.objectID)
+                    print("Copied zExerciseRun \(zExercise.wrappedName) completedAt=\(String(describing: zExerciseRun.completedAt))")
+                    return true
+                }
+
+                copiedObjects.append(zExercise.objectID)
+                print("Copied zExercise \(zExercise.wrappedName)")
+
+                return true
+            }
 
             copiedObjects.append(zRoutine.objectID)
-            print("Copied routine \(zRoutine.wrappedName)")
+            print("Copied zRoutine \(zRoutine.wrappedName)")
 
             return true
         }
+
         return copiedObjects
     }
 
