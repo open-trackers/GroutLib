@@ -28,7 +28,7 @@ public extension ZRoutineRun {
     /// Does NOT save context.
     internal func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZRoutineRun {
         guard let startedAt
-        else { throw DataError.copyError(msg: "missing startedAt") }
+        else { throw DataError.missingData(msg: "startedAt; can't copy") }
         return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
     }
 
@@ -46,7 +46,7 @@ public extension ZRoutineRun {
     // NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: TimeInterval, inStore: NSPersistentStore? = nil) throws -> ZRoutineRun {
         guard let archiveID = zRoutine.routineArchiveID
-        else { throw DataError.missingArchiveID(msg: "ZRoutine missing archiveID") }
+        else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
         if let nu = try ZRoutineRun.get(context, forArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
             return nu

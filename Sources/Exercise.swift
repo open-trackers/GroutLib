@@ -84,7 +84,7 @@ public extension Exercise {
         guard let routineArchiveID = routine?.archiveID,
               let routineName = routine?.name
         else {
-            throw DataError.missingArchiveID(msg: "missing routine details")
+            throw DataError.missingData(msg: "routine details; can't mark done")
         }
 
         if archiveID == nil { archiveID = UUID() }

@@ -28,7 +28,7 @@ extension ZRoutine {
     /// Does NOT save context.
     func shallowCopy(_ context: NSManagedObjectContext, toStore dstStore: NSPersistentStore) throws -> ZRoutine {
         guard let routineArchiveID
-        else { throw DataError.copyError(msg: "missing routineArchiveID") }
+        else { throw DataError.missingData(msg: "routineArchiveID; can't copy") }
         return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
     }
 

@@ -30,7 +30,7 @@ extension ZExercise {
     /// Does NOT save context.
     func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZExercise {
         guard let exerciseArchiveID
-        else { throw DataError.copyError(msg: "missing exerciseArchiveID") }
+        else { throw DataError.missingData(msg: "exerciseArchiveID; can't copy") }
         let nu = try ZExercise.getOrCreate(context, zRoutine: dstRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: wrappedName, inStore: dstStore)
         return nu
     }

@@ -28,7 +28,7 @@ extension ZExerciseRun {
     /// Does NOT save context.
     func shallowCopy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore dstStore: NSPersistentStore) throws -> ZExerciseRun {
         guard let completedAt
-        else { throw DataError.copyError(msg: "missing completedAt") }
+        else { throw DataError.missingData(msg: "completedAt not present; can't copy") }
         return try ZExerciseRun.getOrCreate(context, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
     }
 
@@ -45,7 +45,7 @@ extension ZExerciseRun {
     // NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, inStore: NSPersistentStore? = nil) throws -> ZExerciseRun {
         guard let archiveID = zExercise.exerciseArchiveID
-        else { throw DataError.missingArchiveID(msg: "ZExercise missing archiveID") }
+        else { throw DataError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
         if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
             return nu
