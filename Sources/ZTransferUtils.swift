@@ -8,8 +8,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
 
-import os
 import CoreData
+import os
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier!,
