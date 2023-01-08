@@ -34,62 +34,6 @@ extension ZRoutine {
         return nu
     }
 
-    /// Deep copy of all routines and their children from the source store to specified destination store
-    /// Returning list of the objectIDs of the records copied FROM the SOURCE store.
-    /// Does not delete any records.
-    /// Does NOT save context.
-    static func deepCopy(_ context: NSManagedObjectContext,
-                         fromStore srcStore: NSPersistentStore,
-                         toStore dstStore: NSPersistentStore) throws -> [NSManagedObjectID]
-    {
-        var copiedObjects = [NSManagedObjectID]()
-
-        // recursively copy the routine and its children to the archive
-        try context.fetcher(ZRoutine.self, inStore: srcStore) { zRoutine in
-
-            let dRoutine = try zRoutine.shallowCopy(context, toStore: dstStore)
-
-            let routinePred = NSPredicate(format: "zRoutine = %@", zRoutine)
-
-            try context.fetcher(ZRoutineRun.self, predicate: routinePred, inStore: srcStore) { zRoutineRun in
-
-                _ = try zRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
-
-                copiedObjects.append(zRoutineRun.objectID)
-                print("Copied zRoutineRun \(zRoutine.wrappedName) startedAt=\(String(describing: zRoutineRun.startedAt))")
-                return true
-            }
-
-            try context.fetcher(ZExercise.self, predicate: routinePred, inStore: srcStore) { zExercise in
-
-                let dExercise = try zExercise.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
-
-                let exercisePred = NSPredicate(format: "zExercise = %@", zExercise)
-
-                try context.fetcher(ZExerciseRun.self, predicate: exercisePred, inStore: srcStore) { zExerciseRun in
-
-                    _ = try zExerciseRun.shallowCopy(context, dstExercise: dExercise, toStore: dstStore)
-
-                    copiedObjects.append(zExerciseRun.objectID)
-                    print("Copied zExerciseRun \(zExercise.wrappedName) completedAt=\(String(describing: zExerciseRun.completedAt))")
-                    return true
-                }
-
-                copiedObjects.append(zExercise.objectID)
-                print("Copied zExercise \(zExercise.wrappedName)")
-
-                return true
-            }
-
-            copiedObjects.append(zRoutine.objectID)
-            print("Copied zRoutine \(zRoutine.wrappedName)")
-
-            return true
-        }
-
-        return copiedObjects
-    }
-
     static func get(_ context: NSManagedObjectContext, forArchiveID routineArchiveID: UUID, inStore: NSPersistentStore? = nil) throws -> ZRoutine? {
         let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
         return try context.firstFetcher(predicate: pred, inStore: inStore)

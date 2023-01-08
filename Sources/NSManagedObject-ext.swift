@@ -60,6 +60,11 @@ public extension NSManagedObjectContext {
         let breq = NSBatchDeleteRequest(fetchRequest: req)
         try executeAndMergeChanges(using: breq)
     }
+
+    func deleter(objectIDs: [NSManagedObjectID]) throws {
+        let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
+        try executeAndMergeChanges(using: breq)
+    }
 }
 
 public extension NSManagedObjectContext {

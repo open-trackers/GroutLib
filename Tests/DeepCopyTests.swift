@@ -43,7 +43,7 @@ final class DeepCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
 
-        let objectIDs = try ZRoutine.deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
+        let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertEqual([sr.objectID], objectIDs)
@@ -65,7 +65,7 @@ final class DeepCopyTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
 
-        let objectIDs = try ZRoutine.deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
+        let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertEqual([su.objectID, sr.objectID], objectIDs)
@@ -88,7 +88,7 @@ final class DeepCopyTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
 
-        let objectIDs = try ZRoutine.deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
+        let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertEqual([se.objectID, sr.objectID], objectIDs)
@@ -112,10 +112,14 @@ final class DeepCopyTests: TestBase {
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
-        let objectIDs = try ZRoutine.deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
+        let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertEqual([su.objectID, se.objectID, sr.objectID], objectIDs)
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
