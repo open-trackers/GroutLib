@@ -13,12 +13,12 @@ import CoreData
 /// Archive representation of a Routine record
 extension ZRoutine {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID, inStore: NSPersistentStore? = nil) -> ZRoutine {
+    static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID, toStore: NSPersistentStore? = nil) -> ZRoutine {
         let nu = ZRoutine(context: context)
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
-        if let inStore {
-            context.assign(nu, to: inStore)
+        if let toStore {
+            context.assign(nu, to: toStore)
         }
         return nu
     }
@@ -42,7 +42,7 @@ extension ZRoutine {
         if let nu = try ZRoutine.get(context, forArchiveID: routineArchiveID, inStore: inStore) {
             return nu
         } else {
-            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, inStore: inStore)
+            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, toStore: inStore)
         }
     }
 

@@ -37,7 +37,7 @@ final class DeepCopyTests: TestBase {
     }
 
     func testRoutine() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
@@ -55,7 +55,7 @@ final class DeepCopyTests: TestBase {
     func testRoutineWithRoutineRun() throws {
         let startedAt = Date()
         let duration: TimeInterval = 30.0
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         let su = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration)
         try testContext.save()
 
@@ -78,7 +78,7 @@ final class DeepCopyTests: TestBase {
     }
 
     func testRoutineWithExercise() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
         try testContext.save()
 
@@ -103,7 +103,7 @@ final class DeepCopyTests: TestBase {
     func testRoutineWithExerciseAndExerciseRun() throws {
         let completedAt = Date()
         let intensity: Float = 30.0
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
         let su = ZExerciseRun.create(testContext, zExercise: se, completedAt: completedAt, intensity: intensity)
         try testContext.save()

@@ -12,13 +12,13 @@ import CoreData
 
 extension ZExerciseRun {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, inStore: NSPersistentStore? = nil) -> ZExerciseRun {
+    static func create(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, toStore: NSPersistentStore? = nil) -> ZExerciseRun {
         let nu = ZExerciseRun(context: context)
         nu.zExercise = zExercise
         nu.completedAt = completedAt
         nu.intensity = intensity
-        if let inStore {
-            context.assign(nu, to: inStore)
+        if let toStore {
+            context.assign(nu, to: toStore)
         }
         return nu
     }
@@ -50,7 +50,7 @@ extension ZExerciseRun {
         if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
             return nu
         } else {
-            return ZExerciseRun.create(context, zExercise: zExercise, completedAt: completedAt, intensity: intensity, inStore: inStore)
+            return ZExerciseRun.create(context, zExercise: zExercise, completedAt: completedAt, intensity: intensity, toStore: inStore)
         }
     }
 

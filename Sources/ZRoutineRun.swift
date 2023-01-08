@@ -12,13 +12,13 @@ import CoreData
 
 public extension ZRoutineRun {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: Double, inStore: NSPersistentStore? = nil) -> ZRoutineRun {
+    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: Double, toStore: NSPersistentStore? = nil) -> ZRoutineRun {
         let nu = ZRoutineRun(context: context)
         nu.zRoutine = zRoutine
         nu.startedAt = startedAt
         nu.duration = duration
-        if let inStore {
-            context.assign(nu, to: inStore)
+        if let toStore {
+            context.assign(nu, to: toStore)
         }
         return nu
     }
@@ -51,7 +51,7 @@ public extension ZRoutineRun {
         if let nu = try ZRoutineRun.get(context, forArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
             return nu
         } else {
-            return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, inStore: inStore)
+            return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, toStore: inStore)
         }
     }
 

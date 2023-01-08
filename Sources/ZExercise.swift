@@ -13,13 +13,13 @@ import CoreData
 /// Archive representation of a Exercise record
 extension ZExercise {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseName: String, exerciseArchiveID: UUID, inStore: NSPersistentStore? = nil) -> ZExercise {
+    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseName: String, exerciseArchiveID: UUID, toStore: NSPersistentStore? = nil) -> ZExercise {
         let nu = ZExercise(context: context)
         nu.name = exerciseName
         nu.exerciseArchiveID = exerciseArchiveID
         nu.zRoutine = zRoutine
-        if let inStore {
-            context.assign(nu, to: inStore)
+        if let toStore {
+            context.assign(nu, to: toStore)
         }
         return nu
     }
@@ -45,7 +45,7 @@ extension ZExercise {
         if let nu = try ZExercise.get(context, forArchiveID: exerciseArchiveID, inStore: inStore) {
             return nu
         } else {
-            return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, inStore: inStore)
+            return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, toStore: inStore)
         }
     }
 
