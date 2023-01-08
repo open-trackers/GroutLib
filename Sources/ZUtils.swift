@@ -127,13 +127,10 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
 
     do {
         let srcObjectIdDict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
-        // print("\(#function): \(srcObjectIdDict.count) srcObjectIDs found")
-        // try context.save() // TODO: is this necessary?
         if srcObjectIdDict.count > 0 {
             try srcObjectIdDict.values.forEach {
                 try context.deleter(objectIDs: $0)
             }
-            // try context.save() // TODO: is this necessary?
         }
     } catch {
         throw DataError.transferError(msg: error.localizedDescription)
