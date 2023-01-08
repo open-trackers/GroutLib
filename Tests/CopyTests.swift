@@ -18,6 +18,9 @@ final class CopyTests: TestBase {
     var mainStore: NSPersistentStore!
     var archiveStore: NSPersistentStore!
 
+    var routineArchiveID = UUID()
+    var exerciseArchiveID = UUID()
+
     override func setUpWithError() throws {
         try super.setUpWithError()
         
@@ -39,18 +42,47 @@ final class CopyTests: TestBase {
         XCTAssertFalse(archiveStore.isReadOnly)
     }
     
-    func testCopyRoutine() throws {
-        let uuid = UUID()
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid, inStore: mainStore)
+    func testShallowCopyRoutine() throws {
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
         try testContext.save()
 
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: mainStore))
-        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: archiveStore))
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try r.copy(testContext, toStore: archiveStore)
+        try sr.copy(testContext, toStore: archiveStore)
         try testContext.save()
 
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: mainStore))
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid, inStore: archiveStore))
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+    }
+    
+    func testShallowCopyExerciseWithRoutine() throws {
+        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, inStore: mainStore)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        try testContext.save()
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
+
+        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+        XCTAssertNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
+
+        // routine needs to get there first
+        try sr.copy(testContext, toStore: archiveStore)
+        try testContext.save()
+        guard let dr = try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore)
+        else {
+            XCTFail(); return
+        }
+        
+        // now the exercise
+        try se.copy(testContext, dstRoutine: dr, toStore: archiveStore)
+        try testContext.save()
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
+
+        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
     }
 }
