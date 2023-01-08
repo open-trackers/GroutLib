@@ -26,7 +26,7 @@ extension ZExerciseRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore nuStore: NSPersistentStore) throws -> ZExerciseRun {
+    func shallowCopy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore nuStore: NSPersistentStore) throws -> ZExerciseRun {
         guard let completedAt
         else { throw DataError.copyError(msg: "missing completedAt") }
         let nu = ZExerciseRun.create(context, zExercise: dstExercise, completedAt: completedAt, intensity: intensity)

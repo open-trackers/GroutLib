@@ -28,7 +28,7 @@ extension ZExercise {
     /// NOTE assumes that routine is in dstStore.
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZExercise {
+    func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZExercise {
         guard let exerciseArchiveID
         else { throw DataError.copyError(msg: "missing exerciseArchiveID") }
         let nu = ZExercise.create(context, zRoutine: dstRoutine, exerciseName: wrappedName, exerciseArchiveID: exerciseArchiveID)
@@ -60,7 +60,7 @@ extension ZExercise {
             // create ZRoutine record in destination store if doesn't already exist
             let nuRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routine.wrappedName, inStore: dstStore)
 
-            _ = try zExercise.copy(context, dstRoutine: nuRoutine, toStore: dstStore)
+            _ = try zExercise.shallowCopy(context, dstRoutine: nuRoutine, toStore: dstStore)
 
             copiedObjects.append(zExercise.objectID)
             print("Copied exercise \(zExercise.wrappedName)")

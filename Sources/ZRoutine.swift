@@ -26,7 +26,7 @@ extension ZRoutine {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, toStore dstStore: NSPersistentStore) throws -> ZRoutine {
+    func shallowCopy(_ context: NSManagedObjectContext, toStore dstStore: NSPersistentStore) throws -> ZRoutine {
         guard let routineArchiveID
         else { throw DataError.copyError(msg: "missing routineArchiveID") }
         let nu = ZRoutine.create(context, routineName: wrappedName, routineArchiveID: routineArchiveID)
@@ -52,7 +52,7 @@ extension ZRoutine {
                 return true
             }
 
-            _ = try zRoutine.copy(context, toStore: dstStore)
+            _ = try zRoutine.shallowCopy(context, toStore: dstStore)
 
             copiedObjects.append(zRoutine.objectID)
             print("Copied routine \(zRoutine.wrappedName)")
