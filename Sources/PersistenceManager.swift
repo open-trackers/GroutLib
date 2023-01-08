@@ -18,6 +18,9 @@ import Collections
 // to the 'archive' store on iOS, to reduce watch storage needs.
 public struct PersistenceManager {
     static let modelName = "Grout"
+    static let cloudPrefix = "iCloud.org.openalloc.grout"
+    static let archiveSuffix = "archive"
+    static let baseName = "Grout"
 
     public enum StoreType: Hashable {
         case main
@@ -71,7 +74,7 @@ public struct PersistenceManager {
 
         #if !os(watchOS)
             // NOTE the watch won't get the archive store
-            stores[.archive] = getStoreDescription(suffix: "archive", isCloud: isCloud, isTest: isTest)
+            stores[.archive] = getStoreDescription(suffix: archiveSuffix, isCloud: isCloud, isTest: isTest)
         #endif
 
         container.persistentStoreDescriptions = stores.values.elements
@@ -112,7 +115,7 @@ public struct PersistenceManager {
             let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
             let prefix = isTest ? "Test" : ""
             let netSuffix = suffix?.capitalized ?? ""
-            let baseFileName = "\(prefix)Grout\(netSuffix)"
+            let baseFileName = "\(prefix)\(baseName)\(netSuffix)"
 
             return defaultDirectoryURL.appendingPathComponent(baseFileName).appendingPathExtension("sqlite")
         }()
@@ -125,8 +128,7 @@ public struct PersistenceManager {
                 guard let name = suffix else { return "" }
                 return ".\(name.lowercased())"
             }()
-            let prefix = "iCloud.org.openalloc.grout"
-            let identifier = "\(prefix)\(suffix2)"
+            let identifier = "\(cloudPrefix)\(suffix2)"
             desc.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: identifier)
         }
 
