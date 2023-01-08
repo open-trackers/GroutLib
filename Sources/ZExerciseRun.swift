@@ -26,23 +26,21 @@ extension ZExerciseRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, nuExercise: ZExercise, toStore nuStore: NSPersistentStore) throws -> ZExerciseRun {
+    func copy(_ context: NSManagedObjectContext, dstExercise: ZExercise, toStore nuStore: NSPersistentStore) throws -> ZExerciseRun {
         guard let completedAt
         else { throw DataError.copyError(msg: "missing completedAt") }
-        let nu = ZExerciseRun.create(context, zExercise: nuExercise, completedAt: completedAt, intensity: intensity)
+        let nu = ZExerciseRun.create(context, zExercise: dstExercise, completedAt: completedAt, intensity: intensity)
         context.assign(nu, to: nuStore)
         return nu
     }
 
-    // NOTE UNTESTED
     static func get(_ context: NSManagedObjectContext,
                     forArchiveID archiveID: UUID,
-                    startedAt: Date,
+                    completedAt: Date,
                     inStore: NSPersistentStore? = nil) throws -> ZExerciseRun?
     {
-        let pred = NSPredicate(format: "exerciseArchiveID = %@ AND startedAt = %@",
-                               archiveID.uuidString,
-                               startedAt as NSDate)
+        let pred = NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
+                               archiveID.uuidString, completedAt as NSDate)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 

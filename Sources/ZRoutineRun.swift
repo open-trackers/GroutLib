@@ -26,21 +26,20 @@ public extension ZRoutineRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    func copy(_ context: NSManagedObjectContext, nuRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws -> ZRoutineRun {
+    func copy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore nuStore: NSPersistentStore) throws -> ZRoutineRun {
         guard let startedAt
         else { throw DataError.copyError(msg: "missing startedAt") }
-        let nu = ZRoutineRun.create(context, zRoutine: nuRoutine, startedAt: startedAt, duration: duration)
+        let nu = ZRoutineRun.create(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration)
         context.assign(nu, to: nuStore)
         return nu
     }
 
-    // NOTE UNTESTED
     static func get(_ context: NSManagedObjectContext,
                     forArchiveID archiveID: UUID,
                     startedAt: Date,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutineRun?
     {
-        let pred = NSPredicate(format: "routineArchiveID = %@ AND startedAt = %@",
+        let pred = NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
                                archiveID.uuidString,
                                startedAt as NSDate)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
