@@ -23,7 +23,7 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(r.isDeleted)
         XCTAssertFalse(rr.isDeleted)
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: uuid))
         XCTAssertEqual(1, try ZRoutineRun.count(testContext))
 
         try cleanLogRecords(testContext, keepSince: startDate)
@@ -31,7 +31,7 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(r.isDeleted)
         XCTAssertFalse(rr.isDeleted)
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: uuid))
         XCTAssertEqual(1, try ZRoutineRun.count(testContext))
     }
 
@@ -44,13 +44,13 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(r.isDeleted)
         XCTAssertFalse(rr.isDeleted)
-        XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: uuid))
         XCTAssertEqual(1, try ZRoutineRun.count(testContext))
 
         try cleanLogRecords(testContext, keepSince: startDate.addingTimeInterval(1))
         try testContext.save()
 
-        XCTAssertNil(try ZRoutine.get(testContext, forArchiveID: uuid))
+        XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: uuid))
         XCTAssertEqual(0, try ZRoutineRun.count(testContext))
     }
 
@@ -67,7 +67,7 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(e.isDeleted)
         XCTAssertFalse(ee.isDeleted)
-        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: eUUID))
+        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: eUUID))
         XCTAssertEqual(1, try ZExerciseRun.count(testContext))
 
         try cleanLogRecords(testContext, keepSince: completeDate)
@@ -75,7 +75,7 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(e.isDeleted)
         XCTAssertFalse(ee.isDeleted)
-        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: eUUID))
+        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: eUUID))
         XCTAssertEqual(1, try ZExerciseRun.count(testContext))
     }
 
@@ -92,13 +92,13 @@ final class CleanLogRecordTests: TestBase {
 
         XCTAssertFalse(e.isDeleted)
         XCTAssertFalse(ee.isDeleted)
-        XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: eUUID))
+        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: eUUID))
         XCTAssertEqual(1, try ZExerciseRun.count(testContext))
 
         try cleanLogRecords(testContext, keepSince: completeDate.addingTimeInterval(1))
         try testContext.save()
 
-        XCTAssertNil(try ZExercise.get(testContext, forArchiveID: eUUID))
+        XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: eUUID))
         XCTAssertEqual(0, try ZExerciseRun.count(testContext))
     }
 }

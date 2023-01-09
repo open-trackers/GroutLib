@@ -39,7 +39,7 @@ public extension ZRoutine {
     }
 
     static func get(_ context: NSManagedObjectContext,
-                    forArchiveID routineArchiveID: UUID,
+                    routineArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutine?
     {
         let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
@@ -52,7 +52,7 @@ public extension ZRoutine {
                             routineName: String,
                             inStore: NSPersistentStore? = nil) throws -> ZRoutine
     {
-        if let nu = try ZRoutine.get(context, forArchiveID: routineArchiveID, inStore: inStore) {
+        if let nu = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
             return nu
         } else {
             return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, toStore: inStore)

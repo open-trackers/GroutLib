@@ -47,12 +47,12 @@ public extension ZRoutineRun {
     }
 
     static func get(_ context: NSManagedObjectContext,
-                    forArchiveID archiveID: UUID,
+                    routineArchiveID: UUID,
                     startedAt: Date,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutineRun?
     {
         let pred = NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
-                               archiveID.uuidString,
+                               routineArchiveID.uuidString,
                                startedAt as NSDate)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
@@ -67,7 +67,7 @@ public extension ZRoutineRun {
         guard let archiveID = zRoutine.routineArchiveID
         else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
-        if let nu = try ZRoutineRun.get(context, forArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
+        if let nu = try ZRoutineRun.get(context, routineArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
             return nu
         } else {
             return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, toStore: inStore)

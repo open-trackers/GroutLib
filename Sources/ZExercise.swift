@@ -44,7 +44,7 @@ public extension ZExercise {
     }
 
     static func get(_ context: NSManagedObjectContext,
-                    forArchiveID exerciseArchiveID: UUID,
+                    exerciseArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZExercise?
     {
         let pred = NSPredicate(format: "exerciseArchiveID = %@", exerciseArchiveID.uuidString)
@@ -58,7 +58,7 @@ public extension ZExercise {
                             exerciseName: String,
                             inStore: NSPersistentStore? = nil) throws -> ZExercise
     {
-        if let nu = try ZExercise.get(context, forArchiveID: exerciseArchiveID, inStore: inStore) {
+        if let nu = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
             return nu
         } else {
             return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, toStore: inStore)
