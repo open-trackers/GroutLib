@@ -55,7 +55,8 @@ public extension NSManagedObjectContext {
     }
 
     func deleter(entityName: String, predicate: NSPredicate? = nil,
-                 inStore: NSPersistentStore? = nil) throws {
+                 inStore: NSPersistentStore? = nil) throws
+    {
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         if let predicate { req.predicate = predicate }
         if let inStore { req.affectedStores = [inStore] }
