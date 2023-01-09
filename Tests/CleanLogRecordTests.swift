@@ -60,9 +60,9 @@ final class CleanLogRecordTests: TestBase {
         let startDate = Date.now
         let completeDate = startDate
         let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
-        let _ = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
         let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseArchiveID: eUUID)
-        let ee = ZExerciseRun.create(testContext, zExercise: e, completedAt: completeDate, intensity: 1)
+        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
         try testContext.save()
 
         XCTAssertFalse(e.isDeleted)
@@ -85,9 +85,9 @@ final class CleanLogRecordTests: TestBase {
         let startDate = Date.now
         let completeDate = startDate
         let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
-        let _ = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
         let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseArchiveID: eUUID)
-        let ee = ZExerciseRun.create(testContext, zExercise: e, completedAt: completeDate, intensity: 1)
+        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
         try testContext.save()
 
         XCTAssertFalse(e.isDeleted)

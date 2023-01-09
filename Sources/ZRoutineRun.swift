@@ -11,14 +11,19 @@
 import CoreData
 
 public extension ZRoutineRun {
-    var dateRange: ClosedRange<Date> {
-        guard let startedAt
-        else { return ClosedRange<Date>(uncheckedBounds: (.distantPast, .distantFuture)) }
-        return ClosedRange<Date>(uncheckedBounds: (startedAt, startedAt.addingTimeInterval(duration)))
-    }
+//    var dateRange: ClosedRange<Date> {
+//        guard let startedAt
+//        else { return ClosedRange<Date>(uncheckedBounds: (.distantPast, .distantFuture)) }
+//        return ClosedRange<Date>(uncheckedBounds: (startedAt, startedAt.addingTimeInterval(duration)))
+//    }
 
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: Double, toStore: NSPersistentStore? = nil) -> ZRoutineRun {
+    static func create(_ context: NSManagedObjectContext,
+                       zRoutine: ZRoutine,
+                       startedAt: Date,
+                       duration: Double,
+                       toStore: NSPersistentStore? = nil) -> ZRoutineRun
+    {
         let nu = ZRoutineRun(context: context)
         nu.zRoutine = zRoutine
         nu.startedAt = startedAt
@@ -32,7 +37,10 @@ public extension ZRoutineRun {
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
     /// Does not delete self.
     /// Does NOT save context.
-    internal func shallowCopy(_ context: NSManagedObjectContext, dstRoutine: ZRoutine, toStore dstStore: NSPersistentStore) throws -> ZRoutineRun {
+    internal func shallowCopy(_ context: NSManagedObjectContext,
+                              dstRoutine: ZRoutine,
+                              toStore dstStore: NSPersistentStore) throws -> ZRoutineRun
+    {
         guard let startedAt
         else { throw DataError.missingData(msg: "startedAt; can't copy") }
         return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
@@ -50,7 +58,12 @@ public extension ZRoutineRun {
     }
 
     // NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext, zRoutine: ZRoutine, startedAt: Date, duration: TimeInterval, inStore: NSPersistentStore? = nil) throws -> ZRoutineRun {
+    static func getOrCreate(_ context: NSManagedObjectContext,
+                            zRoutine: ZRoutine,
+                            startedAt: Date,
+                            duration: TimeInterval,
+                            inStore: NSPersistentStore? = nil) throws -> ZRoutineRun
+    {
         guard let archiveID = zRoutine.routineArchiveID
         else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 

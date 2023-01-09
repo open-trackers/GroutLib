@@ -11,10 +11,8 @@
 import CoreData
 import os
 
-private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier!,
-    category: "ZTransfer"
-)
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
+                            category: "ZTransfer")
 
 internal enum ZType {
     case zroutine
@@ -64,33 +62,49 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
         let routinePred = NSPredicate(format: "zRoutine = %@", sRoutine)
 
-        try context.fetcher(ZRoutineRun.self, predicate: routinePred, inStore: srcStore) { sRoutineRun in
-
-            _ = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
-
-            append(.zroutinerun, sRoutineRun.objectID)
-            logger.debug("Copied zRoutineRun \(sRoutine.wrappedName) startedAt=\(String(describing: sRoutineRun.startedAt))")
-            return true
-        }
+        // will need dExercise for creating dExerciseRun
+        var dExerciseDict: [UUID: ZExercise] = [:]
 
         try context.fetcher(ZExercise.self, predicate: routinePred, inStore: srcStore) { sExercise in
 
             let dExercise = try sExercise.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
-            let exercisePred = NSPredicate(format: "zExercise = %@", sExercise)
-
-            try context.fetcher(ZExerciseRun.self, predicate: exercisePred, inStore: srcStore) { sExerciseRun in
-
-                _ = try sExerciseRun.shallowCopy(context, dstExercise: dExercise, toStore: dstStore)
-
-                append(.zexerciserun, sExerciseRun.objectID)
-                logger.debug("Copied zExerciseRun \(sExercise.wrappedName) completedAt=\(String(describing: sExerciseRun.completedAt))")
-                return true
+            if let uuid = dExercise.exerciseArchiveID {
+                dExerciseDict[uuid] = dExercise
+            } else {
+                logger.error("Missing archiveID for zExercise \(sExercise.wrappedName)")
             }
 
             append(.zexercise, sExercise.objectID)
             logger.debug("Copied zExercise \(sExercise.wrappedName)")
 
+            return true
+        }
+
+        try context.fetcher(ZRoutineRun.self, predicate: routinePred, inStore: srcStore) { sRoutineRun in
+
+            let dRoutineRun = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
+
+            let routineRunPred = NSPredicate(format: "zRoutineRun = %@", sRoutineRun)
+
+            try context.fetcher(ZExerciseRun.self, predicate: routineRunPred, inStore: srcStore) { sExerciseRun in
+
+                guard let exerciseArchiveID = sExerciseRun.zExercise?.exerciseArchiveID,
+                      let dExercise = dExerciseDict[exerciseArchiveID]
+                else {
+                    logger.error("Could not determine exerciseArchiveID to obtain destination exercise")
+                    return true
+                }
+
+                _ = try sExerciseRun.shallowCopy(context, dstRoutineRun: dRoutineRun, dstExercise: dExercise, toStore: dstStore)
+
+                append(.zexerciserun, sExerciseRun.objectID)
+                logger.debug("Copied zExerciseRun \(sExerciseRun.zExercise?.name ?? "") completedAt=\(String(describing: sExerciseRun.completedAt))")
+                return true
+            }
+
+            append(.zroutinerun, sRoutineRun.objectID)
+            logger.debug("Copied zRoutineRun \(sRoutine.wrappedName) startedAt=\(String(describing: sRoutineRun.startedAt))")
             return true
         }
 

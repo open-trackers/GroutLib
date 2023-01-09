@@ -113,12 +113,16 @@ final class ShallowCopyTests: TestBase {
     func testRoutineWithExerciseAndExerciseRun() throws {
         let completedAt = Date()
         let intensity: Float = 30.0
+        let startedAt = Date()
+        let duration: TimeInterval = 30.0
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
-        let su = ZExerciseRun.create(testContext, zExercise: se, completedAt: completedAt, intensity: intensity)
+        let srr = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration)
+        let ser = ZExerciseRun.create(testContext, zRoutineRun: srr, zExercise: se, completedAt: completedAt, intensity: intensity)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
@@ -128,6 +132,12 @@ final class ShallowCopyTests: TestBase {
         guard let dr = try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore)
         else { XCTFail(); return }
 
+        // and routineRun too
+        _ = try srr.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
+        try testContext.save()
+        guard let drr = try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore)
+        else { XCTFail(); return }
+
         // and exercise too
         _ = try se.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
         try testContext.save()
@@ -135,14 +145,16 @@ final class ShallowCopyTests: TestBase {
         else { XCTFail(); return }
 
         // and finally copy the exercise run
-        _ = try su.shallowCopy(testContext, dstExercise: de, toStore: archiveStore)
+        _ = try ser.shallowCopy(testContext, dstRoutineRun: drr, dstExercise: de, toStore: archiveStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         XCTAssertNotNil(try ZRoutine.get(testContext, forArchiveID: routineArchiveID, inStore: archiveStore))
+        XCTAssertNotNil(try ZRoutineRun.get(testContext, forArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
         XCTAssertNotNil(try ZExercise.get(testContext, forArchiveID: exerciseArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
     }

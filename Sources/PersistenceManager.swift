@@ -31,10 +31,8 @@ public struct PersistenceManager {
     public static var stores = StoresDict()
     public static let shared = PersistenceManager()
 
-    static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier!,
-        category: String(describing: PersistenceManager.self)
-    )
+    static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
+                               category: String(describing: PersistenceManager.self))
 
     public let container: NSPersistentCloudKitContainer
 

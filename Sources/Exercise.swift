@@ -79,6 +79,7 @@ public extension Exercise {
     // NOTE: does NOT save context
     func markDone(_ context: NSManagedObjectContext,
                   withAdvance: Bool,
+                  routineStartedAt: Date,
                   now: Date = Date.now) throws
     {
         let intensity = lastIntensity
@@ -86,6 +87,13 @@ public extension Exercise {
 
         guard let routineArchiveID = routine?.archiveID,
               let routineName = routine?.name
+//              case let zRoutine = try ZRoutine.getOrCreate(context,
+//                                                  routineArchiveID: routineArchiveID,
+//                                                  routineName: routineName),
+//              let zRoutineRun = try ZRoutineRun.getOrCreate(context,
+//                                                        zRoutine: zRoutine,
+//                                                        startedAt: routineStartedAt,
+//                                                        duration: duration)
         else {
             throw DataError.missingData(msg: "routine details; can't mark done")
         }
@@ -96,6 +104,7 @@ public extension Exercise {
         _ = try Exercise.logRun(context,
                                 routineArchiveID: routineArchiveID,
                                 routineName: routineName,
+                                routineStartedAt: routineStartedAt,
                                 exerciseArchiveID: archiveID!,
                                 exerciseName: wrappedName,
                                 completedAt: completedAt,
@@ -116,6 +125,7 @@ extension Exercise {
     static func logRun(_ context: NSManagedObjectContext,
                        routineArchiveID: UUID,
                        routineName: String,
+                       routineStartedAt: Date,
                        exerciseArchiveID: UUID,
                        exerciseName: String,
                        completedAt: Date,
@@ -128,9 +138,16 @@ extension Exercise {
 
         let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName, inStore: mainStore)
 
+        // if not created, create a ZRoutineRun record, now that exercises are being marked as complete. (No need to create a ZRoutineRun record if no exercises completed.)
+        let zRoutineRun = try ZRoutineRun.getOrCreate(context, zRoutine: zRoutine, startedAt: routineStartedAt, duration: 0)
+
+        // extend the routine run's duration, in case app crashes or is killed
+        zRoutineRun.duration = Date.now.timeIntervalSince(routineStartedAt)
+
         let zExercise = try ZExercise.getOrCreate(context, zRoutine: zRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName, inStore: mainStore)
 
         return try ZExerciseRun.getOrCreate(context,
+                                            zRoutineRun: zRoutineRun,
                                             zExercise: zExercise,
                                             completedAt: completedAt,
                                             intensity: intensity,
