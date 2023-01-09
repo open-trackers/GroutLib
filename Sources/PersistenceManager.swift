@@ -57,16 +57,16 @@ public struct PersistenceManager {
 //        PersistenceManager.getStore(context, .main)
 //    }
 //
-//    public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
-//        PersistenceManager.getStore(context, .archive)
-//    }
+    public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
+        PersistenceManager.getStore(context, .archive)
+    }
 
     // TODO: rethink this
     public static var preview: PersistenceManager = .init(inMemory: true)
 
     // MARK: - Internal
 
-    static func getStore(_ context: NSManagedObjectContext, _ storeType: StoreType) -> NSPersistentStore? {
+    public static func getStore(_ context: NSManagedObjectContext, _ storeType: StoreType) -> NSPersistentStore? {
         guard let url = PersistenceManager.stores[storeType]?.url,
               let psc = context.persistentStoreCoordinator,
               let store = psc.persistentStore(for: url)

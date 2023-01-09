@@ -10,7 +10,7 @@
 
 import CoreData
 
-extension ZExerciseRun {
+public extension ZExerciseRun {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, zExercise: ZExercise, completedAt: Date, intensity: Float, toStore: NSPersistentStore? = nil) -> ZExerciseRun {
         let nu = ZExerciseRun(context: context)

@@ -11,7 +11,7 @@
 import CoreData
 
 /// Archive representation of a Exercise record
-extension ZExercise {
+public extension ZExercise {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, zRoutine: ZRoutine, exerciseName: String, exerciseArchiveID: UUID, toStore: NSPersistentStore? = nil) -> ZExercise {
         let nu = ZExercise(context: context)

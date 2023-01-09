@@ -11,7 +11,7 @@
 import CoreData
 
 /// Archive representation of a Routine record
-extension ZRoutine {
+public extension ZRoutine {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext, routineName: String, routineArchiveID: UUID, toStore: NSPersistentStore? = nil) -> ZRoutine {
         let nu = ZRoutine(context: context)
