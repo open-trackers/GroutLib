@@ -43,6 +43,9 @@ public extension NSManagedObject {
 }
 
 public extension NSManagedObjectContext {
+    /// Batch delete all records for an entity matching the specified predicate/store.
+    /// Safe to run on a background context.
+    /// NOTE: does NOT save context
     func deleter<T: NSFetchRequestResult>(_: T.Type,
                                           predicate: NSPredicate? = nil,
                                           inStore: NSPersistentStore? = nil) throws
@@ -55,8 +58,13 @@ public extension NSManagedObjectContext {
         try executeAndMergeChanges(using: breq)
     }
 
+    /// Batch delete all records for an entity for the given objectIDs.
+    ///
     /// NOTE that objectIDs must all be from the same entityType, or you'll
     /// get the "mismatched objectIDs in batch delete initializer" runtime error.
+    ///
+    /// Safe to run on a background context.
+    /// NOTE: does NOT save context
     func deleter(objectIDs: [NSManagedObjectID]) throws {
         let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
         try executeAndMergeChanges(using: breq)

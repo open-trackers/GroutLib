@@ -24,6 +24,7 @@ internal enum ZType {
 internal typealias ZTypeObjectIDs = [ZType: [NSManagedObjectID]]
 
 /// Transfers all 'Z' records in .main store to .archive store.
+/// Safe to run on a background context.
 /// NOTE: does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext) throws {
     logger.debug("\(#function)")
@@ -44,6 +45,7 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
 /// Deep copy of all routines and their children from the source store to specified destination store
 /// Returning list of the objectIDs of the records copied FROM the SOURCE store.
 /// Does not delete any records.
+/// Safe to run on a background context.
 /// Does NOT save context.
 internal func deepCopy(_ context: NSManagedObjectContext,
                        fromStore srcStore: NSPersistentStore,
