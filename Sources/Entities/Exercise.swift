@@ -80,6 +80,7 @@ public extension Exercise {
     func markDone(_ context: NSManagedObjectContext,
                   withAdvance: Bool,
                   routineStartedAt: Date,
+                  logToHistory: Bool,
                   now: Date = Date.now) throws
     {
         let intensity = lastIntensity
@@ -87,10 +88,12 @@ public extension Exercise {
 
         // Log the completion of the exercise for the historical record.
         // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
-        try logCompletion(context,
-                          routineStartedAt: routineStartedAt,
-                          exerciseCompletedAt: completedAt,
-                          exerciseIntensity: intensity)
+        if logToHistory {
+            try logCompletion(context,
+                              routineStartedAt: routineStartedAt,
+                              exerciseCompletedAt: completedAt,
+                              exerciseIntensity: intensity)
+        }
 
         // update the attributes with fresh data
         if withAdvance {
