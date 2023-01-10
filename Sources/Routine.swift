@@ -39,7 +39,7 @@ public extension Routine {
     // NOTE: does NOT save context
     internal func clearCompletions(_ context: NSManagedObjectContext) throws {
         let predicate = NSPredicate(format: "routine = %@", self)
-        try context.fetcher(Exercise.self, predicate: predicate) { exercise in
+        try context.fetcher(predicate: predicate) { (exercise: Exercise) in
             exercise.lastCompletedAt = nil
             return true
         }

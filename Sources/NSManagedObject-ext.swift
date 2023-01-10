@@ -43,17 +43,6 @@ public extension NSManagedObject {
 }
 
 public extension NSManagedObjectContext {
-    // via avanderlee
-    /// Executes the given `NSBatchDeleteRequest` and directly merges the changes to bring the given managed object context up to date.
-    func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
-        batchDeleteRequest.resultType = .resultTypeObjectIDs
-        let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
-        let changes: [AnyHashable: Any] = [
-            NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? [],
-        ]
-        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
-    }
-
     func deleter(entityName: String,
                  predicate: NSPredicate? = nil,
                  inStore: NSPersistentStore? = nil) throws
@@ -71,13 +60,23 @@ public extension NSManagedObjectContext {
         let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
         try executeAndMergeChanges(using: breq)
     }
+    
+    // via avanderlee
+    /// Executes the given `NSBatchDeleteRequest` and directly merges the changes to bring the given managed object context up to date.
+    internal func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
+        batchDeleteRequest.resultType = .resultTypeObjectIDs
+        let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
+        let changes: [AnyHashable: Any] = [
+            NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? [],
+        ]
+        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
+    }
 }
 
 public extension NSManagedObjectContext {
-    /// Convenient wrapper for iterating over results from simple fetch request.
+    /// Convenience wrapper for iterating over results from simple fetch request.
     /// Will continue iterating so long as callback returns true
-    func fetcher<T: NSFetchRequestResult>(_: T.Type,
-                                          predicate: NSPredicate? = nil,
+    func fetcher<T: NSFetchRequestResult>(predicate: NSPredicate? = nil,
                                           sortDescriptors: [NSSortDescriptor] = [],
                                           inStore: NSPersistentStore? = nil,
                                           _ each: @escaping (T) throws -> Bool) throws
@@ -91,7 +90,7 @@ public extension NSManagedObjectContext {
         }
     }
 
-    /// Convenient wrapper for retrieving one record
+    /// Convenience wrapper for retrieving one record
     func firstFetcher<T: NSFetchRequestResult>(predicate: NSPredicate? = nil,
                                                sortDescriptors: [NSSortDescriptor] = [],
                                                inStore: NSPersistentStore? = nil) throws -> T?
@@ -106,6 +105,7 @@ public extension NSManagedObjectContext {
         return results.first
     }
 
+    /// Convenience wrapper for counting records
     func counter<T: NSFetchRequestResult>(_: T.Type,
                                           predicate: NSPredicate? = nil,
                                           inStore: NSPersistentStore? = nil) throws -> Int

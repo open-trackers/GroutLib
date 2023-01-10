@@ -56,7 +56,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
             .append(objectID)
     }
 
-    try context.fetcher(ZRoutine.self, inStore: srcStore) { sRoutine in
+    try context.fetcher(inStore: srcStore) { (sRoutine: ZRoutine) in
 
         let dRoutine = try sRoutine.shallowCopy(context, toStore: dstStore)
 
@@ -65,7 +65,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
         // will need dExercise for creating dExerciseRun
         var dExerciseDict: [UUID: ZExercise] = [:]
 
-        try context.fetcher(ZExercise.self, predicate: routinePred, inStore: srcStore) { sExercise in
+        try context.fetcher(predicate: routinePred, inStore: srcStore) { (sExercise: ZExercise) in
 
             let dExercise = try sExercise.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
@@ -81,13 +81,13 @@ internal func deepCopy(_ context: NSManagedObjectContext,
             return true
         }
 
-        try context.fetcher(ZRoutineRun.self, predicate: routinePred, inStore: srcStore) { sRoutineRun in
+        try context.fetcher(predicate: routinePred, inStore: srcStore) { (sRoutineRun: ZRoutineRun) in
 
             let dRoutineRun = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
             let routineRunPred = NSPredicate(format: "zRoutineRun = %@", sRoutineRun)
 
-            try context.fetcher(ZExerciseRun.self, predicate: routineRunPred, inStore: srcStore) { sExerciseRun in
+            try context.fetcher(predicate: routineRunPred, inStore: srcStore) { (sExerciseRun: ZExerciseRun) in
 
                 guard let exerciseArchiveID = sExerciseRun.zExercise?.exerciseArchiveID,
                       let dExercise = dExerciseDict[exerciseArchiveID]
