@@ -11,12 +11,6 @@
 import CoreData
 
 public extension ZRoutineRun {
-//    var dateRange: ClosedRange<Date> {
-//        guard let startedAt
-//        else { return ClosedRange<Date>(uncheckedBounds: (.distantPast, .distantFuture)) }
-//        return ClosedRange<Date>(uncheckedBounds: (startedAt, startedAt.addingTimeInterval(duration)))
-//    }
-
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
