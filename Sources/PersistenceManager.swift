@@ -50,7 +50,7 @@ public struct PersistenceManager {
     }
 
     /// Clear Routines and Exercises from the main store. (Should not be present in Archive store.)
-    /// NOTE does not save context
+    /// NOTE: does NOT save context
     static func clearPrimaryEntities(_ context: NSManagedObjectContext) throws {
         try context.deleter(Exercise.self)
         try context.deleter(Routine.self)
@@ -58,7 +58,7 @@ public struct PersistenceManager {
 
     /// Clear the log entities from the specified store.
     /// If no store specified, it will clear from all stores.
-    /// NOTE does not save context
+    /// NOTE: does NOT save context
     public static func clearZEntities(_ context: NSManagedObjectContext, inStore: NSPersistentStore? = nil) throws {
         try context.deleter(ZExerciseRun.self, inStore: inStore)
         try context.deleter(ZExercise.self, inStore: inStore)

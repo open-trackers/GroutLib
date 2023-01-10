@@ -121,7 +121,7 @@ public extension Exercise {
 extension Exercise {
     /// log the run of the exercise to the main store
     /// (These will later be transferred to the archive store on iOS devices)
-    /// NOTE: does not save context
+    /// NOTE: does NOT save context
     static func logRun(_ context: NSManagedObjectContext,
                        routineArchiveID: UUID,
                        routineName: String,
