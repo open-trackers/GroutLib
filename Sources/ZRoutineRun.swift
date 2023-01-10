@@ -57,17 +57,20 @@ public extension ZRoutineRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    // NOTE: does NOT save context
+    /// Fetch a ZRoutineRun record in the specified store, creating if necessary.
+    /// Will update duration on existing record.
+    /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             startedAt: Date,
                             duration: TimeInterval,
-                            inStore: NSPersistentStore? = nil) throws -> ZRoutineRun
+                            inStore: NSPersistentStore) throws -> ZRoutineRun
     {
         guard let archiveID = zRoutine.routineArchiveID
         else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
         if let nu = try ZRoutineRun.get(context, routineArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
+            nu.duration = duration
             return nu
         } else {
             return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, toStore: inStore)

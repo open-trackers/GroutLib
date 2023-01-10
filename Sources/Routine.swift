@@ -52,38 +52,6 @@ public extension Routine {
         }
         return startDate
     }
-
-    // Returns true if routine is updated.
-    // NOTE: does NOT save context
-    func stop(_ context: NSManagedObjectContext,
-              startedAt: Date,
-              now: Date = Date.now) throws -> Bool
-    {
-        guard anyExerciseCompleted,
-              startedAt < now
-        else { return false }
-
-        let duration = now.timeIntervalSince(startedAt)
-
-        if archiveID == nil { archiveID = UUID() }
-
-        // log the run for charting
-        _ = try Routine.logRun(context,
-                               archiveID: archiveID!,
-                               name: wrappedName,
-                               startedAt: startedAt,
-                               duration: duration)
-
-        // update the attributes with fresh data
-        lastStartedAt = startedAt
-        lastDuration = duration
-
-        return true
-    }
-
-    internal var anyExerciseCompleted: Bool {
-        exercises?.first(where: { ($0 as? Exercise)?.lastCompletedAt != nil }) != nil
-    }
 }
 
 public extension Routine {
@@ -155,30 +123,5 @@ public extension Routine {
         }
 
         return nil
-    }
-}
-
-extension Routine {
-    /// log the run of the routine to the main store
-    /// (These will later be transferred to the archive store on iOS devices)
-    /// NOTE: does NOT save context
-    static func logRun(_ context: NSManagedObjectContext,
-                       archiveID: UUID,
-                       name: String,
-                       startedAt: Date,
-                       duration: TimeInterval) throws -> ZRoutineRun
-    {
-        guard let mainStore = PersistenceManager.getStore(context, .main)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "Cannot log routine run.")
-        }
-
-        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: archiveID, routineName: name, inStore: mainStore)
-
-        return try ZRoutineRun.getOrCreate(context,
-                                           zRoutine: zRoutine,
-                                           startedAt: startedAt,
-                                           duration: duration,
-                                           inStore: mainStore)
     }
 }

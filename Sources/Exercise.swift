@@ -85,30 +85,12 @@ public extension Exercise {
         let intensity = lastIntensity
         let completedAt = now
 
-        guard let routineArchiveID = routine?.archiveID,
-              let routineName = routine?.name
-//              case let zRoutine = try ZRoutine.getOrCreate(context,
-//                                                  routineArchiveID: routineArchiveID,
-//                                                  routineName: routineName),
-//              let zRoutineRun = try ZRoutineRun.getOrCreate(context,
-//                                                        zRoutine: zRoutine,
-//                                                        startedAt: routineStartedAt,
-//                                                        duration: duration)
-        else {
-            throw DataError.missingData(msg: "routine details; can't mark done")
-        }
-
-        if archiveID == nil { archiveID = UUID() }
-
-        // log the run for charting
-        _ = try Exercise.logRun(context,
-                                routineArchiveID: routineArchiveID,
-                                routineName: routineName,
-                                routineStartedAt: routineStartedAt,
-                                exerciseArchiveID: archiveID!,
-                                exerciseName: wrappedName,
-                                completedAt: completedAt,
-                                intensity: intensity)
+        // Log the completion of the exercise for the historical record.
+        // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
+        try logRun(context,
+                   routineStartedAt: routineStartedAt,
+                   exerciseCompletedAt: completedAt,
+                   exerciseIntensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -122,35 +104,64 @@ extension Exercise {
     /// log the run of the exercise to the main store
     /// (These will later be transferred to the archive store on iOS devices)
     /// NOTE: does NOT save context
-    static func logRun(_ context: NSManagedObjectContext,
-                       routineArchiveID: UUID,
-                       routineName: String,
-                       routineStartedAt: Date,
-                       exerciseArchiveID: UUID,
-                       exerciseName: String,
-                       completedAt: Date,
-                       intensity: Float) throws -> ZExerciseRun
+    func logRun(_ context: NSManagedObjectContext,
+                routineStartedAt: Date,
+                exerciseCompletedAt: Date,
+                exerciseIntensity: Float) throws
     {
         guard let mainStore = PersistenceManager.getStore(context, .main)
         else {
             throw DataError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
         }
 
-        let zRoutine = try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: routineName, inStore: mainStore)
+        guard let routine else {
+            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
+        }
 
-        // if not created, create a ZRoutineRun record, now that exercises are being marked as complete. (No need to create a ZRoutineRun record if no exercises completed.)
-        let zRoutineRun = try ZRoutineRun.getOrCreate(context, zRoutine: zRoutine, startedAt: routineStartedAt, duration: 0)
+        // Get corresponding zRoutine for log, creating if necessary.
+        let routineArchiveID: UUID = {
+            if routine.archiveID == nil {
+                routine.archiveID = UUID()
+            }
+            return routine.archiveID!
+        }()
+        let zRoutine = try ZRoutine.getOrCreate(context,
+                                                routineArchiveID: routineArchiveID,
+                                                routineName: routine.wrappedName,
+                                                inStore: mainStore)
+
+        // Get corresponding zExercise for log, creating if necessary.
+        let exerciseArchiveID: UUID = {
+            if self.archiveID == nil {
+                self.archiveID = UUID()
+            }
+            return self.archiveID!
+        }()
+        let zExercise = try ZExercise.getOrCreate(context,
+                                                  zRoutine: zRoutine,
+                                                  exerciseArchiveID: exerciseArchiveID,
+                                                  exerciseName: wrappedName,
+                                                  inStore: mainStore)
 
         // extend the routine run's duration, in case app crashes or is killed
-        zRoutineRun.duration = Date.now.timeIntervalSince(routineStartedAt)
+        let nuDuration = Date.now.timeIntervalSince(routineStartedAt)
 
-        let zExercise = try ZExercise.getOrCreate(context, zRoutine: zRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: exerciseName, inStore: mainStore)
+        let zRoutineRun = try ZRoutineRun.getOrCreate(context,
+                                                      zRoutine: zRoutine,
+                                                      startedAt: routineStartedAt,
+                                                      duration: nuDuration,
+                                                      inStore: mainStore)
 
-        return try ZExerciseRun.getOrCreate(context,
-                                            zRoutineRun: zRoutineRun,
-                                            zExercise: zExercise,
-                                            completedAt: completedAt,
-                                            intensity: intensity,
-                                            inStore: mainStore)
+        _ = try ZExerciseRun.getOrCreate(context,
+                                         zRoutineRun: zRoutineRun,
+                                         zExercise: zExercise,
+                                         completedAt: exerciseCompletedAt,
+                                         intensity: exerciseIntensity,
+                                         inStore: mainStore)
+
+        // the routine run has at least one completed exercise, so update the
+        // routine with the latest data.
+        routine.lastStartedAt = routineStartedAt
+        routine.lastDuration = nuDuration
     }
 }

@@ -46,13 +46,16 @@ public extension ZRoutine {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    // NOTE: does NOT save context
+    /// Fetch a ZRoutine record in the specified store, creating if necessary.
+    /// Will update name on existing record.
+    /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             routineArchiveID: UUID,
                             routineName: String,
-                            inStore: NSPersistentStore? = nil) throws -> ZRoutine
+                            inStore: NSPersistentStore) throws -> ZRoutine
     {
         if let nu = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
+            nu.name = routineName
             return nu
         } else {
             return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, toStore: inStore)

@@ -51,14 +51,17 @@ public extension ZExercise {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    // NOTE: does NOT save context
+    /// Fetch a ZExercise record in the specified store, creating if necessary.
+    /// Will update name on existing record.
+    /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             exerciseArchiveID: UUID,
                             exerciseName: String,
-                            inStore: NSPersistentStore? = nil) throws -> ZExercise
+                            inStore: NSPersistentStore) throws -> ZExercise
     {
         if let nu = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
+            nu.name = exerciseName
             return nu
         } else {
             return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, toStore: inStore)

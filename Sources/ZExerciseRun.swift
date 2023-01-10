@@ -54,18 +54,21 @@ public extension ZExerciseRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    // NOTE: does NOT save context
+    /// Fetch a ZExerciseRun record in the specified store, creating if necessary.
+    /// Will update intensity on existing record.
+    /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutineRun: ZRoutineRun,
                             zExercise: ZExercise,
                             completedAt: Date,
                             intensity: Float,
-                            inStore: NSPersistentStore? = nil) throws -> ZExerciseRun
+                            inStore: NSPersistentStore) throws -> ZExerciseRun
     {
         guard let archiveID = zExercise.exerciseArchiveID
         else { throw DataError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
         if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
+            nu.intensity = intensity
             return nu
         } else {
             return ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, intensity: intensity, toStore: inStore)
