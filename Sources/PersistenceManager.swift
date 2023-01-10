@@ -36,13 +36,13 @@ public struct PersistenceManager {
 
     public let container: NSPersistentCloudKitContainer
 
-    public init(inMemory: Bool = false) {
+    public init() {
         container = PersistenceManager.getContainer(isCloud: true,
-                                                    isTest: false,
-                                                    inMemory: inMemory) as! NSPersistentCloudKitContainer
+                                                    isTest: false) as! NSPersistentCloudKitContainer
     }
 
     /// Save context if changes pending, with optional force.
+    /// TODO factor this out. Make an extension of MOC.
     public func save(forced: Bool = false) throws {
         let ctx = container.viewContext
         if forced || ctx.hasChanges {
@@ -58,8 +58,6 @@ public struct PersistenceManager {
     public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
         PersistenceManager.getStore(context, .archive)
     }
-
-    public static var preview: PersistenceManager = .init(inMemory: true)
 
     /// Clear Routines and Exercises from the main store. (Should not be present in Archive store.)
     /// NOTE does not save context
@@ -97,14 +95,13 @@ public struct PersistenceManager {
     }
 
     static func getContainer(isCloud: Bool,
-                             isTest: Bool,
-                             inMemory: Bool) -> NSPersistentContainer
+                             isTest: Bool) -> NSPersistentContainer
     {
         let container = isCloud
             ? NSPersistentCloudKitContainer(name: modelName, managedObjectModel: model)
             : NSPersistentContainer(name: modelName, managedObjectModel: model)
 
-        stores[.main] = getStoreDescription(suffix: nil, isCloud: isCloud, isTest: isTest, inMemory: inMemory)
+        stores[.main] = getStoreDescription(suffix: nil, isCloud: isCloud, isTest: isTest)
 
         #if !os(watchOS)
             // NOTE the watch won't get the archive store
@@ -137,15 +134,9 @@ public struct PersistenceManager {
 
     static func getStoreDescription(suffix: String?,
                                     isCloud: Bool,
-                                    isTest: Bool,
-                                    inMemory: Bool = false) -> NSPersistentStoreDescription
+                                    isTest: Bool) -> NSPersistentStoreDescription
     {
         let url: URL = {
-            // NOTE used exclusively by preview; may need rethinking
-            if inMemory {
-                return URL(fileURLWithPath: "/dev/null")
-            }
-
             let defaultDirectoryURL = NSPersistentContainer.defaultDirectoryURL()
             let prefix = isTest ? "Test" : ""
             let netSuffix = suffix?.capitalized ?? ""
@@ -169,20 +160,23 @@ public struct PersistenceManager {
         return desc
     }
 
-    static func getTestContainer() throws -> NSPersistentContainer {
-        // NOTE: not using inMemory storage for testing, for two reasons:
-        // (1) We're using two stores, where /dev/null may not be usable for both
-        // (2) Batch delete may not be supported for inMemory
+    // MARK: - Preview and Test containers
 
-        let container = getContainer(isCloud: false, isTest: true, inMemory: false)
+    public static func getPreviewContainer() -> NSPersistentContainer {
+        // NOTE At present, no preview data loaded
+        do {
+            return try getTestContainer()
+        } catch {
+            fatalError("Could not clear entities objects from stores.")
+        }
+    }
 
-        let context = container.viewContext
-
-        // clear all data that persisted from earlier tests
-        try clearPrimaryEntities(context)
-        try clearZEntities(context)
-        try context.save()
-
+    public static func getTestContainer() throws -> NSPersistentContainer {
+        let container = getContainer(isCloud: false, isTest: true)
+        let ctx = container.viewContext
+        try clearPrimaryEntities(ctx)
+        try clearZEntities(ctx)
+        try ctx.save()
         return container
     }
 }
