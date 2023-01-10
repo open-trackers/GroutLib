@@ -41,16 +41,6 @@ public struct PersistenceManager {
                                                     isTest: false) as! NSPersistentCloudKitContainer
     }
 
-    /// Save context if changes pending, with optional force.
-    /// TODO factor this out. Make an extension of MOC.
-    public func save(forced: Bool = false) throws {
-        let ctx = container.viewContext
-        if forced || ctx.hasChanges {
-            Self.logger.notice("\(#function) saving context, forced=\(forced)")
-            try ctx.save()
-        }
-    }
-
 //    public static func getMainStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
 //        PersistenceManager.getStore(context, .main)
 //    }
