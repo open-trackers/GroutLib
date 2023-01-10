@@ -78,21 +78,27 @@ public extension Exercise {
 
     // NOTE: does NOT save context
     func markDone(_ context: NSManagedObjectContext,
+                  completedAt: Date,
                   withAdvance: Bool,
                   routineStartedAt: Date,
-                  logToHistory: Bool,
-                  now: Date = Date.now) throws
+                  logToHistory: Bool) throws
     {
-        let intensity = lastIntensity
-        let completedAt = now
+        // extend the routine run's duration, in case app crashes or is killed
+        let nuDuration = completedAt.timeIntervalSince(routineStartedAt)
+
+        // The ZRoutineRun has at least one completed exercise, so update the
+        // Routine with the latest data, even if we're not logging to history
+        routine?.lastStartedAt = routineStartedAt
+        routine?.lastDuration = nuDuration
 
         // Log the completion of the exercise for the historical record.
         // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
         if logToHistory {
             try logCompletion(context,
                               routineStartedAt: routineStartedAt,
+                              nuDuration: nuDuration,
                               exerciseCompletedAt: completedAt,
-                              exerciseIntensity: intensity)
+                              exerciseIntensity: lastIntensity)
         }
 
         // update the attributes with fresh data
@@ -109,6 +115,7 @@ extension Exercise {
     /// NOTE: does NOT save context
     func logCompletion(_ context: NSManagedObjectContext,
                        routineStartedAt: Date,
+                       nuDuration: TimeInterval,
                        exerciseCompletedAt: Date,
                        exerciseIntensity: Float) throws
     {
@@ -146,9 +153,6 @@ extension Exercise {
                                                   exerciseName: wrappedName,
                                                   inStore: mainStore)
 
-        // extend the routine run's duration, in case app crashes or is killed
-        let nuDuration = Date.now.timeIntervalSince(routineStartedAt)
-
         let zRoutineRun = try ZRoutineRun.getOrCreate(context,
                                                       zRoutine: zRoutine,
                                                       startedAt: routineStartedAt,
@@ -161,10 +165,5 @@ extension Exercise {
                                          completedAt: exerciseCompletedAt,
                                          intensity: exerciseIntensity,
                                          inStore: mainStore)
-
-        // The ZRoutineRun has at least one completed exercise, so update the
-        // Routine with the latest data.
-        routine.lastStartedAt = routineStartedAt
-        routine.lastDuration = nuDuration
     }
 }

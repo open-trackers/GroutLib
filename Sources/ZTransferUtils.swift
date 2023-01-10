@@ -49,6 +49,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
                        fromStore srcStore: NSPersistentStore,
                        toStore dstStore: NSPersistentStore) throws -> ZTypeObjectIDs
 {
+    logger.debug("\(#function)")
     var copiedObjects = ZTypeObjectIDs()
 
     func append(_ ztype: ZType, _ objectID: NSManagedObjectID) {
@@ -57,7 +58,6 @@ internal func deepCopy(_ context: NSManagedObjectContext,
     }
 
     try context.fetcher(inStore: srcStore) { (sRoutine: ZRoutine) in
-
         let dRoutine = try sRoutine.shallowCopy(context, toStore: dstStore)
 
         let routinePred = NSPredicate(format: "zRoutine = %@", sRoutine)
@@ -66,7 +66,6 @@ internal func deepCopy(_ context: NSManagedObjectContext,
         var dExerciseDict: [UUID: ZExercise] = [:]
 
         try context.fetcher(predicate: routinePred, inStore: srcStore) { (sExercise: ZExercise) in
-
             let dExercise = try sExercise.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
             if let uuid = dExercise.exerciseArchiveID {
