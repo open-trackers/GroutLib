@@ -14,11 +14,11 @@ import os
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
                             category: "ZTransfer")
 
-internal enum ZType {
-    case zroutine
-    case zroutinerun
-    case zexercise
-    case zexerciserun
+internal enum ZType: String {
+    case zRoutine
+    case zRoutineRun
+    case zExercise
+    case zExerciseRun
 }
 
 internal typealias ZTypeObjectIDs = [ZType: [NSManagedObjectID]]
@@ -35,8 +35,9 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
     }
 
     let dict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
-    try dict.values.forEach { objectIDs in
+    try dict.forEach { ztype, objectIDs in
         if objectIDs.count > 0 {
+            logger.debug("\(#function) Deleting \(objectIDs.count) \(ztype.rawValue)(s) from main store")
             try context.deleter(objectIDs: objectIDs)
         }
     }
@@ -76,7 +77,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
                 logger.error("Missing archiveID for zExercise \(sExercise.wrappedName)")
             }
 
-            append(.zexercise, sExercise.objectID)
+            append(.zExercise, sExercise.objectID)
             logger.debug("Copied zExercise \(sExercise.wrappedName)")
 
             return true
@@ -99,17 +100,17 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
                 _ = try sExerciseRun.shallowCopy(context, dstRoutineRun: dRoutineRun, dstExercise: dExercise, toStore: dstStore)
 
-                append(.zexerciserun, sExerciseRun.objectID)
+                append(.zExerciseRun, sExerciseRun.objectID)
                 logger.debug("Copied zExerciseRun \(sExerciseRun.zExercise?.name ?? "") completedAt=\(String(describing: sExerciseRun.completedAt))")
                 return true
             }
 
-            append(.zroutinerun, sRoutineRun.objectID)
+            append(.zRoutineRun, sRoutineRun.objectID)
             logger.debug("Copied zRoutineRun \(sRoutine.wrappedName) startedAt=\(String(describing: sRoutineRun.startedAt))")
             return true
         }
 
-        append(.zroutine, sRoutine.objectID)
+        append(.zRoutine, sRoutine.objectID)
         logger.debug("Copied zRoutine \(sRoutine.wrappedName)")
 
         return true

@@ -43,7 +43,7 @@ final class DeepCopyTests: TestBase {
         let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
-        XCTAssertEqual([.zroutine: [sr.objectID]], objectIDs)
+        XCTAssertEqual([.zRoutine: [sr.objectID]], objectIDs)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
@@ -65,7 +65,7 @@ final class DeepCopyTests: TestBase {
         let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
-        XCTAssertEqual([.zroutinerun: [su.objectID], .zroutine: [sr.objectID]], objectIDs)
+        XCTAssertEqual([.zRoutineRun: [su.objectID], .zRoutine: [sr.objectID]], objectIDs)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
@@ -88,7 +88,7 @@ final class DeepCopyTests: TestBase {
         let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
-        XCTAssertEqual([.zexercise: [se.objectID], .zroutine: [sr.objectID]], objectIDs)
+        XCTAssertEqual([.zExercise: [se.objectID], .zRoutine: [sr.objectID]], objectIDs)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
@@ -116,10 +116,10 @@ final class DeepCopyTests: TestBase {
         let objectIDs = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
 
-        XCTAssertEqual([.zexerciserun: [ser.objectID],
-                        .zexercise: [se.objectID],
-                        .zroutine: [sr.objectID],
-                        .zroutinerun: [srr.objectID]], objectIDs)
+        XCTAssertEqual([.zExerciseRun: [ser.objectID],
+                        .zExercise: [se.objectID],
+                        .zRoutine: [sr.objectID],
+                        .zRoutineRun: [srr.objectID]], objectIDs)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
