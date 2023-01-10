@@ -9,7 +9,7 @@ let package = Package(name: "GroutLib",
                                    targets: ["GroutLib"]),
                       ],
                       dependencies: [
-                          .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.3"),
+                          .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.4"),
                       ],
                       targets: [
                           .target(name: "GroutLib",
