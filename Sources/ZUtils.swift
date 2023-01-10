@@ -29,15 +29,15 @@ public func updateArchiveIDs(routines: [Routine]) {
 /// Delete all `Z` records prior to a specified date.
 /// NOTE Does NOT save context
 public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
-    try context.deleter(entityName: "ZExerciseRun",
+    try context.deleter(ZExerciseRun.self,
                         predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
 
-    try context.deleter(entityName: "ZExercise",
+    try context.deleter(ZExercise.self,
                         predicate: NSPredicate(format: "zExerciseRuns.@count == 0"))
 
-    try context.deleter(entityName: "ZRoutineRun",
+    try context.deleter(ZRoutineRun.self,
                         predicate: NSPredicate(format: "startedAt < %@", keepSince as NSDate))
 
-    try context.deleter(entityName: "ZRoutine",
+    try context.deleter(ZRoutine.self,
                         predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }

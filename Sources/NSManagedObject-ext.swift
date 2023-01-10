@@ -43,10 +43,11 @@ public extension NSManagedObject {
 }
 
 public extension NSManagedObjectContext {
-    func deleter(entityName: String,
-                 predicate: NSPredicate? = nil,
-                 inStore: NSPersistentStore? = nil) throws
+    func deleter<T: NSFetchRequestResult>(_: T.Type,
+                                          predicate: NSPredicate? = nil,
+                                          inStore: NSPersistentStore? = nil) throws
     {
+        let entityName = String(describing: T.self)
         let req = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         if let predicate { req.predicate = predicate }
         if let inStore { req.affectedStores = [inStore] }
@@ -60,7 +61,7 @@ public extension NSManagedObjectContext {
         let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
         try executeAndMergeChanges(using: breq)
     }
-    
+
     // via avanderlee
     /// Executes the given `NSBatchDeleteRequest` and directly merges the changes to bring the given managed object context up to date.
     internal func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {

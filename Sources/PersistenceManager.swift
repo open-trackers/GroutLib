@@ -54,12 +54,29 @@ public struct PersistenceManager {
 //    public static func getMainStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
 //        PersistenceManager.getStore(context, .main)
 //    }
-//
+
     public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
         PersistenceManager.getStore(context, .archive)
     }
 
     public static var preview: PersistenceManager = .init(inMemory: true)
+
+    /// Clear Routines and Exercises from the main store. (Should not be present in Archive store.)
+    /// NOTE does not save context
+    static func clearPrimaryEntities(_ context: NSManagedObjectContext) throws {
+        try context.deleter(Exercise.self)
+        try context.deleter(Routine.self)
+    }
+
+    /// Clear the log entities from the specified store.
+    /// If no store specified, it will clear from all stores.
+    /// NOTE does not save context
+    public static func clearZEntities(_ context: NSManagedObjectContext, inStore: NSPersistentStore? = nil) throws {
+        try context.deleter(ZExerciseRun.self, inStore: inStore)
+        try context.deleter(ZExercise.self, inStore: inStore)
+        try context.deleter(ZRoutineRun.self, inStore: inStore)
+        try context.deleter(ZRoutine.self, inStore: inStore)
+    }
 
     // MARK: - Internal
 
@@ -159,11 +176,12 @@ public struct PersistenceManager {
 
         let container = getContainer(isCloud: false, isTest: true, inMemory: false)
 
+        let context = container.viewContext
+
         // clear all data that persisted from earlier tests
-        try container.managedObjectModel.entities.forEach {
-            guard let name = $0.name else { return }
-            try container.viewContext.deleter(entityName: name)
-        }
+        try clearPrimaryEntities(context)
+        try clearZEntities(context)
+        try context.save()
 
         return container
     }
