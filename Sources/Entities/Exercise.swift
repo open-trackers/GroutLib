@@ -87,10 +87,10 @@ public extension Exercise {
 
         // Log the completion of the exercise for the historical record.
         // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
-        try logRun(context,
-                   routineStartedAt: routineStartedAt,
-                   exerciseCompletedAt: completedAt,
-                   exerciseIntensity: intensity)
+        try logCompletion(context,
+                          routineStartedAt: routineStartedAt,
+                          exerciseCompletedAt: completedAt,
+                          exerciseIntensity: intensity)
 
         // update the attributes with fresh data
         if withAdvance {
@@ -104,10 +104,10 @@ extension Exercise {
     /// log the run of the exercise to the main store
     /// (These will later be transferred to the archive store on iOS devices)
     /// NOTE: does NOT save context
-    func logRun(_ context: NSManagedObjectContext,
-                routineStartedAt: Date,
-                exerciseCompletedAt: Date,
-                exerciseIntensity: Float) throws
+    func logCompletion(_ context: NSManagedObjectContext,
+                       routineStartedAt: Date,
+                       exerciseCompletedAt: Date,
+                       exerciseIntensity: Float) throws
     {
         guard let mainStore = PersistenceManager.getStore(context, .main)
         else {
@@ -118,7 +118,7 @@ extension Exercise {
             throw DataError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
         }
 
-        // Get corresponding zRoutine for log, creating if necessary.
+        // Get corresponding ZRoutine for log, creating if necessary.
         let routineArchiveID: UUID = {
             if routine.archiveID == nil {
                 routine.archiveID = UUID()
@@ -130,7 +130,7 @@ extension Exercise {
                                                 routineName: routine.wrappedName,
                                                 inStore: mainStore)
 
-        // Get corresponding zExercise for log, creating if necessary.
+        // Get corresponding ZExercise for log, creating if necessary.
         let exerciseArchiveID: UUID = {
             if self.archiveID == nil {
                 self.archiveID = UUID()
@@ -159,8 +159,8 @@ extension Exercise {
                                          intensity: exerciseIntensity,
                                          inStore: mainStore)
 
-        // the routine run has at least one completed exercise, so update the
-        // routine with the latest data.
+        // The ZRoutineRun has at least one completed exercise, so update the
+        // Routine with the latest data.
         routine.lastStartedAt = routineStartedAt
         routine.lastDuration = nuDuration
     }

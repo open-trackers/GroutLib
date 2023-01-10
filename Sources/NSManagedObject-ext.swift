@@ -82,10 +82,10 @@ public extension NSManagedObjectContext {
                                           inStore: NSPersistentStore? = nil,
                                           _ each: @escaping (T) throws -> Bool) throws
     {
-        let request = try getRequest(T.self,
-                                     predicate: predicate,
-                                     sortDescriptors: sortDescriptors,
-                                     inStore: inStore)
+        let request = getRequest(T.self,
+                                 predicate: predicate,
+                                 sortDescriptors: sortDescriptors,
+                                 inStore: inStore)
         for result in try fetch(request) as [T] {
             guard try each(result) else { break }
         }
@@ -96,10 +96,10 @@ public extension NSManagedObjectContext {
                                                sortDescriptors: [NSSortDescriptor] = [],
                                                inStore: NSPersistentStore? = nil) throws -> T?
     {
-        let request = try getRequest(T.self,
-                                     predicate: predicate,
-                                     sortDescriptors: sortDescriptors,
-                                     inStore: inStore)
+        let request = getRequest(T.self,
+                                 predicate: predicate,
+                                 sortDescriptors: sortDescriptors,
+                                 inStore: inStore)
         request.fetchLimit = 1
         // req.returnsObjectsAsFaults = false   //TODO does this matter?
         let results: [T] = try fetch(request) as [T]
@@ -111,9 +111,9 @@ public extension NSManagedObjectContext {
                                           predicate: NSPredicate? = nil,
                                           inStore: NSPersistentStore? = nil) throws -> Int
     {
-        let request = try getRequest(T.self,
-                                     predicate: predicate,
-                                     inStore: inStore)
+        let request = getRequest(T.self,
+                                 predicate: predicate,
+                                 inStore: inStore)
         return try count(for: request)
     }
 }

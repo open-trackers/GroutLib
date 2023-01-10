@@ -13,7 +13,7 @@ import CoreData
 public func getRequest<T: NSFetchRequestResult>(_: T.Type,
                                                 predicate: NSPredicate? = nil,
                                                 sortDescriptors: [NSSortDescriptor] = [],
-                                                inStore: NSPersistentStore? = nil) throws -> NSFetchRequest<T>
+                                                inStore: NSPersistentStore? = nil) -> NSFetchRequest<T>
 {
     let request = NSFetchRequest<T>(entityName: String(describing: T.self))
     request.sortDescriptors = sortDescriptors
