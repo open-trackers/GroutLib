@@ -13,10 +13,14 @@ import CoreData
 /// Data layer errors
 public enum DataError: Error, Equatable {
     case fetchError(msg: String)
+    case missingData(msg: String)
+    case invalidStoreConfiguration(msg: String)
 
     var description: String {
         switch self {
         case let .fetchError(msg): return "Data fetch error: \(msg)"
+        case let .missingData(msg): return "Missing data: \(msg)"
+        case let .invalidStoreConfiguration(msg): return "Invalid store configuration: \(msg)"
         }
     }
 }
