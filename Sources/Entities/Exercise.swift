@@ -17,11 +17,15 @@ extension Exercise: UserOrdered {}
 
 public extension Exercise {
     // NOTE: does NOT save context
-    static func create(_ context: NSManagedObjectContext, userOrder: Int16) -> Exercise {
+    static func create(_ context: NSManagedObjectContext,
+                       userOrder: Int16,
+                       name: String = "New Exercise",
+                       archiveID: UUID = UUID()) -> Exercise
+    {
         let nu = Exercise(context: context)
         nu.userOrder = userOrder
-        nu.name = "New Exercise"
-        nu.archiveID = UUID()
+        nu.name = name
+        nu.archiveID = archiveID
         return nu
     }
 
@@ -166,4 +170,112 @@ extension Exercise {
                                          intensity: exerciseIntensity,
                                          inStore: mainStore)
     }
+}
+
+extension Exercise: Encodable {
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case archiveID
+        case intensityStep
+        case invertedIntensity
+        case lastCompletedAt
+        case lastIntensity
+        case name
+        case primarySetting
+        case repetitions
+        case secondarySetting
+        case sets
+        case units
+        case userOrder
+        case routineArchiveID // FK
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(archiveID, forKey: .archiveID)
+        try c.encode(intensityStep, forKey: .intensityStep)
+        try c.encode(invertedIntensity, forKey: .invertedIntensity)
+        try c.encode(lastCompletedAt, forKey: .lastCompletedAt)
+        try c.encode(lastIntensity, forKey: .lastIntensity)
+        try c.encode(name, forKey: .name)
+        try c.encode(primarySetting, forKey: .primarySetting)
+        try c.encode(repetitions, forKey: .repetitions)
+        try c.encode(secondarySetting, forKey: .secondarySetting)
+        try c.encode(sets, forKey: .sets)
+        try c.encode(units, forKey: .units)
+        try c.encode(userOrder, forKey: .userOrder)
+        try c.encode(routine?.archiveID, forKey: .routineArchiveID)
+    }
+}
+
+extension Exercise: AllocAttributable {
+    public static var attributes: [AllocAttribute] = [
+        AllocAttribute(CodingKeys.archiveID,
+                       .string,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.intensityStep,
+                       .double,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.invertedIntensity,
+                       .bool,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+
+        AllocAttribute(CodingKeys.lastCompletedAt,
+                       .date,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.lastIntensity,
+                       .double,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.name,
+                       .string,
+                       isRequired: true,
+                       isKey: false,
+                       ""),
+
+        AllocAttribute(CodingKeys.primarySetting,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.repetitions,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.secondarySetting,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.sets,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.units,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+
+        AllocAttribute(CodingKeys.userOrder,
+                       .int,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+        AllocAttribute(CodingKeys.routineArchiveID,
+                       .string,
+                       isRequired: true,
+                       isKey: true,
+                       ""),
+    ]
 }

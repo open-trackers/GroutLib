@@ -29,6 +29,10 @@ final class ExportTests: TestBase {
     var duration: TimeInterval!
     let intensityStr = "105.5"
     var intensity: Float!
+    let intensityStepStr = "3.3"
+    var intensityStep: Float!
+    let userOrderStr = "18"
+    var userOrder: Int16!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -46,6 +50,8 @@ final class ExportTests: TestBase {
         completedAt = df.date(from: completedAtStr)
         duration = Double(durationStr)
         intensity = Float(intensityStr)
+        intensityStep = Float(intensityStepStr)
+        userOrder = Int16(userOrderStr)
     }
 
     func testZRoutine() throws {
@@ -119,6 +125,56 @@ final class ExportTests: TestBase {
         let expected = """
         completedAt,intensity,exerciseArchiveID,routineRunStartedAt
         \(completedAtStr),\(intensityStr),\(exerciseArchiveID.uuidString),\(startedAtStr)
+
+        """
+
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testRoutine() throws {
+        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID)
+        r.lastDuration = duration
+        r.lastStartedAt = startedAt
+        r.imageName = "bloop"
+        try testContext.save()
+
+        let request = makeRequest(Routine.self)
+        let results = try testContext.fetch(request)
+        let data = try exportData(results, format: .CSV)
+        guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
+
+        let expected = """
+        archiveID,imageName,lastDuration,lastStartedAt,name,userOrder
+        \(routineArchiveID.uuidString),bloop,\(durationStr),\(startedAtStr),bleh,\(userOrderStr)
+
+        """
+
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testExercise() throws {
+        let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
+        let e = Exercise.create(testContext, userOrder: userOrder, name: "bleep", archiveID: exerciseArchiveID)
+        e.routine = r
+        e.intensityStep = intensityStep
+        e.invertedIntensity = true
+        e.lastCompletedAt = completedAt
+        e.lastIntensity = intensity
+        e.primarySetting = 10
+        e.repetitions = 11
+        e.secondarySetting = 12
+        e.sets = 3
+        e.units = 2
+        try testContext.save()
+
+        let request = makeRequest(Exercise.self)
+        let results = try testContext.fetch(request)
+        let data = try exportData(results, format: .CSV)
+        guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
+
+        let expected = """
+        archiveID,intensityStep,invertedIntensity,lastCompletedAt,lastIntensity,name,primarySetting,repetitions,secondarySetting,sets,units,userOrder,routineArchiveID
+        \(exerciseArchiveID.uuidString),\(intensityStepStr),true,\(completedAtStr),\(intensityStr),bleep,10,11,12,3,2,\(userOrderStr),\(routineArchiveID)
 
         """
 
