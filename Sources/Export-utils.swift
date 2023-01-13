@@ -10,7 +10,7 @@
 
 import CoreData
 
-public enum AllocFormat: String, CaseIterable {
+public enum ExportFormat: String, CaseIterable {
     case JSON = "application/json"
     case CSV = "text/csv"
     case TSV = "text/tab-separated-values"
@@ -39,8 +39,8 @@ public enum AllocFormat: String, CaseIterable {
 }
 
 public func exportData<T>(_ records: [T],
-                          format: AllocFormat) throws -> Data
-    where T: NSFetchRequestResult & MAttributable & Encodable
+                          format: ExportFormat) throws -> Data
+    where T: MAttributable & Encodable
 {
     guard let delimiter = format.delimiter
     else { throw DataError.encodingError(msg: "Format \(format.rawValue) not supported for export.") }
