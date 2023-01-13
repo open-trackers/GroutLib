@@ -26,7 +26,7 @@ public enum ExportFormat: String, CaseIterable {
         }
     }
 
-    public var defaultFileExtension: String? {
+    public var defaultFileExtension: String {
         switch self {
         case .JSON:
             return "json"
@@ -49,18 +49,3 @@ public func exportData<T>(_ records: [T],
     _ = try encoder.encode(headers: headers)
     return try encoder.encode(rows: records)
 }
-
-/*
-  private func exportAction() {
-      let finFormat = AllocFormat.CSV
-      if let data = try? exportData(model.valuationSnapshots, format: finFormat),
-         let ext = finFormat.defaultFileExtension
-      {
-          let name = MValuationSnapshot.entityName.plural.replacingOccurrences(of: " ", with: "-")
- #if os(macOS)
-          NSSavePanel.saveData(data, name: name, ext: ext, completion: { _ in })
- #endif
-      }
-  }
-
-  */

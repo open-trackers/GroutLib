@@ -16,6 +16,7 @@ public enum DataError: Error, Equatable {
     case missingData(msg: String)
     case invalidStoreConfiguration(msg: String)
     case encodingError(msg: String)
+    case archiveCreationFailure
 
     var description: String {
         switch self {
@@ -23,6 +24,7 @@ public enum DataError: Error, Equatable {
         case let .missingData(msg): return "Missing data: \(msg)"
         case let .invalidStoreConfiguration(msg): return "Invalid store configuration: \(msg)"
         case let .encodingError(msg): return "Encoding error: \(msg)"
+        case .archiveCreationFailure: return "Archive creation failure."
         }
     }
 }
