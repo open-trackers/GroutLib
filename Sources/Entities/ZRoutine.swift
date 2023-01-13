@@ -67,3 +67,31 @@ public extension ZRoutine {
         set { name = newValue }
     }
 }
+
+extension ZRoutine: Encodable {
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case name
+        case routineArchiveID
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(name, forKey: .name)
+        try c.encode(routineArchiveID, forKey: .routineArchiveID)
+    }
+}
+
+extension ZRoutine: AllocAttributable {
+    public static var attributes: [AllocAttribute] = [
+        AllocAttribute(CodingKeys.name,
+                       .string,
+                       isRequired: true,
+                       isKey: false,
+                       "The name of the Routine."),
+        AllocAttribute(CodingKeys.routineArchiveID,
+                       .string,
+                       isRequired: true,
+                       isKey: true,
+                       "The Routine Archive ID"),
+    ]
+}
