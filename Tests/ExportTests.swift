@@ -34,13 +34,20 @@ final class ExportTests: TestBase {
     }
 
     func testZRoutine() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         try testContext.save()
 
         let request = makeRequest(ZRoutine.self)
         let results = try testContext.fetch(request)
         let data = try exportData(results, format: .CSV)
-        guard let sdata = String(data: data, encoding: .utf8) else { XCTFail(); return }
-        print(sdata)
+        guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
+
+        let expected = """
+        name,routineArchiveID
+        blah,\(routineArchiveID.uuidString)
+
+        """
+
+        XCTAssertEqual(expected, actual)
     }
 }
