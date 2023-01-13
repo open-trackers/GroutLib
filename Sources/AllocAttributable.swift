@@ -30,24 +30,13 @@ public struct AllocAttribute {
         case date
     }
 
-    public init(_ codingKey: CodingKey, _ type: AttributeTypes, isRequired: Bool, isKey: Bool, _ descript: String) {
+    public init(_ codingKey: CodingKey, _ type: AttributeTypes) {
         self.codingKey = codingKey
         self.type = type
-        self.isRequired = isRequired
-        self.isKey = isKey
-        self.descript = descript
     }
 
     public let codingKey: CodingKey
     public let type: AttributeTypes
-    public let isRequired: Bool
-    public let isKey: Bool
-    public let descript: String
-
-//    public static func getSignature(_ attributes: [AllocAttribute]) -> AllocSchema.TableSignature {
-//        let codingkeys = attributes.filter(\.isRequired).map(\.codingKey)
-//        return AllocSchema.generateSignature(codingkeys)
-//    }
 
     public static func getHeaders(_ attributes: [AllocAttribute]) -> [String] {
         attributes.map(\.codingKey).map(\.stringValue)
@@ -56,6 +45,6 @@ public struct AllocAttribute {
 
 extension AllocAttribute: CustomStringConvertible {
     public var description: String {
-        "\(codingKey.stringValue): type=\(type) required=\(isRequired) key=\(isKey) desc='\(descript)'"
+        "\(codingKey.stringValue): type=\(type)"
     }
 }

@@ -95,20 +95,8 @@ extension ZExercise: Encodable {
 
 extension ZExercise: AllocAttributable {
     public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.name,
-                       .string,
-                       isRequired: true,
-                       isKey: false,
-                       ""),
-        AllocAttribute(CodingKeys.exerciseArchiveID,
-                       .string,
-                       isRequired: true,
-                       isKey: true,
-                       ""),
-        AllocAttribute(CodingKeys.routineArchiveID,
-                       .string,
-                       isRequired: true,
-                       isKey: true,
-                       ""),
+        AllocAttribute(CodingKeys.name, .string),
+        AllocAttribute(CodingKeys.exerciseArchiveID, .string),
+        AllocAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

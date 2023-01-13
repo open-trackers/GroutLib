@@ -105,20 +105,8 @@ extension ZRoutineRun: Encodable {
 
 extension ZRoutineRun: AllocAttributable {
     public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.startedAt,
-                       .date,
-                       isRequired: true,
-                       isKey: false,
-                       ""),
-        AllocAttribute(CodingKeys.duration,
-                       .double,
-                       isRequired: true,
-                       isKey: true,
-                       ""),
-        AllocAttribute(CodingKeys.routineArchiveID,
-                       .string,
-                       isRequired: true,
-                       isKey: true,
-                       ""),
+        AllocAttribute(CodingKeys.startedAt, .date),
+        AllocAttribute(CodingKeys.duration, .double),
+        AllocAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

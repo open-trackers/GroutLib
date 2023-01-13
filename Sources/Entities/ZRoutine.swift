@@ -83,15 +83,7 @@ extension ZRoutine: Encodable {
 
 extension ZRoutine: AllocAttributable {
     public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.name,
-                       .string,
-                       isRequired: true,
-                       isKey: false,
-                       "The name of the Routine."),
-        AllocAttribute(CodingKeys.routineArchiveID,
-                       .string,
-                       isRequired: true,
-                       isKey: true,
-                       "The Routine Archive ID"),
+        AllocAttribute(CodingKeys.name, .string),
+        AllocAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }
