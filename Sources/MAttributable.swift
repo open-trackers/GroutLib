@@ -1,7 +1,9 @@
 //
-//  AllocAttributable.swift
+//  MAttributable.swift
 //
-// Copyright 2021 FlowAllocator LLC
+// Adapted from: AllocAttributable.swift in OpenAlloc's AllocData, with a different license.
+//
+// Copyright 2021 OpenAlloc LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +19,11 @@
 
 import Foundation
 
-public protocol AllocAttributable {
-    static var attributes: [AllocAttribute] { get }
+public protocol MAttributable {
+    static var attributes: [MAttribute] { get }
 }
 
-public struct AllocAttribute {
+public struct MAttribute {
     public enum AttributeTypes {
         case string
         case double
@@ -38,12 +40,12 @@ public struct AllocAttribute {
     public let codingKey: CodingKey
     public let type: AttributeTypes
 
-    public static func getHeaders(_ attributes: [AllocAttribute]) -> [String] {
+    public static func getHeaders(_ attributes: [MAttribute]) -> [String] {
         attributes.map(\.codingKey).map(\.stringValue)
     }
 }
 
-extension AllocAttribute: CustomStringConvertible {
+extension MAttribute: CustomStringConvertible {
     public var description: String {
         "\(codingKey.stringValue): type=\(type)"
     }

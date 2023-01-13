@@ -93,10 +93,10 @@ extension ZExercise: Encodable {
     }
 }
 
-extension ZExercise: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.name, .string),
-        AllocAttribute(CodingKeys.exerciseArchiveID, .string),
-        AllocAttribute(CodingKeys.routineArchiveID, .string),
+extension ZExercise: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.exerciseArchiveID, .string),
+        MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

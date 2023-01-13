@@ -103,10 +103,10 @@ extension ZRoutineRun: Encodable {
     }
 }
 
-extension ZRoutineRun: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.startedAt, .date),
-        AllocAttribute(CodingKeys.duration, .double),
-        AllocAttribute(CodingKeys.routineArchiveID, .string),
+extension ZRoutineRun: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.startedAt, .date),
+        MAttribute(CodingKeys.duration, .double),
+        MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

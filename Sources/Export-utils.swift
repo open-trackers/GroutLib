@@ -1,7 +1,7 @@
 //
 //  Export-utils.swift
 //
-// Copyright 2022, 2023  OpenAlloc LLC
+// Copyright 2023  OpenAlloc LLC
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -40,12 +40,12 @@ public enum AllocFormat: String, CaseIterable {
 
 public func exportData<T>(_ records: [T],
                           format: AllocFormat) throws -> Data
-    where T: NSFetchRequestResult & AllocAttributable & Encodable
+    where T: NSFetchRequestResult & MAttributable & Encodable
 {
     guard let delimiter = format.delimiter
     else { throw DataError.encodingError(msg: "Format \(format.rawValue) not supported for export.") }
     let encoder = DelimitedEncoder(delimiter: String(delimiter))
-    let headers = AllocAttribute.getHeaders(T.attributes)
+    let headers = MAttribute.getHeaders(T.attributes)
     _ = try encoder.encode(headers: headers)
     return try encoder.encode(rows: records)
 }

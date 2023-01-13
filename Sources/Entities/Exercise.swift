@@ -207,20 +207,20 @@ extension Exercise: Encodable {
     }
 }
 
-extension Exercise: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.archiveID, .string),
-        AllocAttribute(CodingKeys.intensityStep, .double),
-        AllocAttribute(CodingKeys.invertedIntensity, .bool),
-        AllocAttribute(CodingKeys.lastCompletedAt, .date),
-        AllocAttribute(CodingKeys.lastIntensity, .double),
-        AllocAttribute(CodingKeys.name, .string),
-        AllocAttribute(CodingKeys.primarySetting, .int),
-        AllocAttribute(CodingKeys.repetitions, .int),
-        AllocAttribute(CodingKeys.secondarySetting, .int),
-        AllocAttribute(CodingKeys.sets, .int),
-        AllocAttribute(CodingKeys.units, .int),
-        AllocAttribute(CodingKeys.userOrder, .int),
-        AllocAttribute(CodingKeys.routineArchiveID, .string),
+extension Exercise: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.archiveID, .string),
+        MAttribute(CodingKeys.intensityStep, .double),
+        MAttribute(CodingKeys.invertedIntensity, .bool),
+        MAttribute(CodingKeys.lastCompletedAt, .date),
+        MAttribute(CodingKeys.lastIntensity, .double),
+        MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.primarySetting, .int),
+        MAttribute(CodingKeys.repetitions, .int),
+        MAttribute(CodingKeys.secondarySetting, .int),
+        MAttribute(CodingKeys.sets, .int),
+        MAttribute(CodingKeys.units, .int),
+        MAttribute(CodingKeys.userOrder, .int),
+        MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

@@ -100,11 +100,11 @@ extension ZExerciseRun: Encodable {
     }
 }
 
-extension ZExerciseRun: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.completedAt, .date),
-        AllocAttribute(CodingKeys.intensity, .double),
-        AllocAttribute(CodingKeys.exerciseArchiveID, .string),
-        AllocAttribute(CodingKeys.routineRunStartedAt, .date),
+extension ZExerciseRun: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.completedAt, .date),
+        MAttribute(CodingKeys.intensity, .double),
+        MAttribute(CodingKeys.exerciseArchiveID, .string),
+        MAttribute(CodingKeys.routineRunStartedAt, .date),
     ]
 }

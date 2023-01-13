@@ -81,9 +81,9 @@ extension ZRoutine: Encodable {
     }
 }
 
-extension ZRoutine: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.name, .string),
-        AllocAttribute(CodingKeys.routineArchiveID, .string),
+extension ZRoutine: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

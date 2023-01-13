@@ -151,13 +151,13 @@ extension Routine: Encodable {
     }
 }
 
-extension Routine: AllocAttributable {
-    public static var attributes: [AllocAttribute] = [
-        AllocAttribute(CodingKeys.archiveID, .string),
-        AllocAttribute(CodingKeys.imageName, .string),
-        AllocAttribute(CodingKeys.lastDuration, .double),
-        AllocAttribute(CodingKeys.lastStartedAt, .date),
-        AllocAttribute(CodingKeys.name, .string),
-        AllocAttribute(CodingKeys.userOrder, .int),
+extension Routine: MAttributable {
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.archiveID, .string),
+        MAttribute(CodingKeys.imageName, .string),
+        MAttribute(CodingKeys.lastDuration, .double),
+        MAttribute(CodingKeys.lastStartedAt, .date),
+        MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.userOrder, .int),
     ]
 }
