@@ -208,6 +208,10 @@ extension Exercise: Encodable {
 }
 
 extension Exercise: MAttributable {
+    public static var fileNamePrefix: String {
+        "exercises"
+    }
+
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.archiveID, .string),
         MAttribute(CodingKeys.intensityStep, .double),

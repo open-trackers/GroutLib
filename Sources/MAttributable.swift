@@ -21,6 +21,7 @@ import Foundation
 
 public protocol MAttributable {
     static var attributes: [MAttribute] { get }
+    static var fileNamePrefix: String { get }
 }
 
 public struct MAttribute {

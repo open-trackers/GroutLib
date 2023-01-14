@@ -152,6 +152,10 @@ extension Routine: Encodable {
 }
 
 extension Routine: MAttributable {
+    public static var fileNamePrefix: String {
+        "routines"
+    }
+
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.archiveID, .string),
         MAttribute(CodingKeys.imageName, .string),

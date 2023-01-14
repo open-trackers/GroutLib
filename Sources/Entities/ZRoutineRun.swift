@@ -104,6 +104,10 @@ extension ZRoutineRun: Encodable {
 }
 
 extension ZRoutineRun: MAttributable {
+    public static var fileNamePrefix: String {
+        "zroutineruns"
+    }
+
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.startedAt, .date),
         MAttribute(CodingKeys.duration, .double),

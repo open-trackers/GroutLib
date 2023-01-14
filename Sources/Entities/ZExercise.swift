@@ -94,6 +94,10 @@ extension ZExercise: Encodable {
 }
 
 extension ZExercise: MAttributable {
+    public static var fileNamePrefix: String {
+        "zexercises"
+    }
+
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.name, .string),
         MAttribute(CodingKeys.exerciseArchiveID, .string),

@@ -82,6 +82,10 @@ extension ZRoutine: Encodable {
 }
 
 extension ZRoutine: MAttributable {
+    public static var fileNamePrefix: String {
+        "zroutines"
+    }
+
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.name, .string),
         MAttribute(CodingKeys.routineArchiveID, .string),
