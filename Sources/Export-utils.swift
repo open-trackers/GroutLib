@@ -66,12 +66,3 @@ public func exportData<T>(_ records: [T],
     _ = try encoder.encode(headers: headers)
     return try encoder.encode(rows: records)
 }
-
-public func generateTimestampFileName(prefix: String, suffix: String, timestamp: Date = Date.now) -> String {
-    let df = ISO8601DateFormatter()
-    return prefix +
-        df.string(from: timestamp)
-        .replacingOccurrences(of: ":", with: "")
-        .replacingOccurrences(of: "Z", with: "")
-        .replacingOccurrences(of: "-", with: "") + suffix
-}
