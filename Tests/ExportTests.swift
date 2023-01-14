@@ -180,4 +180,27 @@ final class ExportTests: TestBase {
 
         XCTAssertEqual(expected, actual)
     }
+
+    func testRoutineJSON() throws {
+        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID)
+        r.lastDuration = duration
+        r.lastStartedAt = startedAt
+        r.imageName = "bloop"
+        try testContext.save()
+
+        let request = makeRequest(Routine.self)
+        let results = try testContext.fetch(request)
+        let data = try exportData(results, format: .JSON)
+        guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
+
+        let durationStr2 = "1332" // JSON doesn't include the ".0"
+
+        let expected = """
+        [{"archiveID":"\(routineArchiveID.uuidString)","imageName":"bloop","userOrder":\(userOrderStr),"name":"bleh","lastStartedAt":"\(startedAtStr)","lastDuration":\(durationStr2)}]
+        """
+
+        XCTAssertEqual(expected, actual)
+    }
+
+    // TODO: JSON export for the other types
 }
