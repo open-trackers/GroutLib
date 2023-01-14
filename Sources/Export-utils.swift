@@ -10,10 +10,21 @@
 
 import CoreData
 
-public enum ExportFormat: String, CaseIterable {
+public enum ExportFormat: String, CaseIterable, CustomStringConvertible {
     case CSV = "text/csv"
     case TSV = "text/tab-separated-values"
     case JSON = "application/json"
+
+    public var description: String {
+        switch self {
+        case .CSV:
+            return "Comma-delimited"
+        case .TSV:
+            return "Tab-delimited"
+        case .JSON:
+            return "JSON"
+        }
+    }
 
     public var delimiter: Character? {
         switch self {
