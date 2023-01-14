@@ -41,9 +41,9 @@ public struct PersistenceManager {
                                                     isTest: false) as! NSPersistentCloudKitContainer
     }
 
-//    public static func getMainStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
-//        PersistenceManager.getStore(context, .main)
-//    }
+    public static func getMainStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
+        PersistenceManager.getStore(context, .main)
+    }
 
     public static func getArchiveStore(_ context: NSManagedObjectContext) -> NSPersistentStore? {
         PersistenceManager.getStore(context, .archive)

@@ -82,3 +82,33 @@ public extension ZExerciseRun {
         try context.counter(ZExerciseRun.self, predicate: predicate, inStore: inStore)
     }
 }
+
+extension ZExerciseRun: Encodable {
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case completedAt
+        case intensity
+        case exerciseArchiveID // FK
+        case routineRunStartedAt // FK
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(completedAt, forKey: .completedAt)
+        try c.encode(intensity, forKey: .intensity)
+        try c.encode(zExercise?.exerciseArchiveID, forKey: .exerciseArchiveID)
+        try c.encode(zRoutineRun?.startedAt, forKey: .routineRunStartedAt)
+    }
+}
+
+extension ZExerciseRun: MAttributable {
+    public static var fileNamePrefix: String {
+        "zexerciseruns"
+    }
+
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.completedAt, .date),
+        MAttribute(CodingKeys.intensity, .double),
+        MAttribute(CodingKeys.exerciseArchiveID, .string),
+        MAttribute(CodingKeys.routineRunStartedAt, .date),
+    ]
+}

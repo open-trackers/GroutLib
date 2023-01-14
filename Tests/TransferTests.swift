@@ -99,7 +99,7 @@ final class TransferTests: TestBase {
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
         let srr = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration)
-        let ser = ZExerciseRun.create(testContext, zRoutineRun: srr, zExercise: se, completedAt: completedAt, intensity: intensity)
+        _ = ZExerciseRun.create(testContext, zRoutineRun: srr, zExercise: se, completedAt: completedAt, intensity: intensity)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))

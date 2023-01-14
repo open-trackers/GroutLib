@@ -77,3 +77,30 @@ public extension ZExercise {
         set { name = newValue }
     }
 }
+
+extension ZExercise: Encodable {
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case name
+        case exerciseArchiveID
+        case routineArchiveID // FK
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(name, forKey: .name)
+        try c.encode(exerciseArchiveID, forKey: .exerciseArchiveID)
+        try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
+    }
+}
+
+extension ZExercise: MAttributable {
+    public static var fileNamePrefix: String {
+        "zexercises"
+    }
+
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.exerciseArchiveID, .string),
+        MAttribute(CodingKeys.routineArchiveID, .string),
+    ]
+}

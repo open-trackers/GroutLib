@@ -87,3 +87,30 @@ public extension ZRoutineRun {
 //        set { name = newValue }
 //    }
 }
+
+extension ZRoutineRun: Encodable {
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case startedAt
+        case duration
+        case routineArchiveID // FK
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(startedAt, forKey: .startedAt)
+        try c.encode(duration, forKey: .duration)
+        try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
+    }
+}
+
+extension ZRoutineRun: MAttributable {
+    public static var fileNamePrefix: String {
+        "zroutineruns"
+    }
+
+    public static var attributes: [MAttribute] = [
+        MAttribute(CodingKeys.startedAt, .date),
+        MAttribute(CodingKeys.duration, .double),
+        MAttribute(CodingKeys.routineArchiveID, .string),
+    ]
+}
