@@ -54,7 +54,7 @@ public extension Exercise {
 
     /// Format an intensity value, such as lastIntensity and intensityStep, with optional units
     func formattedIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
-        let units = Units(rawValue: self.units) ?? .none
+        let units = Units(rawValue: units) ?? .none
         return formatIntensity(intensityValue,
                                units: units,
                                withUnits: withUnits,

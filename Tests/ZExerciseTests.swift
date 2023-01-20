@@ -14,7 +14,6 @@ import CoreData
 import XCTest
 
 final class ZExerciseTests: TestBase {
-    
     var mainStore: NSPersistentStore!
     var archiveStore: NSPersistentStore!
 
@@ -31,7 +30,7 @@ final class ZExerciseTests: TestBase {
 
         self.mainStore = mainStore
     }
-    
+
     func testGetOrCreateUpdatesNameAndUnits() throws {
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         _ = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)

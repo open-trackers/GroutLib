@@ -10,11 +10,11 @@
 
 import Foundation
 
-
 public func formatIntensity(_ intensityValue: Float,
                             units: Units = .none,
                             withUnits: Bool = false,
-                            isFractional: Bool = false) -> String {
+                            isFractional: Bool = false) -> String
+{
     let suffix: String = {
         guard withUnits,
               units != .none
