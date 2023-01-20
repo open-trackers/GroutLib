@@ -53,17 +53,12 @@ public extension Exercise {
     }
 
     /// Format an intensity value, such as lastIntensity and intensityStep, with optional units
-    func formatIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
-        let suffix: String = {
-            guard withUnits,
-                  let units = Units(rawValue: self.units),
-                  units != .none
-            else { return "" }
-            let abbrev = units.abbreviation
-            return " \(abbrev)"
-        }()
-        let specifier = "%0.\(isIntensityFractional ? 1 : 0)f\(suffix)"
-        return String(format: specifier, intensityValue)
+    func formattedIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
+        let units = Units(rawValue: self.units) ?? .none
+        return formatIntensity(intensityValue,
+                               units: units,
+                               withUnits: withUnits,
+                               isFractional: isIntensityFractional)
     }
 }
 
@@ -155,6 +150,7 @@ extension Exercise {
                                                   zRoutine: zRoutine,
                                                   exerciseArchiveID: exerciseArchiveID,
                                                   exerciseName: wrappedName,
+                                                  exerciseUnits: Units(rawValue: units) ?? .none,
                                                   inStore: mainStore)
 
         let zRoutineRun = try ZRoutineRun.getOrCreate(context,

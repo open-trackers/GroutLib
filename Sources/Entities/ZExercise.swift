@@ -16,11 +16,13 @@ public extension ZExercise {
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
                        exerciseName: String,
+                       exerciseUnits: Units,
                        exerciseArchiveID: UUID,
                        toStore: NSPersistentStore? = nil) -> ZExercise
     {
         let nu = ZExercise(context: context)
         nu.name = exerciseName
+        nu.units = exerciseUnits.rawValue
         nu.exerciseArchiveID = exerciseArchiveID
         nu.zRoutine = zRoutine
         if let toStore {
@@ -39,7 +41,12 @@ public extension ZExercise {
     {
         guard let exerciseArchiveID
         else { throw DataError.missingData(msg: "exerciseArchiveID; can't copy") }
-        let nu = try ZExercise.getOrCreate(context, zRoutine: dstRoutine, exerciseArchiveID: exerciseArchiveID, exerciseName: wrappedName, inStore: dstStore)
+        let nu = try ZExercise.getOrCreate(context,
+                                           zRoutine: dstRoutine,
+                                           exerciseArchiveID: exerciseArchiveID,
+                                           exerciseName: wrappedName,
+                                           exerciseUnits: Units(rawValue: units) ?? Units.none,
+                                           inStore: dstStore)
         return nu
     }
 
@@ -52,19 +59,27 @@ public extension ZExercise {
     }
 
     /// Fetch a ZExercise record in the specified store, creating if necessary.
-    /// Will update name on existing record.
+    /// Will update name and units on existing record.
+    /// Will NOT update ZRoutine on existing record.
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             exerciseArchiveID: UUID,
                             exerciseName: String,
+                            exerciseUnits: Units,
                             inStore: NSPersistentStore) throws -> ZExercise
     {
         if let nu = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
             nu.name = exerciseName
+            nu.units = exerciseUnits.rawValue
             return nu
         } else {
-            return ZExercise.create(context, zRoutine: zRoutine, exerciseName: exerciseName, exerciseArchiveID: exerciseArchiveID, toStore: inStore)
+            return ZExercise.create(context,
+                                    zRoutine: zRoutine,
+                                    exerciseName: exerciseName,
+                                    exerciseUnits: exerciseUnits,
+                                    exerciseArchiveID: exerciseArchiveID,
+                                    toStore: inStore)
         }
     }
 
@@ -81,6 +96,7 @@ public extension ZExercise {
 extension ZExercise: Encodable {
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case name
+        case units
         case exerciseArchiveID
         case routineArchiveID // FK
     }
@@ -88,6 +104,7 @@ extension ZExercise: Encodable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(name, forKey: .name)
+        try c.encode(units, forKey: .units)
         try c.encode(exerciseArchiveID, forKey: .exerciseArchiveID)
         try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
     }
@@ -100,6 +117,7 @@ extension ZExercise: MAttributable {
 
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.name, .string),
+        MAttribute(CodingKeys.units, .int),
         MAttribute(CodingKeys.exerciseArchiveID, .string),
         MAttribute(CodingKeys.routineArchiveID, .string),
     ]

@@ -93,7 +93,7 @@ final class ExportTests: TestBase {
 
     func testZExercise() throws {
         let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        _ = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        _ = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
         try testContext.save()
 
         let request = makeRequest(ZExercise.self)
@@ -102,8 +102,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        name,exerciseArchiveID,routineArchiveID
-        bleh,\(exerciseArchiveID.uuidString),\(routineArchiveID.uuidString)
+        name,units,exerciseArchiveID,routineArchiveID
+        bleh,\(Units.kilograms.rawValue),\(exerciseArchiveID.uuidString),\(routineArchiveID.uuidString)
 
         """
 
@@ -112,7 +112,7 @@ final class ExportTests: TestBase {
 
     func testZExerciseRun() throws {
         let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
         let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration)
         _ = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity)
         try testContext.save()
