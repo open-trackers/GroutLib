@@ -56,6 +56,7 @@ public extension ZExerciseRun {
 
     /// Fetch a ZExerciseRun record in the specified store, creating if necessary.
     /// Will update intensity on existing record.
+    /// Will NOT update ZRoutineRun on existing record.
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutineRun: ZRoutineRun,

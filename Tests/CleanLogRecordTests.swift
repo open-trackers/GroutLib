@@ -61,7 +61,7 @@ final class CleanLogRecordTests: TestBase {
         let completeDate = startDate
         let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
         let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseArchiveID: eUUID)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID)
         let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
         try testContext.save()
 
@@ -86,7 +86,7 @@ final class CleanLogRecordTests: TestBase {
         let completeDate = startDate
         let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
         let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseArchiveID: eUUID)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID)
         let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
         try testContext.save()
 

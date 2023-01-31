@@ -84,7 +84,7 @@ final class ShallowCopyTests: TestBase {
 
     func testRoutineWithExercise() throws {
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -100,8 +100,10 @@ final class ShallowCopyTests: TestBase {
         else { XCTFail(); return }
 
         // now the exercise copy
-        _ = try se.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
+        let de = try se.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
         try testContext.save()
+
+        XCTAssertEqual(Units.kilograms.rawValue, de.units)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
@@ -116,7 +118,7 @@ final class ShallowCopyTests: TestBase {
         let startedAt = Date()
         let duration: TimeInterval = 30.0
         let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
         let srr = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration)
         let ser = ZExerciseRun.create(testContext, zRoutineRun: srr, zExercise: se, completedAt: completedAt, intensity: intensity)
         try testContext.save()
@@ -143,6 +145,8 @@ final class ShallowCopyTests: TestBase {
         try testContext.save()
         guard let de = try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore)
         else { XCTFail(); return }
+
+        XCTAssertEqual(Units.kilograms.rawValue, de.units)
 
         // and finally copy the exercise run
         _ = try ser.shallowCopy(testContext, dstRoutineRun: drr, dstExercise: de, toStore: archiveStore)
