@@ -66,6 +66,7 @@ public extension NSManagedObjectContext {
     /// Safe to run on a background context.
     /// NOTE: does NOT save context
     func deleter(objectIDs: [NSManagedObjectID]) throws {
+        guard objectIDs.first != nil else { return }
         let breq = NSBatchDeleteRequest(objectIDs: objectIDs)
         try executeAndMergeChanges(using: breq)
     }

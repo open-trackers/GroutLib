@@ -33,6 +33,13 @@ public extension Routine {
         NSManagedObject.get(context, forURIRepresentation: url) as? Routine
     }
 
+    static func get(_ context: NSManagedObjectContext,
+                    archiveID: UUID) throws -> Routine?
+    {
+        let pred = NSPredicate(format: "archiveID = %@", archiveID.uuidString)
+        return try context.firstFetcher(predicate: pred)
+    }
+
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }

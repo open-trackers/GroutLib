@@ -82,13 +82,19 @@ public extension Exercise {
                   routineStartedAt: Date,
                   logToHistory: Bool) throws
     {
+        guard let routine else {
+            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot mark exercise done.")
+        }
+
         // extend the routine run's duration, in case app crashes or is killed
         let nuDuration = completedAt.timeIntervalSince(routineStartedAt)
 
         // The ZRoutineRun has at least one completed exercise, so update the
-        // Routine with the latest data, even if we're not logging to history
-        routine?.lastStartedAt = routineStartedAt
-        routine?.lastDuration = nuDuration
+        // Routine with the latest data, even if we're not logging to history.
+        // NOTE: in transferToArchive, this timestamp will also determine if
+        //       corresponding ZRoutine is purged from main store.
+        routine.lastStartedAt = routineStartedAt
+        routine.lastDuration = nuDuration
 
         // Log the completion of the exercise for the historical record.
         // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.

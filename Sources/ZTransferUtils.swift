@@ -14,19 +14,13 @@ import os
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
                             category: "ZTransfer")
 
-internal enum ZType: String {
-    case zRoutine
-    case zRoutineRun
-    case zExercise
-    case zExerciseRun
-}
-
-internal typealias ZTypeObjectIDs = [ZType: [NSManagedObjectID]]
-
 /// Transfers all 'Z' records in .main store to .archive store.
 /// Safe to run on a background context.
 /// NOTE: does NOT save context
-public func transferToArchive(_ context: NSManagedObjectContext) throws {
+public func transferToArchive(_ context: NSManagedObjectContext,
+                              now: Date = Date.now,
+                              thresholdSecs: TimeInterval = 86400) throws
+{
     logger.debug("\(#function)")
     guard let mainStore = PersistenceManager.getStore(context, .main),
           let archiveStore = PersistenceManager.getStore(context, .archive)
@@ -34,33 +28,30 @@ public func transferToArchive(_ context: NSManagedObjectContext) throws {
         throw DataError.invalidStoreConfiguration(msg: "transfer to archive")
     }
 
-    let dict = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
-    try dict.forEach { ztype, objectIDs in
-        if objectIDs.count > 0 {
-            logger.debug("\(#function) Deleting \(objectIDs.count) \(ztype.rawValue)(s) from main store")
-            try context.deleter(objectIDs: objectIDs)
-        }
-    }
+    let zRoutines = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
+
+    let filteredZRoutines = zRoutines.filter { !$0.isFresh(context, now: now, thresholdSecs: thresholdSecs) }
+
+    let objectIDs = filteredZRoutines.map(\.objectID)
+
+    // rely on cascading delete to remove children
+    try context.deleter(objectIDs: objectIDs)
 }
 
 /// Deep copy of all routines and their children from the source store to specified destination store
-/// Returning list of the objectIDs of the records copied FROM the SOURCE store.
+/// Returns list of ZRoutines in fromStore that have been copied.
 /// Does not delete any records.
 /// Safe to run on a background context.
 /// Does NOT save context.
 internal func deepCopy(_ context: NSManagedObjectContext,
                        fromStore srcStore: NSPersistentStore,
-                       toStore dstStore: NSPersistentStore) throws -> ZTypeObjectIDs
+                       toStore dstStore: NSPersistentStore) throws -> [ZRoutine]
 {
     logger.debug("\(#function)")
-    var copiedObjects = ZTypeObjectIDs()
-
-    func append(_ ztype: ZType, _ objectID: NSManagedObjectID) {
-        copiedObjects[ztype, default: [NSManagedObjectID]()]
-            .append(objectID)
-    }
+    var copiedZRoutines = [ZRoutine]()
 
     try context.fetcher(inStore: srcStore) { (sRoutine: ZRoutine) in
+
         let dRoutine = try sRoutine.shallowCopy(context, toStore: dstStore)
 
         let routinePred = NSPredicate(format: "zRoutine = %@", sRoutine)
@@ -77,7 +68,6 @@ internal func deepCopy(_ context: NSManagedObjectContext,
                 logger.error("Missing archiveID for zExercise \(sExercise.wrappedName)")
             }
 
-            append(.zExercise, sExercise.objectID)
             logger.debug("Copied zExercise \(sExercise.wrappedName)")
 
             return true
@@ -100,21 +90,19 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
                 _ = try sExerciseRun.shallowCopy(context, dstRoutineRun: dRoutineRun, dstExercise: dExercise, toStore: dstStore)
 
-                append(.zExerciseRun, sExerciseRun.objectID)
                 logger.debug("Copied zExerciseRun \(sExerciseRun.zExercise?.name ?? "") completedAt=\(String(describing: sExerciseRun.completedAt))")
                 return true
             }
 
-            append(.zRoutineRun, sRoutineRun.objectID)
             logger.debug("Copied zRoutineRun \(sRoutine.wrappedName) startedAt=\(String(describing: sRoutineRun.startedAt))")
             return true
         }
 
-        append(.zRoutine, sRoutine.objectID)
+        copiedZRoutines.append(sRoutine)
         logger.debug("Copied zRoutine \(sRoutine.wrappedName)")
 
         return true
     }
 
-    return copiedObjects
+    return copiedZRoutines
 }

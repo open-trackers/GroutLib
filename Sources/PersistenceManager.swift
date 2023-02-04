@@ -123,17 +123,18 @@ public struct PersistenceManager {
         //       so that a complete deployment to production is possible in CloudKit dashboard.
         // NOTE: Both containers need to be deployed to production.
         #if DEBUG
-        if isCloud,
-            let cloudContainer = container as? NSPersistentCloudKitContainer {
-            do {
-                logger.notice("\(#function) initializeCloudKitSchema")
-                try cloudContainer.initializeCloudKitSchema(options: [])
-            } catch {
-                logger.error("\(#function) initializeCloudKitSchema ERROR \(error)")
+            if isCloud,
+               let cloudContainer = container as? NSPersistentCloudKitContainer
+            {
+                do {
+                    logger.notice("\(#function) initializeCloudKitSchema")
+                    try cloudContainer.initializeCloudKitSchema(options: [])
+                } catch {
+                    logger.error("\(#function) initializeCloudKitSchema ERROR \(error)")
+                }
             }
-        }
         #endif
-        
+
         return container
     }
 
@@ -152,7 +153,7 @@ public struct PersistenceManager {
 
         let desc = NSPersistentStoreDescription(url: url)
         // desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-        
+
         // these are already set as "YES" by default
 //        desc.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
 //        desc.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
