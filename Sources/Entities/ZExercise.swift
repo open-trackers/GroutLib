@@ -83,10 +83,6 @@ public extension ZExercise {
         }
     }
 
-//    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutine? {
-//        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutine
-//    }
-
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }

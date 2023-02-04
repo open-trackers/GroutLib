@@ -45,9 +45,7 @@ public extension ZRoutineRun {
                     startedAt: Date,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutineRun?
     {
-        let pred = NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
-                               routineArchiveID.uuidString,
-                               startedAt as NSDate)
+        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
@@ -82,6 +80,30 @@ public extension ZRoutineRun {
         try context.counter(ZRoutineRun.self, predicate: predicate, inStore: inStore)
     }
 
+    // for use in user delete of individual routine runs in UI, from both stores
+    static func delete(_ context: NSManagedObjectContext,
+                       routineArchiveID: UUID,
+                       startedAt: Date,
+                       inStore: NSPersistentStore? = nil) throws
+    {
+        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
+
+        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
+            context.delete(element)
+            return true
+        }
+
+        // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
+        // try context.deleter(ZRoutineRun.self, predicate: pred, inStore: inStore)
+    }
+
+    internal static func getPredicate(routineArchiveID: UUID,
+                                      startedAt: Date) -> NSPredicate
+    {
+        NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
+                    routineArchiveID.uuidString,
+                    startedAt as NSDate)
+    }
 //    var wrappedName: String {
 //        get { name ?? "unknown" }
 //        set { name = newValue }

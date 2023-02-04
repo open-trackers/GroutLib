@@ -126,7 +126,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         // routine needs to get to archive first
         _ = try sr.shallowCopy(testContext, toStore: archiveStore)
@@ -155,11 +155,11 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
     }
 }

@@ -75,7 +75,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore))
-        XCTAssertNil(try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
+        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
 
         try e.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
         try testContext.save()
@@ -91,7 +91,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(ze)
         XCTAssertEqual(e.name, ze?.name)
         XCTAssertEqual(e.units, ze?.units)
-        let zer = try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore)
+        let zer = try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore)
         XCTAssertNotNil(zer)
         XCTAssertEqual(completedAt1, zer?.completedAt)
         XCTAssertEqual(intensity1, zer?.intensity)
@@ -115,26 +115,26 @@ final class LogCompletionTests: TestBase {
         try e1.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
         try testContext.save()
 
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
-        XCTAssertNil(try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
+        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
 
         try transferToArchive(testContext)
         try testContext.save()
 
-        XCTAssertNil(try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
+        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
 
         try e2.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt2, exerciseIntensity: intensity2)
         try testContext.save()
 
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
-        XCTAssertNil(try ZExerciseRun.get(testContext, forArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
+        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
 
         try transferToArchive(testContext)
         try testContext.save()
 
-        XCTAssertNil(try ZExerciseRun.get(testContext, forArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
-        XCTAssertNotNil(try ZExerciseRun.get(testContext, forArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
+        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
 
         let zr = try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore)
         XCTAssertNotNil(zr)
@@ -148,7 +148,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(ze1)
         XCTAssertEqual(e1.name, ze1?.name)
         XCTAssertEqual(e1.units, ze1?.units)
-        let zer1 = try ZExerciseRun.get(testContext, forArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore)
+        let zer1 = try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore)
         XCTAssertNotNil(zer1)
         XCTAssertEqual(completedAt1, zer1?.completedAt)
         XCTAssertEqual(intensity1, zer1?.intensity)
@@ -157,7 +157,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(ze2)
         XCTAssertEqual(e2.name, ze2?.name)
         XCTAssertEqual(e2.units, ze2?.units)
-        let zer2 = try ZExerciseRun.get(testContext, forArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore)
+        let zer2 = try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore)
         XCTAssertNotNil(zer2)
         XCTAssertEqual(completedAt2, zer2?.completedAt)
         XCTAssertEqual(intensity2, zer2?.intensity)

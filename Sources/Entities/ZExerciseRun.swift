@@ -44,13 +44,11 @@ public extension ZExerciseRun {
     }
 
     static func get(_ context: NSManagedObjectContext,
-                    forArchiveID archiveID: UUID,
+                    exerciseArchiveID: UUID,
                     completedAt: Date,
                     inStore: NSPersistentStore? = nil) throws -> ZExerciseRun?
     {
-        let pred = NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
-                               archiveID.uuidString,
-                               completedAt as NSDate)
+        let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
@@ -65,10 +63,10 @@ public extension ZExerciseRun {
                             intensity: Float,
                             inStore: NSPersistentStore) throws -> ZExerciseRun
     {
-        guard let archiveID = zExercise.exerciseArchiveID
+        guard let exerciseArchiveID = zExercise.exerciseArchiveID
         else { throw DataError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
-        if let nu = try ZExerciseRun.get(context, forArchiveID: archiveID, completedAt: completedAt, inStore: inStore) {
+        if let nu = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
             nu.intensity = intensity
             return nu
         } else {
@@ -81,6 +79,31 @@ public extension ZExerciseRun {
                       inStore: NSPersistentStore? = nil) throws -> Int
     {
         try context.counter(ZExerciseRun.self, predicate: predicate, inStore: inStore)
+    }
+
+    // for use in user delete of individual exercise runs in UI, from both stores
+    static func delete(_ context: NSManagedObjectContext,
+                       exerciseArchiveID: UUID,
+                       completedAt: Date,
+                       inStore: NSPersistentStore? = nil) throws
+    {
+        let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
+
+        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZExerciseRun) in
+            context.delete(element)
+            return true
+        }
+
+        // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
+        // try context.deleter(ZExerciseRun.self, predicate: pred, inStore: inStore)
+    }
+
+    internal static func getPredicate(exerciseArchiveID: UUID,
+                                      completedAt: Date) -> NSPredicate
+    {
+        NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
+                    exerciseArchiveID.uuidString,
+                    completedAt as NSDate)
     }
 }
 
