@@ -172,9 +172,3 @@ extension Routine: MAttributable {
         MAttribute(CodingKeys.userOrder, .int),
     ]
 }
-
-extension Routine {
-    public var hasAtLeastOneExercise: Bool {
-        self.exercises?.first != nil
-    }
-}
