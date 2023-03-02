@@ -11,11 +11,13 @@ let package = Package(name: "GroutLib",
                       ],
                       dependencies: [
                           .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.4"),
+                          .package(url: "https://github.com/open-trackers/TrackerLib.git", from: "1.0.0"),
                       ],
                       targets: [
                           .target(name: "GroutLib",
                                   dependencies: [
                                       .product(name: "Collections", package: "swift-collections"),
+                                      .product(name: "TrackerLib", package: "TrackerLib"),
                                   ],
                                   path: "Sources"),
                           .testTarget(name: "GroutLibTests",

@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 @objc(Exercise)
 public class Exercise: NSManagedObject {}
 
@@ -83,7 +85,7 @@ public extension Exercise {
                   logToHistory: Bool) throws
     {
         guard let routine else {
-            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot mark exercise done.")
+            throw TrackerError.missingData(msg: "Unexpectedly no routine. Cannot mark exercise done.")
         }
 
         // extend the routine run's duration, in case app crashes or is killed
@@ -126,11 +128,11 @@ extension Exercise {
     {
         guard let mainStore = PersistenceManager.getStore(context, .main)
         else {
-            throw DataError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
+            throw TrackerError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
         }
 
         guard let routine else {
-            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
+            throw TrackerError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
         }
 
         // Get corresponding ZRoutine for log, creating if necessary.

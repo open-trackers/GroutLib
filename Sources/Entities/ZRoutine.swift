@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 /// Archive representation of a Routine record
 public extension ZRoutine {
     // NOTE: does NOT save context
@@ -34,7 +36,7 @@ public extension ZRoutine {
                      toStore dstStore: NSPersistentStore) throws -> ZRoutine
     {
         guard let routineArchiveID
-        else { throw DataError.missingData(msg: "routineArchiveID; can't copy") }
+        else { throw TrackerError.missingData(msg: "routineArchiveID; can't copy") }
         return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
     }
 

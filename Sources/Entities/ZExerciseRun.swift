@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 public extension ZExerciseRun {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
@@ -39,7 +41,7 @@ public extension ZExerciseRun {
                      toStore dstStore: NSPersistentStore) throws -> ZExerciseRun
     {
         guard let completedAt
-        else { throw DataError.missingData(msg: "completedAt not present; can't copy") }
+        else { throw TrackerError.missingData(msg: "completedAt not present; can't copy") }
         return try ZExerciseRun.getOrCreate(context, zRoutineRun: dstRoutineRun, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
     }
 
@@ -64,7 +66,7 @@ public extension ZExerciseRun {
                             inStore: NSPersistentStore) throws -> ZExerciseRun
     {
         guard let exerciseArchiveID = zExercise.exerciseArchiveID
-        else { throw DataError.missingData(msg: "ZExercise.archiveID; can't get or create") }
+        else { throw TrackerError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
         if let nu = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
             nu.intensity = intensity

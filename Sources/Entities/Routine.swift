@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 @objc(Routine)
 public class Routine: NSManagedObject {}
 
@@ -130,7 +132,7 @@ public extension Routine {
                 }
             }
         } catch {
-            throw DataError.fetchError(msg: error.localizedDescription)
+            throw TrackerError.fetchError(msg: error.localizedDescription)
         }
 
         return nil

@@ -11,6 +11,8 @@
 import CoreData
 import os
 
+import TrackerLib
+
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
                             category: "ZTransfer")
 
@@ -25,7 +27,7 @@ public func transferToArchive(_ context: NSManagedObjectContext,
     guard let mainStore = PersistenceManager.getStore(context, .main),
           let archiveStore = PersistenceManager.getStore(context, .archive)
     else {
-        throw DataError.invalidStoreConfiguration(msg: "transfer to archive")
+        throw TrackerError.invalidStoreConfiguration(msg: "transfer to archive")
     }
 
     let zRoutines = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)

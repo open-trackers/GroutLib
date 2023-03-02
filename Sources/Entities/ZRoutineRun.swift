@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 public extension ZRoutineRun {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
@@ -36,7 +38,7 @@ public extension ZRoutineRun {
                               toStore dstStore: NSPersistentStore) throws -> ZRoutineRun
     {
         guard let startedAt
-        else { throw DataError.missingData(msg: "startedAt; can't copy") }
+        else { throw TrackerError.missingData(msg: "startedAt; can't copy") }
         return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
     }
 
@@ -63,7 +65,7 @@ public extension ZRoutineRun {
                             inStore: NSPersistentStore) throws -> ZRoutineRun
     {
         guard let archiveID = zRoutine.routineArchiveID
-        else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
+        else { throw TrackerError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
         if let nu = try ZRoutineRun.get(context, routineArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
             nu.duration = duration

@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
@@ -25,7 +27,7 @@ final class ZExerciseTests: TestBase {
 
         guard let mainStore = PersistenceManager.getStore(testContext, .main)
         else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
+            throw TrackerError.invalidStoreConfiguration(msg: "setup")
         }
 
         self.mainStore = mainStore

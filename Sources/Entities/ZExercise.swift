@@ -10,6 +10,8 @@
 
 import CoreData
 
+import TrackerLib
+
 /// Archive representation of a Exercise record
 public extension ZExercise {
     // NOTE: does NOT save context
@@ -40,7 +42,7 @@ public extension ZExercise {
                      toStore dstStore: NSPersistentStore) throws -> ZExercise
     {
         guard let exerciseArchiveID
-        else { throw DataError.missingData(msg: "exerciseArchiveID; can't copy") }
+        else { throw TrackerError.missingData(msg: "exerciseArchiveID; can't copy") }
         let nu = try ZExercise.getOrCreate(context,
                                            zRoutine: dstRoutine,
                                            exerciseArchiveID: exerciseArchiveID,
