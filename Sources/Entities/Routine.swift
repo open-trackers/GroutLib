@@ -49,6 +49,16 @@ public extension Routine {
 }
 
 public extension Routine {
+    static func maxUserOrder(_ context: NSManagedObjectContext) throws -> Int16? {
+        var sort: [NSSortDescriptor] {
+            [NSSortDescriptor(keyPath: \Routine.userOrder, ascending: false)]
+        }
+        let routine: Routine? = try context.firstFetcher(sortDescriptors: sort)
+        return routine?.userOrder
+    }
+}
+
+public extension Routine {
     // NOTE: does NOT save context
     internal func clearCompletions(_ context: NSManagedObjectContext) throws {
         let predicate = NSPredicate(format: "routine = %@", self)

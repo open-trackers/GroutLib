@@ -20,11 +20,13 @@ extension Exercise: UserOrdered {}
 public extension Exercise {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
+                       routine: Routine,
                        userOrder: Int16,
                        name: String = "New Exercise",
                        archiveID: UUID = UUID()) -> Exercise
     {
         let nu = Exercise(context: context)
+        routine.addToExercises(nu)
         nu.userOrder = userOrder
         nu.name = name
         nu.archiveID = archiveID
@@ -38,6 +40,17 @@ public extension Exercise {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
+    }
+}
+
+public extension Exercise {
+    static func maxUserOrder(_ context: NSManagedObjectContext, routine: Routine) throws -> Int16? {
+        var sort: [NSSortDescriptor] {
+            [NSSortDescriptor(keyPath: \Exercise.userOrder, ascending: false)]
+        }
+        let pred = NSPredicate(format: "routine == %@", routine)
+        let exercise: Exercise? = try context.firstFetcher(predicate: pred, sortDescriptors: sort)
+        return exercise?.userOrder
     }
 }
 
