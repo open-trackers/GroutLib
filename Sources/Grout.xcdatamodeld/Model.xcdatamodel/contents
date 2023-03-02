@@ -20,6 +20,7 @@
     </entity>
     <entity name="Routine" representedClassName="Routine" syncable="YES" codeGenerationType="category">
         <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="color" optional="YES" attributeType="Binary"/>
         <attribute name="imageName" optional="YES" attributeType="String"/>
         <attribute name="lastDuration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lastStartedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
