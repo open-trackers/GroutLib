@@ -79,6 +79,7 @@ public extension Exercise {
 
     // NOTE: does NOT save context
     func markDone(_ context: NSManagedObjectContext,
+                  mainStore: NSPersistentStore,
                   completedAt: Date,
                   withAdvance: Bool,
                   routineStartedAt: Date,
@@ -102,6 +103,7 @@ public extension Exercise {
         // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
         if logToHistory {
             try logCompletion(context,
+                              mainStore: mainStore,
                               routineStartedAt: routineStartedAt,
                               nuDuration: nuDuration,
                               exerciseCompletedAt: completedAt,
@@ -121,16 +123,12 @@ extension Exercise {
     /// (These will later be transferred to the archive store on iOS devices)
     /// NOTE: does NOT save context
     func logCompletion(_ context: NSManagedObjectContext,
+                       mainStore: NSPersistentStore,
                        routineStartedAt: Date,
                        nuDuration: TimeInterval,
                        exerciseCompletedAt: Date,
                        exerciseIntensity: Float) throws
     {
-        guard let mainStore = PersistenceManager.getStore(context, .main)
-        else {
-            throw TrackerError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
-        }
-
         guard let routine else {
             throw TrackerError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
         }

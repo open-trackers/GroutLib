@@ -20,15 +20,12 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
 /// Safe to run on a background context.
 /// NOTE: does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext,
+                              mainStore: NSPersistentStore,
+                              archiveStore: NSPersistentStore,
                               now: Date = Date.now,
                               thresholdSecs: TimeInterval = 86400) throws
 {
     logger.debug("\(#function)")
-    guard let mainStore = PersistenceManager.getStore(context, .main),
-          let archiveStore = PersistenceManager.getStore(context, .archive)
-    else {
-        throw TrackerError.invalidStoreConfiguration(msg: "transfer to archive")
-    }
 
     let zRoutines = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
 

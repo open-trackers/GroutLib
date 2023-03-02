@@ -16,24 +16,12 @@ import TrackerLib
 import XCTest
 
 final class ZRoutineFreshTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
     let secondsPerDay: TimeInterval = 86400
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw TrackerError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
     }
 
     func testMissingRoutineIsStale() throws {
@@ -104,7 +92,7 @@ final class ZRoutineFreshTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // preserved!
@@ -123,7 +111,7 @@ final class ZRoutineFreshTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // purged!

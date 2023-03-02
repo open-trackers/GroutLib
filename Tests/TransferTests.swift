@@ -16,23 +16,11 @@ import TrackerLib
 import XCTest
 
 final class TransferTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw TrackerError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
     }
 
     func testRoutine() throws {
@@ -42,7 +30,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -62,7 +50,7 @@ final class TransferTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -83,7 +71,7 @@ final class TransferTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -109,7 +97,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))

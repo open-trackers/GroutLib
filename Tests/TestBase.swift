@@ -14,14 +14,21 @@ import CoreData
 import XCTest
 
 class TestBase: XCTestCase {
-    var testContainer: NSPersistentContainer!
-    var testContext: NSManagedObjectContext!
+    public var testCoreDataStack: CoreDataStack!
+    public var testContainer: NSPersistentContainer!
+    public var testContext: NSManagedObjectContext!
+    public var mainStore: NSPersistentStore!
+    public var archiveStore: NSPersistentStore!
 
     lazy var df = ISO8601DateFormatter()
 
-    override func setUpWithError() throws {
+    override open func setUpWithError() throws {
         try super.setUpWithError()
-        testContainer = try PersistenceManager.getTestContainer()
+        testCoreDataStack = CoreDataStack.getPreviewStack()
+        testContainer = testCoreDataStack.container
         testContext = testContainer.viewContext
+
+        mainStore = testCoreDataStack.getMainStore(testContext)
+        archiveStore = testCoreDataStack.getArchiveStore(testContext)
     }
 }

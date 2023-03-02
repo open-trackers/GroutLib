@@ -17,9 +17,6 @@ import TrackerLib
 import XCTest
 
 final class ExportTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
 
@@ -39,15 +36,6 @@ final class ExportTests: TestBase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw TrackerError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
 
         startedAt = df.date(from: startedAtStr)
         completedAt = df.date(from: completedAtStr)
