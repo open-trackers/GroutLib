@@ -24,8 +24,8 @@ final class ZExerciseTests: TestBase {
     }
 
     func testGetOrCreateUpdatesNameAndUnits() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
-        _ = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        _ = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         try testContext.save()
 
         let se2 = try ZExercise.getOrCreate(testContext,

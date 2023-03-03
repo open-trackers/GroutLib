@@ -48,7 +48,7 @@ final class ExportTests: TestBase {
     }
 
     func testZRoutine() throws {
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, createdAt: createdAt, toStore: mainStore)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", createdAt: createdAt, toStore: mainStore)
         try testContext.save()
 
         let request = makeRequest(ZRoutine.self)
@@ -66,7 +66,7 @@ final class ExportTests: TestBase {
     }
 
     func testZRoutineRun() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         _ = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, createdAt: createdAt, toStore: mainStore)
         try testContext.save()
 
@@ -85,8 +85,8 @@ final class ExportTests: TestBase {
     }
 
     func testZExercise() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
-        _ = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, createdAt: createdAt, toStore: mainStore)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        _ = ZExercise.create(testContext, zRoutine: zr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, createdAt: createdAt, toStore: mainStore)
         try testContext.save()
 
         let request = makeRequest(ZExercise.self)
@@ -104,8 +104,8 @@ final class ExportTests: TestBase {
     }
 
     func testZExerciseRun() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
-        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, toStore: mainStore)
         _ = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity, createdAt: createdAt, toStore: mainStore)
         try testContext.save()

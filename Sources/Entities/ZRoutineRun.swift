@@ -120,8 +120,10 @@ public extension ZRoutineRun {
                     routineArchiveID.uuidString,
                     startedAt as NSDate)
     }
-//    var wrappedName: String {
-//        get { name ?? "unknown" }
-//        set { name = newValue }
-//    }
+}
+
+public extension ZRoutineRun {
+    var zExerciseRunsArray: [ZExerciseRun] {
+        (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
+    }
 }

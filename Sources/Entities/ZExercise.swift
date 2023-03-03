@@ -17,9 +17,9 @@ public extension ZExercise {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
+                       exerciseArchiveID: UUID,
                        exerciseName: String? = nil,
                        exerciseUnits: Units = Units.none,
-                       exerciseArchiveID: UUID,
                        createdAt: Date? = Date.now,
                        toStore: NSPersistentStore) -> ZExercise
     {
@@ -95,5 +95,18 @@ public extension ZExercise {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
+    }
+
+    /// NOTE does NOT filter for the userRemoved attribute!
+    internal static func getPredicate(routineArchiveID: UUID,
+                                      exerciseArchiveID: UUID) -> NSPredicate
+    {
+        NSPredicate(format: "zRoutine.routineArchiveID == %@ AND exerciseArchiveID == %@",
+                    routineArchiveID.uuidString,
+                    exerciseArchiveID.uuidString)
+    }
+
+    var exerciseRunsArray: [ZExerciseRun] {
+        (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
     }
 }

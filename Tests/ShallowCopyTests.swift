@@ -29,7 +29,7 @@ final class ShallowCopyTests: TestBase {
     }
 
     func testRoutine() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -45,7 +45,7 @@ final class ShallowCopyTests: TestBase {
     func testRoutineWithRoutineRun() throws {
         let startedAt = Date()
         let duration: TimeInterval = 30.0
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         let su = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration, toStore: mainStore)
         try testContext.save()
 
@@ -73,8 +73,8 @@ final class ShallowCopyTests: TestBase {
     }
 
     func testRoutineWithExercise() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
-        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -107,8 +107,8 @@ final class ShallowCopyTests: TestBase {
         let intensity: Float = 30.0
         let startedAt = Date()
         let duration: TimeInterval = 30.0
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
-        let se = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         let srr = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, duration: duration, toStore: mainStore)
         let ser = ZExerciseRun.create(testContext, zRoutineRun: srr, zExercise: se, completedAt: completedAt, intensity: intensity, toStore: mainStore)
         try testContext.save()

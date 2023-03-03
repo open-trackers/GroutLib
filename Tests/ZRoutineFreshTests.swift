@@ -25,7 +25,7 @@ final class ZRoutineFreshTests: TestBase {
     }
 
     func testMissingRoutineIsStale() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(sr.isFresh(testContext))
@@ -36,7 +36,7 @@ final class ZRoutineFreshTests: TestBase {
 
         XCTAssertNil(r.lastStartedAt)
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(sr.isFresh(testContext))
@@ -49,7 +49,7 @@ final class ZRoutineFreshTests: TestBase {
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         // if within the threshold, it's fresh
@@ -67,7 +67,7 @@ final class ZRoutineFreshTests: TestBase {
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         // if within the threshold, it's fresh
@@ -86,7 +86,7 @@ final class ZRoutineFreshTests: TestBase {
 
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -105,7 +105,7 @@ final class ZRoutineFreshTests: TestBase {
 
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))

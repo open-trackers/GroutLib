@@ -73,34 +73,32 @@ public final class CoreDataStack: BaseCoreDataStack {
 
         do {
             switch entityName {
-//            case AppSetting.entity().name:
-//                try AppSetting.dedupe(backgroundContext)
-//            case MFoodGroup.entity().name:
-//                try MFoodGroup.dedupe(backgroundContext, object)
-//            case MCategory.entity().name:
-//                try MCategory.dedupe(backgroundContext, object)
-//            case MServing.entity().name:
-//                try MServing.dedupe(backgroundContext, object)
-//            case ZCategory.entity().name:
-//                try ZCategory.dedupe(backgroundContext, object, inStore: mainStore)
-//                #if !os(watchOS)
-//                    try ZCategory.dedupe(backgroundContext, object, inStore: archiveStore)
-//                #endif
-//            case ZServing.entity().name:
-//                try ZServing.dedupe(backgroundContext, object, inStore: mainStore)
-//                #if !os(watchOS)
-//                    try ZServing.dedupe(backgroundContext, object, inStore: archiveStore)
-//                #endif
-//            case ZServingRun.entity().name:
-//                try ZServingRun.dedupe(backgroundContext, object, inStore: mainStore)
-//                #if !os(watchOS)
-//                    try ZServingRun.dedupe(backgroundContext, object, inStore: archiveStore)
-//                #endif
-//            case ZDayRun.entity().name:
-//                try ZDayRun.dedupe(backgroundContext, object, inStore: mainStore)
-//                #if !os(watchOS)
-//                    try ZDayRun.dedupe(backgroundContext, object, inStore: archiveStore)
-//                #endif
+            case AppSetting.entity().name:
+                try AppSetting.dedupe(backgroundContext)
+            case Exercise.entity().name:
+                try Exercise.dedupe(backgroundContext, object)
+            case Routine.entity().name:
+                try Routine.dedupe(backgroundContext, object)
+            case ZExercise.entity().name:
+                try ZExercise.dedupe(backgroundContext, object, inStore: mainStore)
+                #if !os(watchOS)
+                    try ZExercise.dedupe(backgroundContext, object, inStore: archiveStore)
+                #endif
+            case ZExerciseRun.entity().name:
+                try ZExerciseRun.dedupe(backgroundContext, object, inStore: mainStore)
+                #if !os(watchOS)
+                    try ZExerciseRun.dedupe(backgroundContext, object, inStore: archiveStore)
+                #endif
+            case ZRoutine.entity().name:
+                try ZRoutine.dedupe(backgroundContext, object, inStore: mainStore)
+                #if !os(watchOS)
+                    try ZRoutine.dedupe(backgroundContext, object, inStore: archiveStore)
+                #endif
+            case ZRoutineRun.entity().name:
+                try ZRoutineRun.dedupe(backgroundContext, object, inStore: mainStore)
+                #if !os(watchOS)
+                    try ZRoutineRun.dedupe(backgroundContext, object, inStore: archiveStore)
+                #endif
             default:
                 _ = 0
             }

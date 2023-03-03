@@ -16,8 +16,8 @@ import TrackerLib
 public extension ZRoutine {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
-                       routineName: String? = nil,
                        routineArchiveID: UUID,
+                       routineName: String? = nil,
                        createdAt: Date? = Date.now,
                        toStore: NSPersistentStore) -> ZRoutine
     {
@@ -49,7 +49,7 @@ public extension ZRoutine {
                     routineArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutine?
     {
-        let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
+        let pred = getPredicate(routineArchiveID: routineArchiveID)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
@@ -58,17 +58,14 @@ public extension ZRoutine {
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             routineArchiveID: UUID,
-                            // routineName: String,
                             inStore: NSPersistentStore,
                             onUpdate: (Bool, ZRoutine) -> Void = { _, _ in }) throws -> ZRoutine
     {
         if let existing = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
             onUpdate(true, existing)
-            // nu.name = routineName
             return existing
         } else {
             let nu = ZRoutine.create(context,
-                                     // routineName: routineName,
                                      routineArchiveID: routineArchiveID,
                                      toStore: inStore)
             onUpdate(false, nu)
@@ -79,5 +76,19 @@ public extension ZRoutine {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
+    }
+
+    internal static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
+        NSPredicate(format: "routineArchiveID == %@", routineArchiveID.uuidString)
+    }
+
+    var zExercisesArray: [ZExercise] {
+        (zExercises?.allObjects as? [ZExercise]) ?? []
+    }
+}
+
+public extension ZRoutine {
+    var zRoutineRunsArray: [ZRoutineRun] {
+        (zRoutineRuns?.allObjects as? [ZRoutineRun]) ?? []
     }
 }
