@@ -43,3 +43,9 @@ public extension Routine {
         set { name = newValue }
     }
 }
+
+public extension Routine {
+    var exercisesArray: [Exercise] {
+        (exercises?.allObjects as? [Exercise]) ?? []
+    }
+}
