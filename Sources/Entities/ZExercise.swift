@@ -54,10 +54,6 @@ public extension ZExercise {
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZExercise? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? ZExercise
-    }
-
     static func get(_ context: NSManagedObjectContext,
                     exerciseArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZExercise?

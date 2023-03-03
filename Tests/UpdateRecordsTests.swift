@@ -27,10 +27,10 @@ final class UpdateRecordsTests: TestBase {
         let r = Routine.create(testContext, userOrder: 0, name: "blah", archiveID: routineArchiveID)
         r.archiveID = nil
         try testContext.save()
-        let r1 = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let r1: Routine? = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNil(r1?.archiveID)
         try updateArchiveIDs(testContext)
-        let r2 = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let r2: Routine? = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNotNil(r2?.archiveID)
     }
 
@@ -39,10 +39,10 @@ final class UpdateRecordsTests: TestBase {
         let e = Exercise.create(testContext, routine: r, userOrder: 0, name: "blah", archiveID: exerciseArchiveID)
         e.archiveID = nil
         try testContext.save()
-        let e1 = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e1: Exercise? = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNil(e1?.archiveID)
         try updateArchiveIDs(testContext)
-        let e2 = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e2: Exercise? = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNotNil(e2?.archiveID)
     }
 
@@ -50,10 +50,10 @@ final class UpdateRecordsTests: TestBase {
         let r = Routine.create(testContext, userOrder: 0, name: "blah", archiveID: routineArchiveID)
         r.createdAt = nil
         try testContext.save()
-        let r1 = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let r1: Routine? = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNil(r1?.createdAt)
         try updateCreatedAts(testContext)
-        let r2 = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let r2: Routine? = Routine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNotNil(r2?.createdAt)
     }
 
@@ -62,10 +62,10 @@ final class UpdateRecordsTests: TestBase {
         let e = Exercise.create(testContext, routine: r, userOrder: 0, name: "blah", archiveID: exerciseArchiveID)
         e.createdAt = nil
         try testContext.save()
-        let e1 = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e1: Exercise? = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNil(e1?.createdAt)
         try updateCreatedAts(testContext)
-        let e2 = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e2: Exercise? = Exercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNotNil(e2?.createdAt)
     }
 
@@ -73,10 +73,10 @@ final class UpdateRecordsTests: TestBase {
         let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
         r.createdAt = nil
         try testContext.save()
-        let e1 = ZRoutine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let e1: ZRoutine? = ZRoutine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNil(e1?.createdAt)
         try updateCreatedAts(testContext)
-        let e2 = ZRoutine.get(testContext, forURIRepresentation: r.uriRepresentation)
+        let e2: ZRoutine? = ZRoutine.get(testContext, forURIRepresentation: r.uriRepresentation)
         XCTAssertNotNil(e2?.createdAt)
     }
 
@@ -85,10 +85,10 @@ final class UpdateRecordsTests: TestBase {
         let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
         e.createdAt = nil
         try testContext.save()
-        let e1 = ZExercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e1: ZExercise? = ZExercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNil(e1?.createdAt)
         try updateCreatedAts(testContext)
-        let e2 = ZExercise.get(testContext, forURIRepresentation: e.uriRepresentation)
+        let e2: ZExercise? = ZExercise.get(testContext, forURIRepresentation: e.uriRepresentation)
         XCTAssertNotNil(e2?.createdAt)
     }
 
@@ -97,10 +97,10 @@ final class UpdateRecordsTests: TestBase {
         let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: Date.now, duration: 10)
         rr.createdAt = nil
         try testContext.save()
-        let e1 = ZRoutineRun.get(testContext, forURIRepresentation: rr.uriRepresentation)
+        let e1: ZRoutineRun? = ZRoutineRun.get(testContext, forURIRepresentation: rr.uriRepresentation)
         XCTAssertNil(e1?.createdAt)
         try updateCreatedAts(testContext)
-        let e2 = ZRoutineRun.get(testContext, forURIRepresentation: rr.uriRepresentation)
+        let e2: ZRoutineRun? = ZRoutineRun.get(testContext, forURIRepresentation: rr.uriRepresentation)
         XCTAssertNotNil(e2?.createdAt)
     }
 
@@ -111,10 +111,10 @@ final class UpdateRecordsTests: TestBase {
         let er = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: Date.now, intensity: 1)
         er.createdAt = nil
         try testContext.save()
-        let e1 = ZExerciseRun.get(testContext, forURIRepresentation: er.uriRepresentation)
+        let e1: ZExerciseRun? = ZExerciseRun.get(testContext, forURIRepresentation: er.uriRepresentation)
         XCTAssertNil(e1?.createdAt)
         try updateCreatedAts(testContext)
-        let e2 = ZExerciseRun.get(testContext, forURIRepresentation: er.uriRepresentation)
+        let e2: ZExerciseRun? = ZExerciseRun.get(testContext, forURIRepresentation: er.uriRepresentation)
         XCTAssertNotNil(e2?.createdAt)
     }
 }

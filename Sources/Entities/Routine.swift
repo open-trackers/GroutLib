@@ -33,10 +33,6 @@ public extension Routine {
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Routine? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? Routine
-    }
-
     static func get(_ context: NSManagedObjectContext,
                     archiveID: UUID) throws -> Routine?
     {

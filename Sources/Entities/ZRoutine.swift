@@ -42,10 +42,6 @@ public extension ZRoutine {
         return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutine? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutine
-    }
-
     static func get(_ context: NSManagedObjectContext,
                     routineArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutine?

@@ -35,10 +35,6 @@ public extension Exercise {
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Exercise? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? Exercise
-    }
-
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }

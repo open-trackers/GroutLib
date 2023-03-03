@@ -47,10 +47,6 @@ public extension ZExerciseRun {
         return try ZExerciseRun.getOrCreate(context, zRoutineRun: dstRoutineRun, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZExerciseRun? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? ZExerciseRun
-    }
-
     static func get(_ context: NSManagedObjectContext,
                     exerciseArchiveID: UUID,
                     completedAt: Date,

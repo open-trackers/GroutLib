@@ -53,10 +53,6 @@ public extension ZRoutineRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutineRun? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutineRun
-    }
-
     /// Fetch a ZRoutineRun record in the specified store, creating if necessary.
     /// Will update duration on existing record.
     /// NOTE: does NOT save context
