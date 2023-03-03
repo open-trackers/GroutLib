@@ -19,16 +19,14 @@ public extension ZRoutineRun {
                        startedAt: Date,
                        duration: Double,
                        createdAt: Date? = Date.now,
-                       toStore: NSPersistentStore? = nil) -> ZRoutineRun
+                       toStore: NSPersistentStore) -> ZRoutineRun
     {
         let nu = ZRoutineRun(context: context)
         zRoutine.addToZRoutineRuns(nu)
         nu.createdAt = createdAt
         nu.startedAt = startedAt
         nu.duration = duration
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 

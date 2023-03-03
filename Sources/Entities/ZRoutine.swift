@@ -19,15 +19,13 @@ public extension ZRoutine {
                        routineName: String,
                        routineArchiveID: UUID,
                        createdAt: Date? = Date.now,
-                       toStore: NSPersistentStore? = nil) -> ZRoutine
+                       toStore: NSPersistentStore) -> ZRoutine
     {
         let nu = ZRoutine(context: context)
         nu.createdAt = createdAt
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 

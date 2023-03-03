@@ -17,8 +17,8 @@ final class CleanLogRecordTests: TestBase {
     func testRoutineKeepAt() throws {
         let uuid = UUID()
         let startDate = Date.now
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1, toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(r.isDeleted)
@@ -38,8 +38,8 @@ final class CleanLogRecordTests: TestBase {
     func testRoutineDumpEarlierThan() throws {
         let uuid = UUID()
         let startDate = Date.now
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: uuid, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1, toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(r.isDeleted)
@@ -59,10 +59,10 @@ final class CleanLogRecordTests: TestBase {
         let eUUID = UUID()
         let startDate = Date.now
         let completeDate = startDate
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID)
-        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1, toStore: mainStore)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID, toStore: mainStore)
+        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1, toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(e.isDeleted)
@@ -84,10 +84,10 @@ final class CleanLogRecordTests: TestBase {
         let eUUID = UUID()
         let startDate = Date.now
         let completeDate = startDate
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID)
-        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: rUUID, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startDate, duration: 1, toStore: mainStore)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "blah", exerciseUnits: .kilograms, exerciseArchiveID: eUUID, toStore: mainStore)
+        let ee = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completeDate, intensity: 1, toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(e.isDeleted)

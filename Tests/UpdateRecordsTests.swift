@@ -70,7 +70,7 @@ final class UpdateRecordsTests: TestBase {
     }
 
     func testUpdateZRoutineCreatedAt() throws {
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
         r.createdAt = nil
         try testContext.save()
         let e1: ZRoutine? = ZRoutine.get(testContext, forURIRepresentation: r.uriRepresentation)
@@ -81,8 +81,8 @@ final class UpdateRecordsTests: TestBase {
     }
 
     func testUpdateZExerciseCreatedAt() throws {
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
         e.createdAt = nil
         try testContext.save()
         let e1: ZExercise? = ZExercise.get(testContext, forURIRepresentation: e.uriRepresentation)
@@ -93,8 +93,8 @@ final class UpdateRecordsTests: TestBase {
     }
 
     func testUpdateZRoutineRunCreatedAt() throws {
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: Date.now, duration: 10)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: Date.now, duration: 10, toStore: mainStore)
         rr.createdAt = nil
         try testContext.save()
         let e1: ZRoutineRun? = ZRoutineRun.get(testContext, forURIRepresentation: rr.uriRepresentation)
@@ -105,10 +105,10 @@ final class UpdateRecordsTests: TestBase {
     }
 
     func testUpdateZExerciseRunCreatedAt() throws {
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID)
-        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: Date.now, duration: 10)
-        let er = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: Date.now, intensity: 1)
+        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: Date.now, duration: 10, toStore: mainStore)
+        let er = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: Date.now, intensity: 1, toStore: mainStore)
         er.createdAt = nil
         try testContext.save()
         let e1: ZExerciseRun? = ZExerciseRun.get(testContext, forURIRepresentation: er.uriRepresentation)

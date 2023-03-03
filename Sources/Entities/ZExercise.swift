@@ -21,7 +21,7 @@ public extension ZExercise {
                        exerciseUnits: Units = Units.none,
                        exerciseArchiveID: UUID,
                        createdAt: Date? = Date.now,
-                       toStore: NSPersistentStore? = nil) -> ZExercise
+                       toStore: NSPersistentStore) -> ZExercise
     {
         let nu = ZExercise(context: context)
         zRoutine.addToZExercises(nu)
@@ -29,9 +29,7 @@ public extension ZExercise {
         nu.name = exerciseName
         nu.units = exerciseUnits.rawValue
         nu.exerciseArchiveID = exerciseArchiveID
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 

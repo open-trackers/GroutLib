@@ -20,7 +20,7 @@ public extension ZExerciseRun {
                        completedAt: Date,
                        intensity: Float,
                        createdAt: Date? = Date.now,
-                       toStore: NSPersistentStore? = nil) -> ZExerciseRun
+                       toStore: NSPersistentStore) -> ZExerciseRun
     {
         let nu = ZExerciseRun(context: context)
         zRoutineRun.addToZExerciseRuns(nu)
@@ -28,9 +28,7 @@ public extension ZExerciseRun {
         nu.createdAt = createdAt
         nu.completedAt = completedAt
         nu.intensity = intensity
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 
