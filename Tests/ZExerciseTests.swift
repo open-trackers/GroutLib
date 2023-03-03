@@ -28,7 +28,15 @@ final class ZExerciseTests: TestBase {
         _ = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
         try testContext.save()
 
-        let se2 = try ZExercise.getOrCreate(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh2", exerciseUnits: .pounds, inStore: mainStore)
+        let se2 = try ZExercise.getOrCreate(testContext,
+                                            zRoutine: sr,
+                                            exerciseArchiveID: exerciseArchiveID,
+//                                            exerciseName: "bleh2",
+//                                            exerciseUnits: .pounds,
+                                            inStore: mainStore) { _, element in
+            element.name = "bleh2"
+            element.units = Units.pounds.rawValue
+        }
         try testContext.save()
 
         XCTAssertEqual("bleh2", se2.name)
