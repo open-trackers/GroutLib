@@ -39,7 +39,8 @@ public extension ZRoutine {
         else { throw TrackerError.missingData(msg: "routineArchiveID; can't copy") }
         return try ZRoutine.getOrCreate(context,
                                         routineArchiveID: routineArchiveID,
-                                        inStore: dstStore) { _, element in
+                                        inStore: dstStore)
+        { _, element in
             element.name = wrappedName
             element.createdAt = createdAt
         }

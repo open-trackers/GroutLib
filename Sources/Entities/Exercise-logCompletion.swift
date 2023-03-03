@@ -37,7 +37,8 @@ extension Exercise {
         let zRoutine = try ZRoutine.getOrCreate(context,
                                                 routineArchiveID: routineArchiveID,
                                                 // routineName: routine.wrappedName,
-                                                inStore: mainStore) { _, element in
+                                                inStore: mainStore)
+        { _, element in
             element.name = routine.wrappedName
         }
 
@@ -53,7 +54,8 @@ extension Exercise {
                                                   exerciseArchiveID: exerciseArchiveID,
                                                   // exerciseName: wrappedName,
                                                   // exerciseUnits: Units(rawValue: units) ?? .none,
-                                                  inStore: mainStore) { _, element in
+                                                  inStore: mainStore)
+        { _, element in
             element.name = wrappedName
             element.units = units
         }
@@ -62,7 +64,8 @@ extension Exercise {
                                                       zRoutine: zRoutine,
                                                       startedAt: routineStartedAt,
                                                       // duration: nuDuration,
-                                                      inStore: mainStore) { _, element in
+                                                      inStore: mainStore)
+        { _, element in
             element.duration = nuDuration
         }
 
@@ -71,7 +74,8 @@ extension Exercise {
                                          zExercise: zExercise,
                                          completedAt: exerciseCompletedAt,
                                          // intensity: exerciseIntensity,
-                                         inStore: mainStore) { _, element in
+                                         inStore: mainStore)
+        { _, element in
             element.intensity = exerciseIntensity
         }
     }

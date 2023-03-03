@@ -33,7 +33,8 @@ final class ZExerciseTests: TestBase {
                                             exerciseArchiveID: exerciseArchiveID,
 //                                            exerciseName: "bleh2",
 //                                            exerciseUnits: .pounds,
-                                            inStore: mainStore) { _, element in
+                                            inStore: mainStore)
+        { _, element in
             element.name = "bleh2"
             element.units = Units.pounds.rawValue
         }

@@ -48,7 +48,8 @@ public extension ZExercise {
                                            exerciseArchiveID: exerciseArchiveID,
 //                                           exerciseName: wrappedName,
 //                                           exerciseUnits: Units(rawValue: units) ?? Units.none,
-                                           inStore: dstStore) { _, element in
+                                           inStore: dstStore)
+        { _, element in
             element.name = wrappedName
             element.units = units
             element.createdAt = createdAt
