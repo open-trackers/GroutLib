@@ -17,6 +17,7 @@ extension ZExerciseRun: Encodable {
         case completedAt
         case intensity
         case createdAt
+        case userRemoved
         case exerciseArchiveID // FK
         case routineRunStartedAt // FK
     }
@@ -25,6 +26,7 @@ extension ZExerciseRun: Encodable {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(completedAt, forKey: .completedAt)
         try c.encode(intensity, forKey: .intensity)
+        try c.encode(userRemoved, forKey: .userRemoved)
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(zExercise?.exerciseArchiveID, forKey: .exerciseArchiveID)
         try c.encode(zRoutineRun?.startedAt, forKey: .routineRunStartedAt)
@@ -39,6 +41,7 @@ extension ZExerciseRun: MAttributable {
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.completedAt, .date),
         MAttribute(CodingKeys.intensity, .double),
+        MAttribute(CodingKeys.userRemoved, .bool),
         MAttribute(CodingKeys.createdAt, .date),
         MAttribute(CodingKeys.exerciseArchiveID, .string),
         MAttribute(CodingKeys.routineRunStartedAt, .date),

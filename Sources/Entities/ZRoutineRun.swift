@@ -45,6 +45,7 @@ public extension ZRoutineRun {
                                            // duration: duration,
                                            inStore: dstStore) { _, element in
             element.duration = duration
+            element.createdAt = createdAt
         }
     }
 

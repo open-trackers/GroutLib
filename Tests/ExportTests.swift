@@ -107,7 +107,8 @@ final class ExportTests: TestBase {
         let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         let ze = ZExercise.create(testContext, zRoutine: zr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, toStore: mainStore)
-        _ = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity, createdAt: createdAt, toStore: mainStore)
+        let zer = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity, createdAt: createdAt, toStore: mainStore)
+        zer.userRemoved = true
         try testContext.save()
 
         let request = makeRequest(ZExerciseRun.self)
@@ -116,8 +117,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        completedAt,intensity,createdAt,exerciseArchiveID,routineRunStartedAt
-        \(completedAtStr),\(intensityStr),\(createdAtStr),\(exerciseArchiveID.uuidString),\(startedAtStr)
+        completedAt,intensity,userRemoved,createdAt,exerciseArchiveID,routineRunStartedAt
+        \(completedAtStr),\(intensityStr),true,\(createdAtStr),\(exerciseArchiveID.uuidString),\(startedAtStr)
 
         """
 

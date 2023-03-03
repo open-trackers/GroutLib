@@ -48,7 +48,9 @@ public extension ZExerciseRun {
                                             completedAt: completedAt,
                                             // intensity: intensity,
                                             inStore: dstStore) { _, element in
+            element.userRemoved = userRemoved
             element.intensity = intensity
+            element.createdAt = createdAt
         }
     }
 

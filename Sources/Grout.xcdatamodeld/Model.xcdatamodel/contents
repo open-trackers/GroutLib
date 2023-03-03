@@ -42,6 +42,7 @@
         <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="intensity" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="userRemoved" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="zExercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZExercise" inverseName="zExerciseRuns" inverseEntity="ZExercise"/>
         <relationship name="zRoutineRun" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutineRun" inverseName="zExerciseRuns" inverseEntity="ZRoutineRun"/>
     </entity>

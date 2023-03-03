@@ -51,6 +51,7 @@ public extension ZExercise {
                                            inStore: dstStore) { _, element in
             element.name = wrappedName
             element.units = units
+            element.createdAt = createdAt
         }
         return nu
     }
@@ -103,7 +104,6 @@ public extension ZExercise {
 }
 
 internal extension ZExercise {
-    /// NOTE does NOT filter for the userRemoved attribute!
     static func getPredicate(routineArchiveID: UUID,
                              exerciseArchiveID: UUID) -> NSPredicate
     {
