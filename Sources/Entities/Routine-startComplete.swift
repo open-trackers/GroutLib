@@ -14,18 +14,11 @@ import TrackerLib
 
 public extension Routine {
     // NOTE: does NOT save context
-    internal func clearCompletions(_ context: NSManagedObjectContext) throws {
-        let predicate = NSPredicate(format: "routine = %@", self)
+    func start(_ context: NSManagedObjectContext, startDate: Date = Date.now) throws -> Date {
+        let predicate = NSPredicate(format: "routine == %@", self)
         try context.fetcher(predicate: predicate) { (exercise: Exercise) in
             exercise.lastCompletedAt = nil
             return true
-        }
-    }
-
-    // NOTE: does NOT save context
-    func start(_ context: NSManagedObjectContext, clearData: Bool, startDate: Date = Date.now) throws -> Date {
-        if clearData {
-            try clearCompletions(context)
         }
         return startDate
     }
