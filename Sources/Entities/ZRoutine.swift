@@ -18,9 +18,11 @@ public extension ZRoutine {
     static func create(_ context: NSManagedObjectContext,
                        routineName: String,
                        routineArchiveID: UUID,
+                       createdAt: Date? = Date.now,
                        toStore: NSPersistentStore? = nil) -> ZRoutine
     {
         let nu = ZRoutine(context: context)
+        nu.createdAt = createdAt
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
         if let toStore {
@@ -38,6 +40,10 @@ public extension ZRoutine {
         guard let routineArchiveID
         else { throw TrackerError.missingData(msg: "routineArchiveID; can't copy") }
         return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
+    }
+
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutine? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutine
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -74,12 +80,14 @@ extension ZRoutine: Encodable {
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case name
         case routineArchiveID
+        case createdAt
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(name, forKey: .name)
         try c.encode(routineArchiveID, forKey: .routineArchiveID)
+        try c.encode(createdAt, forKey: .createdAt)
     }
 }
 
@@ -91,6 +99,7 @@ extension ZRoutine: MAttributable {
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.name, .string),
         MAttribute(CodingKeys.routineArchiveID, .string),
+        MAttribute(CodingKeys.createdAt, .date),
     ]
 }
 

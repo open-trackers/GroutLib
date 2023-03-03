@@ -22,9 +22,11 @@ public extension Routine {
     static func create(_ context: NSManagedObjectContext,
                        userOrder: Int16,
                        name: String = "New Routine",
-                       archiveID: UUID = UUID()) -> Routine
+                       archiveID: UUID = UUID(),
+                       createdAt: Date = Date.now) -> Routine
     {
         let nu = Routine(context: context)
+        nu.createdAt = createdAt
         nu.userOrder = userOrder
         nu.name = name
         nu.archiveID = archiveID
@@ -157,6 +159,7 @@ extension Routine: Encodable {
         case lastStartedAt
         case name
         case userOrder
+        case createdAt
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -167,6 +170,7 @@ extension Routine: Encodable {
         try c.encode(lastStartedAt, forKey: .lastStartedAt)
         try c.encode(name, forKey: .name)
         try c.encode(userOrder, forKey: .userOrder)
+        try c.encode(createdAt, forKey: .createdAt)
     }
 }
 
@@ -182,5 +186,6 @@ extension Routine: MAttributable {
         MAttribute(CodingKeys.lastStartedAt, .date),
         MAttribute(CodingKeys.name, .string),
         MAttribute(CodingKeys.userOrder, .int),
+        MAttribute(CodingKeys.createdAt, .date),
     ]
 }

@@ -56,7 +56,7 @@ final class LogCompletionTests: TestBase {
 
     func testSimple() throws {
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e = Exercise.create(testContext, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
+        let e = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
         e.routine = r
         e.lastIntensity = intensity1
         e.units = Units.kilograms.rawValue
@@ -91,12 +91,12 @@ final class LogCompletionTests: TestBase {
         /// ensure that a transfer doesn't interfere with an actively running routine
 
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e1 = Exercise.create(testContext, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
+        let e1 = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
         e1.routine = r
         e1.lastIntensity = intensity1
         e1.units = Units.kilograms.rawValue
 
-        let e2 = Exercise.create(testContext, userOrder: userOrder2, name: "blort", archiveID: exercise2ArchiveID)
+        let e2 = Exercise.create(testContext, routine: r, userOrder: userOrder2, name: "blort", archiveID: exercise2ArchiveID)
         e2.routine = r
         e2.lastIntensity = intensity2
         e2.units = Units.pounds.rawValue

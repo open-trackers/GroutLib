@@ -18,10 +18,12 @@ public extension ZRoutineRun {
                        zRoutine: ZRoutine,
                        startedAt: Date,
                        duration: Double,
+                       createdAt: Date? = Date.now,
                        toStore: NSPersistentStore? = nil) -> ZRoutineRun
     {
         let nu = ZRoutineRun(context: context)
-        nu.zRoutine = zRoutine
+        zRoutine.addToZRoutineRuns(nu)
+        nu.createdAt = createdAt
         nu.startedAt = startedAt
         nu.duration = duration
         if let toStore {
@@ -116,6 +118,7 @@ extension ZRoutineRun: Encodable {
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case startedAt
         case duration
+        case createdAt
         case routineArchiveID // FK
     }
 
@@ -123,6 +126,7 @@ extension ZRoutineRun: Encodable {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(startedAt, forKey: .startedAt)
         try c.encode(duration, forKey: .duration)
+        try c.encode(createdAt, forKey: .createdAt)
         try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
     }
 }
@@ -135,6 +139,7 @@ extension ZRoutineRun: MAttributable {
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.startedAt, .date),
         MAttribute(CodingKeys.duration, .double),
+        MAttribute(CodingKeys.createdAt, .date),
         MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

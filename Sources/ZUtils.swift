@@ -12,17 +12,53 @@ import CoreData
 
 /// Ensure all the records have archiveIDs
 /// NOTE: does NOT save context
-public func updateArchiveIDs(routines: [Routine]) {
-    for routine in routines {
-        if let _ = routine.archiveID { continue }
+public func updateArchiveIDs(_ context: NSManagedObjectContext) throws {
+    let pred = NSPredicate(format: "archiveID == NULL")
+    try context.fetcher(predicate: pred) { (routine: Routine) in
+        if let _ = routine.archiveID { return true }
         routine.archiveID = UUID()
-        // logger.notice("\(#function): added archiveID to \(routine.wrappedName)")
-        guard let exercises = routine.exercises?.allObjects as? [Exercise] else { continue }
-        for exercise in exercises {
-            if let _ = exercise.archiveID { continue }
-            exercise.archiveID = UUID()
-            // logger.notice("\(#function): added archiveID to \(exercise.wrappedName)")
-        }
+        return true
+    }
+    try context.fetcher(predicate: pred) { (exercise: Exercise) in
+        if let _ = exercise.archiveID { return true }
+        exercise.archiveID = UUID()
+        return true
+    }
+}
+
+/// Ensure all the records have createdAts
+/// NOTE: does NOT save context
+public func updateCreatedAts(_ context: NSManagedObjectContext) throws {
+    let pred = NSPredicate(format: "createdAt == NULL")
+    try context.fetcher(predicate: pred) { (element: Routine) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
+    try context.fetcher(predicate: pred) { (element: Exercise) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
+    try context.fetcher(predicate: pred) { (element: ZExercise) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
+    try context.fetcher(predicate: pred) { (element: ZExerciseRun) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
+    try context.fetcher(predicate: pred) { (element: ZRoutine) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
+    try context.fetcher(predicate: pred) { (element: ZRoutineRun) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
     }
 }
 

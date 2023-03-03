@@ -144,7 +144,7 @@ final class ExportTests: TestBase {
 
     func testExercise() throws {
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e = Exercise.create(testContext, userOrder: userOrder, name: "bleep", archiveID: exerciseArchiveID)
+        let e = Exercise.create(testContext, routine: r, userOrder: userOrder, name: "bleep", archiveID: exerciseArchiveID)
         e.routine = r
         e.intensityStep = intensityStep
         e.invertedIntensity = true

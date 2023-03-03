@@ -19,11 +19,13 @@ public extension ZExerciseRun {
                        zExercise: ZExercise,
                        completedAt: Date,
                        intensity: Float,
+                       createdAt: Date? = Date.now,
                        toStore: NSPersistentStore? = nil) -> ZExerciseRun
     {
         let nu = ZExerciseRun(context: context)
-        nu.zRoutineRun = zRoutineRun
-        nu.zExercise = zExercise
+        zRoutineRun.addToZExerciseRuns(nu)
+        zExercise.addToZExerciseRuns(nu)
+        nu.createdAt = createdAt
         nu.completedAt = completedAt
         nu.intensity = intensity
         if let toStore {
@@ -43,6 +45,10 @@ public extension ZExerciseRun {
         guard let completedAt
         else { throw TrackerError.missingData(msg: "completedAt not present; can't copy") }
         return try ZExerciseRun.getOrCreate(context, zRoutineRun: dstRoutineRun, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
+    }
+
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZExerciseRun? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? ZExerciseRun
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -113,6 +119,7 @@ extension ZExerciseRun: Encodable {
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case completedAt
         case intensity
+        case createdAt
         case exerciseArchiveID // FK
         case routineRunStartedAt // FK
     }
@@ -121,6 +128,7 @@ extension ZExerciseRun: Encodable {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(completedAt, forKey: .completedAt)
         try c.encode(intensity, forKey: .intensity)
+        try c.encode(createdAt, forKey: .createdAt)
         try c.encode(zExercise?.exerciseArchiveID, forKey: .exerciseArchiveID)
         try c.encode(zRoutineRun?.startedAt, forKey: .routineRunStartedAt)
     }
@@ -134,6 +142,7 @@ extension ZExerciseRun: MAttributable {
     public static var attributes: [MAttribute] = [
         MAttribute(CodingKeys.completedAt, .date),
         MAttribute(CodingKeys.intensity, .double),
+        MAttribute(CodingKeys.createdAt, .date),
         MAttribute(CodingKeys.exerciseArchiveID, .string),
         MAttribute(CodingKeys.routineRunStartedAt, .date),
     ]

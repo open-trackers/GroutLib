@@ -18,15 +18,17 @@ public extension ZExercise {
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
                        exerciseName: String,
-                       exerciseUnits: Units,
+                       exerciseUnits: Units = Units.none,
                        exerciseArchiveID: UUID,
+                       createdAt: Date? = Date.now,
                        toStore: NSPersistentStore? = nil) -> ZExercise
     {
         let nu = ZExercise(context: context)
+        zRoutine.addToZExercises(nu)
+        nu.createdAt = createdAt
         nu.name = exerciseName
         nu.units = exerciseUnits.rawValue
         nu.exerciseArchiveID = exerciseArchiveID
-        nu.zRoutine = zRoutine
         if let toStore {
             context.assign(nu, to: toStore)
         }
@@ -50,6 +52,10 @@ public extension ZExercise {
                                            exerciseUnits: Units(rawValue: units) ?? Units.none,
                                            inStore: dstStore)
         return nu
+    }
+
+    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZExercise? {
+        NSManagedObject.get(context, forURIRepresentation: url) as? ZExercise
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -96,6 +102,7 @@ extension ZExercise: Encodable {
         case name
         case units
         case exerciseArchiveID
+        case createdAt
         case routineArchiveID // FK
     }
 
@@ -104,6 +111,7 @@ extension ZExercise: Encodable {
         try c.encode(name, forKey: .name)
         try c.encode(units, forKey: .units)
         try c.encode(exerciseArchiveID, forKey: .exerciseArchiveID)
+        try c.encode(createdAt, forKey: .createdAt)
         try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
     }
 }
@@ -117,6 +125,7 @@ extension ZExercise: MAttributable {
         MAttribute(CodingKeys.name, .string),
         MAttribute(CodingKeys.units, .int),
         MAttribute(CodingKeys.exerciseArchiveID, .string),
+        MAttribute(CodingKeys.createdAt, .date),
         MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }

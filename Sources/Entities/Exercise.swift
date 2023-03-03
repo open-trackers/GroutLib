@@ -23,10 +23,12 @@ public extension Exercise {
                        routine: Routine,
                        userOrder: Int16,
                        name: String = "New Exercise",
-                       archiveID: UUID = UUID()) -> Exercise
+                       archiveID: UUID = UUID(),
+                       createdAt: Date = Date.now) -> Exercise
     {
         let nu = Exercise(context: context)
         routine.addToExercises(nu)
+        nu.createdAt = createdAt
         nu.userOrder = userOrder
         nu.name = name
         nu.archiveID = archiveID
@@ -93,7 +95,7 @@ public extension Exercise {
     // NOTE: does NOT save context
     func markDone(_ context: NSManagedObjectContext,
                   mainStore: NSPersistentStore,
-                  completedAt: Date,
+                  completedAt: Date = Date.now,
                   withAdvance: Bool,
                   routineStartedAt: Date,
                   logToHistory: Bool) throws
@@ -201,6 +203,7 @@ extension Exercise: Encodable {
         case sets
         case units
         case userOrder
+        case createdAt
         case routineArchiveID // FK
     }
 
@@ -218,6 +221,7 @@ extension Exercise: Encodable {
         try c.encode(sets, forKey: .sets)
         try c.encode(units, forKey: .units)
         try c.encode(userOrder, forKey: .userOrder)
+        try c.encode(createdAt, forKey: .createdAt)
         try c.encode(routine?.archiveID, forKey: .routineArchiveID)
     }
 }
@@ -240,6 +244,7 @@ extension Exercise: MAttributable {
         MAttribute(CodingKeys.sets, .int),
         MAttribute(CodingKeys.units, .int),
         MAttribute(CodingKeys.userOrder, .int),
+        MAttribute(CodingKeys.createdAt, .date),
         MAttribute(CodingKeys.routineArchiveID, .string),
     ]
 }
