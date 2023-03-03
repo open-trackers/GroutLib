@@ -30,12 +30,11 @@ final class ShallowCopyTests: TestBase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        
+
         createdAt1 = df.date(from: createdAt1Str)
         createdAt2 = df.date(from: createdAt2Str)
         createdAt3 = df.date(from: createdAt3Str)
         createdAt4 = df.date(from: createdAt4Str)
-
     }
 
     func testReadOnly() throws {
@@ -88,7 +87,7 @@ final class ShallowCopyTests: TestBase {
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
-        
+
         let dc: ZRoutine? = try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore)
         XCTAssertNotNil(dc)
         XCTAssertEqual(createdAt1, dc?.createdAt)
@@ -96,7 +95,6 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(ds)
         XCTAssertEqual(createdAt2, ds?.createdAt)
     }
-
 
     func testRoutineWithRoutineRun() throws {
         let startedAt = Date()
@@ -177,7 +175,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
         XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
-        
+
         let dc: ZRoutine? = try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore)
         XCTAssertNotNil(dc)
         XCTAssertEqual(createdAt1, dc?.createdAt)
@@ -191,7 +189,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(dsr)
         XCTAssertEqual(createdAt4, dsr?.createdAt)
     }
-    
+
     func testExerciseRunIncludesUserRemoved() throws {
         let startedAt = Date()
         let completedAt = startedAt.addingTimeInterval(1000)

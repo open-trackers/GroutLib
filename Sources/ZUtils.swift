@@ -64,16 +64,26 @@ public func updateCreatedAts(_ context: NSManagedObjectContext) throws {
 
 /// Delete all `Z` records prior to a specified date.
 /// NOTE: does NOT save context
-public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date) throws {
-    try context.deleter(ZExerciseRun.self,
-                        predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
+public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date, inStore: NSPersistentStore? = nil) throws {
+    let pred = NSPredicate(format: "startedAt < %@", keepSince as NSDate)
 
-    try context.deleter(ZExercise.self,
-                        predicate: NSPredicate(format: "zExerciseRuns.@count == 0"))
+    try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
+        context.delete(element)
+        return true
+    }
 
-    try context.deleter(ZRoutineRun.self,
-                        predicate: NSPredicate(format: "startedAt < %@", keepSince as NSDate))
+    // TODO: delete orphaned ZExercise and ZRoutine
 
-    try context.deleter(ZRoutine.self,
-                        predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
+    // no longer using deleter due to errors not occurring with plain old delete
+//    try context.deleter(ZExerciseRun.self,
+//                        predicate: NSPredicate(format: "completedAt < %@", keepSince as NSDate))
+//
+//    try context.deleter(ZExercise.self,
+//                        predicate: NSPredicate(format: "zExerciseRuns.@count == 0"))
+//
+//    try context.deleter(ZRoutineRun.self,
+//                        predicate: NSPredicate(format: "startedAt < %@", keepSince as NSDate))
+//
+//    try context.deleter(ZRoutine.self,
+//                        predicate: NSPredicate(format: "zRoutineRuns.@count == 0"))
 }

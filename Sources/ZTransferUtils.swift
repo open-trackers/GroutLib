@@ -31,10 +31,8 @@ public func transferToArchive(_ context: NSManagedObjectContext,
 
     let filteredZRoutines = zRoutines.filter { !$0.isFresh(context, now: now, thresholdSecs: thresholdSecs) }
 
-    let objectIDs = filteredZRoutines.map(\.objectID)
-
     // rely on cascading delete to remove children
-    try context.deleter(objectIDs: objectIDs)
+    filteredZRoutines.forEach { context.delete($0) }
 }
 
 /// Deep copy of all routines and their children from the source store to specified destination store
