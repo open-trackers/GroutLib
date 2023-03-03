@@ -17,7 +17,7 @@ public extension ZRoutineRun {
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
                        startedAt: Date,
-                       duration: Double,
+                       duration: Double = 0,
                        createdAt: Date? = Date.now,
                        toStore: NSPersistentStore) -> ZRoutineRun
     {
@@ -39,7 +39,13 @@ public extension ZRoutineRun {
     {
         guard let startedAt
         else { throw TrackerError.missingData(msg: "startedAt; can't copy") }
-        return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
+        return try ZRoutineRun.getOrCreate(context,
+                                           zRoutine: dstRoutine,
+                                           startedAt: startedAt,
+                                           // duration: duration,
+                                           inStore: dstStore) { _, element in
+            element.duration = duration
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -57,17 +63,29 @@ public extension ZRoutineRun {
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             startedAt: Date,
-                            duration: TimeInterval,
-                            inStore: NSPersistentStore) throws -> ZRoutineRun
+//                            duration: TimeInterval,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZRoutineRun) -> Void = { _, _ in }) throws -> ZRoutineRun
     {
         guard let archiveID = zRoutine.routineArchiveID
         else { throw TrackerError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
-        if let nu = try ZRoutineRun.get(context, routineArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
-            nu.duration = duration
-            return nu
+        if let existing = try ZRoutineRun.get(context,
+                                              routineArchiveID: archiveID,
+                                              startedAt: startedAt,
+                                              inStore: inStore)
+        {
+//            nu.duration = duration
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, toStore: inStore)
+            let nu = ZRoutineRun.create(context,
+                                        zRoutine: zRoutine,
+                                        startedAt: startedAt,
+                                        // duration: duration,
+                                        toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 

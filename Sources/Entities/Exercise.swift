@@ -153,8 +153,10 @@ extension Exercise {
         }()
         let zRoutine = try ZRoutine.getOrCreate(context,
                                                 routineArchiveID: routineArchiveID,
-                                                routineName: routine.wrappedName,
-                                                inStore: mainStore)
+                                                // routineName: routine.wrappedName,
+                                                inStore: mainStore) { _, element in
+            element.name = routine.wrappedName
+        }
 
         // Get corresponding ZExercise for log, creating if necessary.
         let exerciseArchiveID: UUID = {
@@ -166,22 +168,29 @@ extension Exercise {
         let zExercise = try ZExercise.getOrCreate(context,
                                                   zRoutine: zRoutine,
                                                   exerciseArchiveID: exerciseArchiveID,
-                                                  exerciseName: wrappedName,
-                                                  exerciseUnits: Units(rawValue: units) ?? .none,
-                                                  inStore: mainStore)
+                                                  // exerciseName: wrappedName,
+                                                  // exerciseUnits: Units(rawValue: units) ?? .none,
+                                                  inStore: mainStore) { _, element in
+            element.name = wrappedName
+            element.units = units
+        }
 
         let zRoutineRun = try ZRoutineRun.getOrCreate(context,
                                                       zRoutine: zRoutine,
                                                       startedAt: routineStartedAt,
-                                                      duration: nuDuration,
-                                                      inStore: mainStore)
+                                                      // duration: nuDuration,
+                                                      inStore: mainStore) { _, element in
+            element.duration = nuDuration
+        }
 
         _ = try ZExerciseRun.getOrCreate(context,
                                          zRoutineRun: zRoutineRun,
                                          zExercise: zExercise,
                                          completedAt: exerciseCompletedAt,
-                                         intensity: exerciseIntensity,
-                                         inStore: mainStore)
+                                         // intensity: exerciseIntensity,
+                                         inStore: mainStore) { _, element in
+            element.intensity = exerciseIntensity
+        }
     }
 }
 

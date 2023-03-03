@@ -18,7 +18,7 @@ public extension ZExerciseRun {
                        zRoutineRun: ZRoutineRun,
                        zExercise: ZExercise,
                        completedAt: Date,
-                       intensity: Float,
+                       intensity: Float = 0,
                        createdAt: Date? = Date.now,
                        toStore: NSPersistentStore) -> ZExerciseRun
     {
@@ -42,7 +42,14 @@ public extension ZExerciseRun {
     {
         guard let completedAt
         else { throw TrackerError.missingData(msg: "completedAt not present; can't copy") }
-        return try ZExerciseRun.getOrCreate(context, zRoutineRun: dstRoutineRun, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
+        return try ZExerciseRun.getOrCreate(context,
+                                            zRoutineRun: dstRoutineRun,
+                                            zExercise: dstExercise,
+                                            completedAt: completedAt,
+                                            // intensity: intensity,
+                                            inStore: dstStore) { _, element in
+            element.intensity = intensity
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -62,17 +69,21 @@ public extension ZExerciseRun {
                             zRoutineRun: ZRoutineRun,
                             zExercise: ZExercise,
                             completedAt: Date,
-                            intensity: Float,
-                            inStore: NSPersistentStore) throws -> ZExerciseRun
+                            // intensity: Float,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZExerciseRun) -> Void = { _, _ in }) throws -> ZExerciseRun
     {
         guard let exerciseArchiveID = zExercise.exerciseArchiveID
         else { throw TrackerError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
-        if let nu = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
-            nu.intensity = intensity
-            return nu
+        if let existing = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
+            // nu.intensity = intensity
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, intensity: intensity, toStore: inStore)
+            let nu = ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 

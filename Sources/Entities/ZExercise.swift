@@ -17,7 +17,7 @@ public extension ZExercise {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
-                       exerciseName: String,
+                       exerciseName: String? = nil,
                        exerciseUnits: Units = Units.none,
                        exerciseArchiveID: UUID,
                        createdAt: Date? = Date.now,
@@ -46,9 +46,12 @@ public extension ZExercise {
         let nu = try ZExercise.getOrCreate(context,
                                            zRoutine: dstRoutine,
                                            exerciseArchiveID: exerciseArchiveID,
-                                           exerciseName: wrappedName,
-                                           exerciseUnits: Units(rawValue: units) ?? Units.none,
-                                           inStore: dstStore)
+//                                           exerciseName: wrappedName,
+//                                           exerciseUnits: Units(rawValue: units) ?? Units.none,
+                                           inStore: dstStore) { _, element in
+            element.name = wrappedName
+            element.units = units
+        }
         return nu
     }
 
@@ -67,21 +70,25 @@ public extension ZExercise {
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             exerciseArchiveID: UUID,
-                            exerciseName: String,
-                            exerciseUnits: Units,
-                            inStore: NSPersistentStore) throws -> ZExercise
+                            // exerciseName: String,
+                            // exerciseUnits: Units,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZExercise) -> Void = { _, _ in }) throws -> ZExercise
     {
-        if let nu = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
-            nu.name = exerciseName
-            nu.units = exerciseUnits.rawValue
-            return nu
+        if let existing = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
+//            nu.name = exerciseName
+//            nu.units = exerciseUnits.rawValue
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZExercise.create(context,
-                                    zRoutine: zRoutine,
-                                    exerciseName: exerciseName,
-                                    exerciseUnits: exerciseUnits,
-                                    exerciseArchiveID: exerciseArchiveID,
-                                    toStore: inStore)
+            let nu = ZExercise.create(context,
+                                      zRoutine: zRoutine,
+//                                    exerciseName: exerciseName,
+//                                    exerciseUnits: exerciseUnits,
+                                      exerciseArchiveID: exerciseArchiveID,
+                                      toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 

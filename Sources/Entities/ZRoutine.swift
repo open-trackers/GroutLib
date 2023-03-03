@@ -16,7 +16,7 @@ import TrackerLib
 public extension ZRoutine {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
-                       routineName: String,
+                       routineName: String? = nil,
                        routineArchiveID: UUID,
                        createdAt: Date? = Date.now,
                        toStore: NSPersistentStore) -> ZRoutine
@@ -37,7 +37,12 @@ public extension ZRoutine {
     {
         guard let routineArchiveID
         else { throw TrackerError.missingData(msg: "routineArchiveID; can't copy") }
-        return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
+        return try ZRoutine.getOrCreate(context,
+                                        routineArchiveID: routineArchiveID,
+                                        // routineName: wrappedName,
+                                        inStore: dstStore) { _, element in
+            element.name = wrappedName
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -53,14 +58,21 @@ public extension ZRoutine {
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             routineArchiveID: UUID,
-                            routineName: String,
-                            inStore: NSPersistentStore) throws -> ZRoutine
+                            // routineName: String,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZRoutine) -> Void = { _, _ in }) throws -> ZRoutine
     {
-        if let nu = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
-            nu.name = routineName
-            return nu
+        if let existing = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
+            onUpdate(true, existing)
+            // nu.name = routineName
+            return existing
         } else {
-            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, toStore: inStore)
+            let nu = ZRoutine.create(context,
+                                     // routineName: routineName,
+                                     routineArchiveID: routineArchiveID,
+                                     toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 
