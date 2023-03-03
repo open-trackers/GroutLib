@@ -38,3 +38,9 @@ public extension Exercise {
         set { name = newValue }
     }
 }
+
+internal extension Exercise {
+    static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
+        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
+    }
+}

@@ -97,16 +97,18 @@ public extension ZExercise {
         set { name = newValue }
     }
 
+    var exerciseRunsArray: [ZExerciseRun] {
+        (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
+    }
+}
+
+internal extension ZExercise {
     /// NOTE does NOT filter for the userRemoved attribute!
-    internal static func getPredicate(routineArchiveID: UUID,
-                                      exerciseArchiveID: UUID) -> NSPredicate
+    static func getPredicate(routineArchiveID: UUID,
+                             exerciseArchiveID: UUID) -> NSPredicate
     {
         NSPredicate(format: "zRoutine.routineArchiveID == %@ AND exerciseArchiveID == %@",
                     routineArchiveID.uuidString,
                     exerciseArchiveID.uuidString)
-    }
-
-    var exerciseRunsArray: [ZExerciseRun] {
-        (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
     }
 }

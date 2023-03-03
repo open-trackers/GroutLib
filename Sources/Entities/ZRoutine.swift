@@ -77,18 +77,20 @@ public extension ZRoutine {
         get { name ?? "unknown" }
         set { name = newValue }
     }
+}
 
-    internal static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
+internal extension ZRoutine {
+    static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
         NSPredicate(format: "routineArchiveID == %@", routineArchiveID.uuidString)
-    }
-
-    var zExercisesArray: [ZExercise] {
-        (zExercises?.allObjects as? [ZExercise]) ?? []
     }
 }
 
 public extension ZRoutine {
     var zRoutineRunsArray: [ZRoutineRun] {
         (zRoutineRuns?.allObjects as? [ZRoutineRun]) ?? []
+    }
+
+    var zExercisesArray: [ZExercise] {
+        (zExercises?.allObjects as? [ZExercise]) ?? []
     }
 }

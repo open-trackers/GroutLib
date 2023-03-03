@@ -63,7 +63,7 @@ public extension ZRoutineRun {
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             startedAt: Date,
-//                            duration: TimeInterval,
+                            //                            duration: TimeInterval,
                             inStore: NSPersistentStore,
                             onUpdate: (Bool, ZRoutineRun) -> Void = { _, _ in }) throws -> ZRoutineRun
     {
@@ -75,7 +75,7 @@ public extension ZRoutineRun {
                                               startedAt: startedAt,
                                               inStore: inStore)
         {
-//            nu.duration = duration
+            //            nu.duration = duration
             onUpdate(true, existing)
             return existing
         } else {
@@ -112,9 +112,11 @@ public extension ZRoutineRun {
         // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
         // try context.deleter(ZRoutineRun.self, predicate: pred, inStore: inStore)
     }
+}
 
-    internal static func getPredicate(routineArchiveID: UUID,
-                                      startedAt: Date) -> NSPredicate
+internal extension ZRoutineRun {
+    static func getPredicate(routineArchiveID: UUID,
+                             startedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
                     routineArchiveID.uuidString,

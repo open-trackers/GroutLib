@@ -110,9 +110,11 @@ public extension ZExerciseRun {
         // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
         // try context.deleter(ZExerciseRun.self, predicate: pred, inStore: inStore)
     }
+}
 
-    internal static func getPredicate(exerciseArchiveID: UUID,
-                                      completedAt: Date) -> NSPredicate
+internal extension ZExerciseRun {
+    static func getPredicate(exerciseArchiveID: UUID,
+                             completedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
                     exerciseArchiveID.uuidString,

@@ -44,6 +44,12 @@ public extension Routine {
     }
 }
 
+internal extension Routine {
+    static func getPredicate(archiveID: UUID) -> NSPredicate {
+        NSPredicate(format: "archiveID == %@", archiveID.uuidString)
+    }
+}
+
 public extension Routine {
     var exercisesArray: [Exercise] {
         (exercises?.allObjects as? [Exercise]) ?? []

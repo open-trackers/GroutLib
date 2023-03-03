@@ -14,10 +14,6 @@ import CoreData
 import TrackerLib
 
 extension Exercise {
-    internal static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
-    }
-
     internal static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, exerciseArchiveID: UUID) throws {
         let pred = getPredicate(routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID)
         let sort = [NSSortDescriptor(keyPath: \Exercise.createdAt, ascending: true)]
