@@ -70,12 +70,16 @@ internal func deepCopy(_ context: NSManagedObjectContext,
             return true
         }
 
+        // NOTE: including even those ZRoutineRun records with userRemoved==1, as we need to reflect
+        // removed records in the archive (which may have been previously copied as userRemoved=0)
         try context.fetcher(predicate: routinePred, inStore: srcStore) { (sRoutineRun: ZRoutineRun) in
 
             let dRoutineRun = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
             let routineRunPred = NSPredicate(format: "zRoutineRun = %@", sRoutineRun)
 
+            // NOTE: including even those ZExerciseRun records with userRemoved==1, as we need to reflect
+            // removed records in the archive (which may have been previously copied as userRemoved=0)
             try context.fetcher(predicate: routineRunPred, inStore: srcStore) { (sExerciseRun: ZExerciseRun) in
 
                 guard let exerciseArchiveID = sExerciseRun.zExercise?.exerciseArchiveID,

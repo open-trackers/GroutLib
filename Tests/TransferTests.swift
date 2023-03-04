@@ -123,10 +123,6 @@ final class TransferTests: TestBase {
     }
 
     func testIncludesCopyOfExerciseRunWhereUserRemoved() throws {
-//        let startedAt = "2022-12-20"
-//        let completedAt3 = "16:03"
-//        let completedAt5 = "16:05"
-//        let completedAt7 = "16:07"
         let startedAt = Date()
         let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         let se = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", toStore: mainStore)
@@ -144,6 +140,32 @@ final class TransferTests: TestBase {
         try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore) // , startOfDay: startOfDay, now: now, tz: tz)
         try testContext.save()
 
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt1, inStore: archiveStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: archiveStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: archiveStore))
+    }
+    
+    func testIncludesCopyOfRoutineRunWhereUserRemoved() throws {
+        let startedAt = Date()
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let se = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", toStore: mainStore)
+        let dr = ZRoutineRun.create(testContext, zRoutine: sr, startedAt: startedAt, toStore: mainStore)
+        _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt1, toStore: mainStore)
+        _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt2, toStore: mainStore)
+        _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt3, toStore: mainStore)
+        
+        dr.userRemoved = true       // removing routineRun
+        try testContext.save()
+        
+        XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt1, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: mainStore))
+        XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: mainStore))
+
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore) // , startOfDay: startOfDay, now: now, tz: tz)
+        try testContext.save()
+
+        XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt1, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: archiveStore))

@@ -222,4 +222,39 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(dsr)
         XCTAssertTrue(dsr!.userRemoved)
     }
+    
+    func testRoutineRunIncludesUserRemoved() throws {
+        let startedAt = Date()
+        let completedAt = startedAt.addingTimeInterval(1000)
+        let sc = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", createdAt: createdAt1, toStore: mainStore)
+        let ss = ZExercise.create(testContext, zRoutine: sc, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", createdAt: createdAt2, toStore: mainStore)
+        let sdr = ZRoutineRun.create(testContext, zRoutine: sc, startedAt: startedAt, createdAt: createdAt3, toStore: mainStore)
+        let ssr = ZExerciseRun.create(testContext, zRoutineRun: sdr, zExercise: ss, completedAt: completedAt, createdAt: createdAt4, toStore: mainStore)
+        
+        sdr.userRemoved = true  // remove the routineRun
+        try testContext.save()
+
+        _ = try sc.shallowCopy(testContext, toStore: archiveStore)
+        try testContext.save()
+        guard let dr = try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore)
+        else { XCTFail(); return }
+
+        _ = try sdr.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
+        try testContext.save()
+        guard let ddr = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore)
+        else { XCTFail(); return }
+        XCTAssertTrue(ddr.userRemoved)
+
+        _ = try ss.shallowCopy(testContext, dstRoutine: dr, toStore: archiveStore)
+        try testContext.save()
+        guard let de = try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore)
+        else { XCTFail(); return }
+
+        _ = try ssr.shallowCopy(testContext, dstRoutineRun: ddr, dstExercise: de, toStore: archiveStore)
+        try testContext.save()
+
+        let dsr: ZExerciseRun? = try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore)
+        XCTAssertNotNil(dsr)
+        XCTAssertFalse(dsr!.userRemoved)  // because only the parent routineRun has been removed
+    }
 }

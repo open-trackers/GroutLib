@@ -15,6 +15,10 @@ import TrackerLib
 extension Exercise {
     /// log the run of the exercise to the main store
     /// (These will later be transferred to the archive store on iOS devices)
+    ///
+    /// If ZRoutineRun for the exercise has been deleted, possibly on another device,
+    /// it's userRemoved flag will be set back to 'false'.
+    ///
     /// NOTE: does NOT save context
     func logCompletion(_ context: NSManagedObjectContext,
                        mainStore: NSPersistentStore,
@@ -67,6 +71,7 @@ extension Exercise {
                                                       inStore: mainStore)
         { _, element in
             element.duration = nuDuration
+            element.userRemoved = false         // removal may have happened on another device; we're reversing it
         }
 
         _ = try ZExerciseRun.getOrCreate(context,

@@ -47,6 +47,7 @@ public extension ZRoutineRun {
         { _, element in
             element.duration = duration
             element.createdAt = createdAt
+            element.userRemoved = userRemoved
         }
     }
 

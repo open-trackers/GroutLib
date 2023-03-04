@@ -67,7 +67,8 @@ final class ExportTests: TestBase {
 
     func testZRoutineRun() throws {
         let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
-        _ = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, createdAt: createdAt, toStore: mainStore)
+        let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, createdAt: createdAt, toStore: mainStore)
+        zrr.userRemoved = true
         try testContext.save()
 
         let request = makeRequest(ZRoutineRun.self)
@@ -76,8 +77,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        startedAt,duration,createdAt,routineArchiveID
-        \(startedAtStr),\(durationStr),\(createdAtStr),\(routineArchiveID.uuidString)
+        startedAt,duration,userRemoved,createdAt,routineArchiveID
+        \(startedAtStr),\(durationStr),true,\(createdAtStr),\(routineArchiveID.uuidString)
 
         """
 
