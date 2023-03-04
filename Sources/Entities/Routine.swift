@@ -42,6 +42,11 @@ public extension Routine {
         get { name ?? "unknown" }
         set { name = newValue }
     }
+
+    static func getFirst(_ context: NSManagedObjectContext) throws -> Routine? {
+        let sort = [NSSortDescriptor(keyPath: \Routine.userOrder, ascending: true)]
+        return try context.firstFetcher(sortDescriptors: sort)
+    }
 }
 
 internal extension Routine {
