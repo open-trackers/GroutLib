@@ -144,7 +144,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: archiveStore))
     }
-    
+
     func testIncludesCopyOfRoutineRunWhereUserRemoved() throws {
         let startedAt = Date()
         let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
@@ -153,10 +153,10 @@ final class TransferTests: TestBase {
         _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt1, toStore: mainStore)
         _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt2, toStore: mainStore)
         _ = ZExerciseRun.create(testContext, zRoutineRun: dr, zExercise: se, completedAt: completedAt3, toStore: mainStore)
-        
-        dr.userRemoved = true       // removing routineRun
+
+        dr.userRemoved = true // removing routineRun
         try testContext.save()
-        
+
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt1, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: mainStore))

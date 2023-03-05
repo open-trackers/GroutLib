@@ -71,7 +71,7 @@ extension Exercise {
                                                       inStore: mainStore)
         { _, element in
             element.duration = nuDuration
-            element.userRemoved = false         // removal may have happened on another device; we're reversing it
+            element.userRemoved = false // removal may have happened on another device; we're reversing it
         }
 
         _ = try ZExerciseRun.getOrCreate(context,

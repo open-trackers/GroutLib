@@ -222,7 +222,7 @@ final class ShallowCopyTests: TestBase {
         XCTAssertNotNil(dsr)
         XCTAssertTrue(dsr!.userRemoved)
     }
-    
+
     func testRoutineRunIncludesUserRemoved() throws {
         let startedAt = Date()
         let completedAt = startedAt.addingTimeInterval(1000)
@@ -230,8 +230,8 @@ final class ShallowCopyTests: TestBase {
         let ss = ZExercise.create(testContext, zRoutine: sc, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", createdAt: createdAt2, toStore: mainStore)
         let sdr = ZRoutineRun.create(testContext, zRoutine: sc, startedAt: startedAt, createdAt: createdAt3, toStore: mainStore)
         let ssr = ZExerciseRun.create(testContext, zRoutineRun: sdr, zExercise: ss, completedAt: completedAt, createdAt: createdAt4, toStore: mainStore)
-        
-        sdr.userRemoved = true  // remove the routineRun
+
+        sdr.userRemoved = true // remove the routineRun
         try testContext.save()
 
         _ = try sc.shallowCopy(testContext, toStore: archiveStore)
@@ -255,6 +255,6 @@ final class ShallowCopyTests: TestBase {
 
         let dsr: ZExerciseRun? = try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore)
         XCTAssertNotNil(dsr)
-        XCTAssertFalse(dsr!.userRemoved)  // because only the parent routineRun has been removed
+        XCTAssertFalse(dsr!.userRemoved) // because only the parent routineRun has been removed
     }
 }

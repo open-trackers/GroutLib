@@ -152,7 +152,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertEqual(completedAt2, zer2?.completedAt)
         XCTAssertEqual(intensity2, zer2?.intensity)
     }
-    
+
     func testRestoreRoutineRunAfterUserCompletesExercise() throws {
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
         let e1 = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
@@ -160,28 +160,28 @@ final class LogCompletionTests: TestBase {
         let e2 = Exercise.create(testContext, routine: r, userOrder: userOrder2, name: "blort", archiveID: exercise1ArchiveID)
         e2.lastIntensity = intensity2
         try testContext.save()
-        
+
         try e1.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
         try testContext.save()
-        
+
         guard let zrr1 = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore)
         else { XCTFail(); return }
         XCTAssertEqual(duration, zrr1.duration)
         XCTAssertEqual(startedAt, zrr1.startedAt)
-        
+
         // user removes ZRoutineRun (possibly from different device)
-        
+
         zrr1.userRemoved = true
         try testContext.save()
-        
+
         // user completes exercise (possibly from different device)
-        
+
         try e2.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt2, exerciseIntensity: intensity2)
         try testContext.save()
-        
+
         guard let zrr2 = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore)
         else { XCTFail(); return }
-        
+
         // ensure that ZRoutineRun has been restored from the userRemove (possibly on another device)
         XCTAssertFalse(zrr2.userRemoved)
     }
