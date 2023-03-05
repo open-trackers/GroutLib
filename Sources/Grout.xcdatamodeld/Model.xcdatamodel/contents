@@ -2,6 +2,11 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="AppSetting" representedClassName="AppSetting" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="defExIntensity" optional="YES" attributeType="Float" defaultValueString="30" usesScalarValueType="YES"/>
+        <attribute name="defExIntensityStep" optional="YES" attributeType="Float" defaultValueString="5" usesScalarValueType="YES"/>
+        <attribute name="defExReps" optional="YES" attributeType="Integer 16" defaultValueString="12" usesScalarValueType="YES"/>
+        <attribute name="defExSets" optional="YES" attributeType="Integer 16" defaultValueString="3" usesScalarValueType="YES"/>
+        <attribute name="defExUnits" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="category">
         <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>

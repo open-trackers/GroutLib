@@ -30,7 +30,24 @@ public extension Exercise {
         nu.userOrder = userOrder
         nu.name = name
         nu.archiveID = archiveID
+
+        // NOTE that these may be replaced with defaults from AppSetting
+        nu.units = defaultUnits
+        nu.repetitions = defaultReps
+        nu.lastIntensity = defaultIntensity
+        nu.intensityStep = defaultIntensityStep
+        nu.sets = defaultSets
+
         return nu
+    }
+
+    func updateFromAppSettings(_ context: NSManagedObjectContext) throws {
+        let appSetting = try AppSetting.getOrCreate(context)
+        lastIntensity = appSetting.defExIntensity
+        intensityStep = appSetting.defExIntensityStep
+        units = appSetting.defExUnits
+        repetitions = appSetting.defExReps
+        sets = appSetting.defExSets
     }
 
     var wrappedName: String {
@@ -43,4 +60,12 @@ internal extension Exercise {
     static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
         NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
     }
+}
+
+public extension Exercise {
+    static let defaultUnits: Int16 = 0
+    static let defaultReps: Int16 = 12
+    static let defaultIntensity: Float = 30
+    static let defaultIntensityStep: Float = 5
+    static let defaultSets: Int16 = 3
 }

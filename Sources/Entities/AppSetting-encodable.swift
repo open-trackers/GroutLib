@@ -14,15 +14,21 @@ import TrackerLib
 
 extension AppSetting: Encodable {
     private enum CodingKeys: String, CodingKey, CaseIterable {
-//        case startOfDay
-//        case targetCalories
+        case defExIntensity
+        case defExIntensityStep
+        case defExReps
+        case defExSets
+        case defExUnits
         case createdAt
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
-//        try c.encode(startOfDay, forKey: .startOfDay)
-//        try c.encode(targetCalories, forKey: .targetCalories)
+        try c.encode(defExIntensity, forKey: .defExIntensity)
+        try c.encode(defExIntensityStep, forKey: .defExIntensityStep)
+        try c.encode(defExReps, forKey: .defExReps)
+        try c.encode(defExSets, forKey: .defExSets)
+        try c.encode(defExUnits, forKey: .defExUnits)
         try c.encode(createdAt, forKey: .createdAt)
     }
 }
@@ -33,8 +39,11 @@ extension AppSetting: MAttributable {
     }
 
     public static var attributes: [MAttribute] = [
-        //        MAttribute(CodingKeys.startOfDay, .int),
-//        MAttribute(CodingKeys.targetCalories, .int),
+        MAttribute(CodingKeys.defExIntensity, .double),
+        MAttribute(CodingKeys.defExIntensityStep, .double),
+        MAttribute(CodingKeys.defExReps, .int),
+        MAttribute(CodingKeys.defExSets, .int),
+        MAttribute(CodingKeys.defExUnits, .int),
         MAttribute(CodingKeys.createdAt, .date),
     ]
 }

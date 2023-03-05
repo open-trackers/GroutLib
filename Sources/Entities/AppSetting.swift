@@ -21,8 +21,11 @@ public extension AppSetting {
     {
         let nu = AppSetting(context: context)
         nu.createdAt = createdAt
-//        nu.targetCalories = targetCalories
-//        nu.startOfDay = Int32(startOfDay.rawValue)
+        nu.defExUnits = Exercise.defaultUnits
+        nu.defExReps = Exercise.defaultReps
+        nu.defExIntensity = Exercise.defaultIntensity
+        nu.defExIntensityStep = Exercise.defaultIntensityStep
+        nu.defExSets = Exercise.defaultSets
         return nu
     }
 
