@@ -115,6 +115,21 @@ public extension ZRoutineRun {
         // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
         // try context.deleter(ZRoutineRun.self, predicate: pred, inStore: inStore)
     }
+
+    /// Like a delete, but allows the mirroring to archive and iCloud to properly
+    /// reflect that the user 'deleted' the record(s) from the store(s).
+    static func userRemove(_ context: NSManagedObjectContext,
+                           routineArchiveID: UUID,
+                           startedAt: Date,
+                           inStore: NSPersistentStore? = nil) throws
+    {
+        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
+
+        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
+            element.userRemoved = true
+            return true
+        }
+    }
 }
 
 internal extension ZRoutineRun {
