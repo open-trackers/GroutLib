@@ -10,23 +10,25 @@
 
 import CoreData
 
+import TrackerLib
+
 public extension ZExerciseRun {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
                        zRoutineRun: ZRoutineRun,
                        zExercise: ZExercise,
                        completedAt: Date,
-                       intensity: Float,
-                       toStore: NSPersistentStore? = nil) -> ZExerciseRun
+                       intensity: Float = 0,
+                       createdAt: Date? = Date.now,
+                       toStore: NSPersistentStore) -> ZExerciseRun
     {
         let nu = ZExerciseRun(context: context)
-        nu.zRoutineRun = zRoutineRun
-        nu.zExercise = zExercise
+        zRoutineRun.addToZExerciseRuns(nu)
+        zExercise.addToZExerciseRuns(nu)
+        nu.createdAt = createdAt
         nu.completedAt = completedAt
         nu.intensity = intensity
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 
@@ -39,8 +41,18 @@ public extension ZExerciseRun {
                      toStore dstStore: NSPersistentStore) throws -> ZExerciseRun
     {
         guard let completedAt
-        else { throw DataError.missingData(msg: "completedAt not present; can't copy") }
-        return try ZExerciseRun.getOrCreate(context, zRoutineRun: dstRoutineRun, zExercise: dstExercise, completedAt: completedAt, intensity: intensity, inStore: dstStore)
+        else { throw TrackerError.missingData(msg: "completedAt not present; can't copy") }
+        return try ZExerciseRun.getOrCreate(context,
+                                            zRoutineRun: dstRoutineRun,
+                                            zExercise: dstExercise,
+                                            completedAt: completedAt,
+                                            // intensity: intensity,
+                                            inStore: dstStore)
+        { _, element in
+            element.userRemoved = userRemoved
+            element.intensity = intensity
+            element.createdAt = createdAt
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -60,17 +72,21 @@ public extension ZExerciseRun {
                             zRoutineRun: ZRoutineRun,
                             zExercise: ZExercise,
                             completedAt: Date,
-                            intensity: Float,
-                            inStore: NSPersistentStore) throws -> ZExerciseRun
+                            // intensity: Float,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZExerciseRun) -> Void = { _, _ in }) throws -> ZExerciseRun
     {
         guard let exerciseArchiveID = zExercise.exerciseArchiveID
-        else { throw DataError.missingData(msg: "ZExercise.archiveID; can't get or create") }
+        else { throw TrackerError.missingData(msg: "ZExercise.archiveID; can't get or create") }
 
-        if let nu = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
-            nu.intensity = intensity
-            return nu
+        if let existing = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
+            // nu.intensity = intensity
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, intensity: intensity, toStore: inStore)
+            let nu = ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 
@@ -98,41 +114,28 @@ public extension ZExerciseRun {
         // try context.deleter(ZExerciseRun.self, predicate: pred, inStore: inStore)
     }
 
-    internal static func getPredicate(exerciseArchiveID: UUID,
-                                      completedAt: Date) -> NSPredicate
+    /// Like a delete, but allows the mirroring to archive and iCloud to properly
+    /// reflect that the user 'deleted' the record(s) from the store(s).
+    static func userRemove(_ context: NSManagedObjectContext,
+                           exerciseArchiveID: UUID,
+                           completedAt: Date,
+                           inStore: NSPersistentStore? = nil) throws
+    {
+        let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
+
+        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZExerciseRun) in
+            element.userRemoved = true
+            return true
+        }
+    }
+}
+
+internal extension ZExerciseRun {
+    static func getPredicate(exerciseArchiveID: UUID,
+                             completedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
                     exerciseArchiveID.uuidString,
                     completedAt as NSDate)
     }
-}
-
-extension ZExerciseRun: Encodable {
-    private enum CodingKeys: String, CodingKey, CaseIterable {
-        case completedAt
-        case intensity
-        case exerciseArchiveID // FK
-        case routineRunStartedAt // FK
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(completedAt, forKey: .completedAt)
-        try c.encode(intensity, forKey: .intensity)
-        try c.encode(zExercise?.exerciseArchiveID, forKey: .exerciseArchiveID)
-        try c.encode(zRoutineRun?.startedAt, forKey: .routineRunStartedAt)
-    }
-}
-
-extension ZExerciseRun: MAttributable {
-    public static var fileNamePrefix: String {
-        "zexerciseruns"
-    }
-
-    public static var attributes: [MAttribute] = [
-        MAttribute(CodingKeys.completedAt, .date),
-        MAttribute(CodingKeys.intensity, .double),
-        MAttribute(CodingKeys.exerciseArchiveID, .string),
-        MAttribute(CodingKeys.routineRunStartedAt, .date),
-    ]
 }

@@ -10,27 +10,44 @@
 
 import CoreData
 
+import TrackerLib
+
 @objc(Exercise)
 public class Exercise: NSManagedObject {}
-
-extension Exercise: UserOrdered {}
 
 public extension Exercise {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
+                       routine: Routine,
                        userOrder: Int16,
                        name: String = "New Exercise",
-                       archiveID: UUID = UUID()) -> Exercise
+                       archiveID: UUID = UUID(),
+                       createdAt: Date = Date.now) -> Exercise
     {
         let nu = Exercise(context: context)
+        routine.addToExercises(nu)
+        nu.createdAt = createdAt
         nu.userOrder = userOrder
         nu.name = name
         nu.archiveID = archiveID
+
+        // NOTE that these may be replaced with defaults from AppSetting
+        nu.units = defaultUnits
+        nu.repetitions = defaultReps
+        nu.lastIntensity = defaultIntensity
+        nu.intensityStep = defaultIntensityStep
+        nu.sets = defaultSets
+
         return nu
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> Exercise? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? Exercise
+    func updateFromAppSettings(_ context: NSManagedObjectContext) throws {
+        let appSetting = try AppSetting.getOrCreate(context)
+        lastIntensity = appSetting.defExIntensity
+        intensityStep = appSetting.defExIntensityStep
+        units = appSetting.defExUnits
+        repetitions = appSetting.defExReps
+        sets = appSetting.defExSets
     }
 
     var wrappedName: String {
@@ -39,194 +56,16 @@ public extension Exercise {
     }
 }
 
-public extension Exercise {
-    /// true if both intensity and its step are whole numbers (or close to it)
-    private var isIntensityFractional: Bool {
-        let accuracy: Float = 0.1
-        return
-            isFractional(value: intensityStep, accuracy: accuracy) ||
-            isFractional(value: lastIntensity, accuracy: accuracy)
-    }
-
-    var isDone: Bool {
-        lastCompletedAt != nil
-    }
-
-    /// Format an intensity value, such as lastIntensity and intensityStep, with optional units
-    func formattedIntensity(_ intensityValue: Float, withUnits: Bool = false) -> String {
-        let units = Units(rawValue: units) ?? .none
-        return formatIntensity(intensityValue,
-                               units: units,
-                               withUnits: withUnits,
-                               isFractional: isIntensityFractional)
+internal extension Exercise {
+    static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
+        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
     }
 }
 
 public extension Exercise {
-    static var intensityMaxValue: Float = 500.0
-
-    var advancedIntensity: Float {
-        if invertedIntensity {
-            // advance downwards
-            return max(0, lastIntensity - intensityStep)
-        } else {
-            // advance upwards
-            return min(Exercise.intensityMaxValue, lastIntensity + intensityStep)
-        }
-    }
-
-    // NOTE: does NOT save context
-    func markDone(_ context: NSManagedObjectContext,
-                  completedAt: Date,
-                  withAdvance: Bool,
-                  routineStartedAt: Date,
-                  logToHistory: Bool) throws
-    {
-        guard let routine else {
-            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot mark exercise done.")
-        }
-
-        // extend the routine run's duration, in case app crashes or is killed
-        let nuDuration = completedAt.timeIntervalSince(routineStartedAt)
-
-        // The ZRoutineRun has at least one completed exercise, so update the
-        // Routine with the latest data, even if we're not logging to history.
-        // NOTE: in transferToArchive, this timestamp will also determine if
-        //       corresponding ZRoutine is purged from main store.
-        routine.lastStartedAt = routineStartedAt
-        routine.lastDuration = nuDuration
-
-        // Log the completion of the exercise for the historical record.
-        // NOTE: can update Routine and create/update ZRoutine, ZRoutineRun, and ZExerciseRun.
-        if logToHistory {
-            try logCompletion(context,
-                              routineStartedAt: routineStartedAt,
-                              nuDuration: nuDuration,
-                              exerciseCompletedAt: completedAt,
-                              exerciseIntensity: lastIntensity)
-        }
-
-        // update the attributes with fresh data
-        if withAdvance {
-            lastIntensity = advancedIntensity
-        }
-        lastCompletedAt = completedAt
-    }
-}
-
-extension Exercise {
-    /// log the run of the exercise to the main store
-    /// (These will later be transferred to the archive store on iOS devices)
-    /// NOTE: does NOT save context
-    func logCompletion(_ context: NSManagedObjectContext,
-                       routineStartedAt: Date,
-                       nuDuration: TimeInterval,
-                       exerciseCompletedAt: Date,
-                       exerciseIntensity: Float) throws
-    {
-        guard let mainStore = PersistenceManager.getStore(context, .main)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "Cannot log exercise run.")
-        }
-
-        guard let routine else {
-            throw DataError.missingData(msg: "Unexpectedly no routine. Cannot log exercise run.")
-        }
-
-        // Get corresponding ZRoutine for log, creating if necessary.
-        let routineArchiveID: UUID = {
-            if routine.archiveID == nil {
-                routine.archiveID = UUID()
-            }
-            return routine.archiveID!
-        }()
-        let zRoutine = try ZRoutine.getOrCreate(context,
-                                                routineArchiveID: routineArchiveID,
-                                                routineName: routine.wrappedName,
-                                                inStore: mainStore)
-
-        // Get corresponding ZExercise for log, creating if necessary.
-        let exerciseArchiveID: UUID = {
-            if self.archiveID == nil {
-                self.archiveID = UUID()
-            }
-            return self.archiveID!
-        }()
-        let zExercise = try ZExercise.getOrCreate(context,
-                                                  zRoutine: zRoutine,
-                                                  exerciseArchiveID: exerciseArchiveID,
-                                                  exerciseName: wrappedName,
-                                                  exerciseUnits: Units(rawValue: units) ?? .none,
-                                                  inStore: mainStore)
-
-        let zRoutineRun = try ZRoutineRun.getOrCreate(context,
-                                                      zRoutine: zRoutine,
-                                                      startedAt: routineStartedAt,
-                                                      duration: nuDuration,
-                                                      inStore: mainStore)
-
-        _ = try ZExerciseRun.getOrCreate(context,
-                                         zRoutineRun: zRoutineRun,
-                                         zExercise: zExercise,
-                                         completedAt: exerciseCompletedAt,
-                                         intensity: exerciseIntensity,
-                                         inStore: mainStore)
-    }
-}
-
-extension Exercise: Encodable {
-    private enum CodingKeys: String, CodingKey, CaseIterable {
-        case archiveID
-        case intensityStep
-        case invertedIntensity
-        case lastCompletedAt
-        case lastIntensity
-        case name
-        case primarySetting
-        case repetitions
-        case secondarySetting
-        case sets
-        case units
-        case userOrder
-        case routineArchiveID // FK
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(archiveID, forKey: .archiveID)
-        try c.encode(intensityStep, forKey: .intensityStep)
-        try c.encode(invertedIntensity, forKey: .invertedIntensity)
-        try c.encode(lastCompletedAt, forKey: .lastCompletedAt)
-        try c.encode(lastIntensity, forKey: .lastIntensity)
-        try c.encode(name, forKey: .name)
-        try c.encode(primarySetting, forKey: .primarySetting)
-        try c.encode(repetitions, forKey: .repetitions)
-        try c.encode(secondarySetting, forKey: .secondarySetting)
-        try c.encode(sets, forKey: .sets)
-        try c.encode(units, forKey: .units)
-        try c.encode(userOrder, forKey: .userOrder)
-        try c.encode(routine?.archiveID, forKey: .routineArchiveID)
-    }
-}
-
-extension Exercise: MAttributable {
-    public static var fileNamePrefix: String {
-        "exercises"
-    }
-
-    public static var attributes: [MAttribute] = [
-        MAttribute(CodingKeys.archiveID, .string),
-        MAttribute(CodingKeys.intensityStep, .double),
-        MAttribute(CodingKeys.invertedIntensity, .bool),
-        MAttribute(CodingKeys.lastCompletedAt, .date),
-        MAttribute(CodingKeys.lastIntensity, .double),
-        MAttribute(CodingKeys.name, .string),
-        MAttribute(CodingKeys.primarySetting, .int),
-        MAttribute(CodingKeys.repetitions, .int),
-        MAttribute(CodingKeys.secondarySetting, .int),
-        MAttribute(CodingKeys.sets, .int),
-        MAttribute(CodingKeys.units, .int),
-        MAttribute(CodingKeys.userOrder, .int),
-        MAttribute(CodingKeys.routineArchiveID, .string),
-    ]
+    static let defaultUnits: Int16 = 0
+    static let defaultReps: Int16 = 12
+    static let defaultIntensity: Float = 30
+    static let defaultIntensityStep: Float = 5
+    static let defaultSets: Int16 = 3
 }

@@ -10,59 +10,25 @@
 
 import CoreData
 
-public enum ExportFormat: String, CaseIterable, CustomStringConvertible {
-    case CSV = "text/csv"
-    case TSV = "text/tab-separated-values"
-    case JSON = "application/json"
+import TrackerLib
 
-    public var description: String {
-        switch self {
-        case .CSV:
-            return "Comma-delimited"
-        case .TSV:
-            return "Tab-delimited"
-        case .JSON:
-            return "JSON"
-        }
+#if !os(watchOS)
+    public func groutCreateZipArchive(_ context: NSManagedObjectContext,
+                                      mainStore: NSPersistentStore,
+                                      archiveStore: NSPersistentStore,
+                                      format: ExportFormat = .CSV) throws -> Data?
+    {
+        let entries: [(String, Data)] = [
+            try makeDelimFile(AppSetting.self, context, format: format, inStore: mainStore),
+            try makeDelimFile(Routine.self, context, format: format, inStore: mainStore),
+            try makeDelimFile(Exercise.self, context, format: format, inStore: mainStore),
+
+            try makeDelimFile(ZRoutine.self, context, format: format, inStore: archiveStore),
+            try makeDelimFile(ZRoutineRun.self, context, format: format, inStore: archiveStore),
+            try makeDelimFile(ZExercise.self, context, format: format, inStore: archiveStore),
+            try makeDelimFile(ZExerciseRun.self, context, format: format, inStore: archiveStore),
+        ]
+
+        return try createZipArchive(context, entries: entries)
     }
-
-    public var delimiter: Character? {
-        switch self {
-        case .CSV:
-            return ","
-        case .TSV:
-            return "\t"
-        default:
-            return nil
-        }
-    }
-
-    public var defaultFileExtension: String {
-        switch self {
-        case .CSV:
-            return "csv"
-        case .TSV:
-            return "tsv"
-        case .JSON:
-            return "json"
-        }
-    }
-}
-
-public func exportData<T>(_ records: [T],
-                          format: ExportFormat) throws -> Data
-    where T: MAttributable & Encodable
-{
-    if format == .JSON {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        return try encoder.encode(records)
-    }
-
-    guard let delimiter = format.delimiter
-    else { throw DataError.encodingError(msg: "Format \(format.rawValue) not supported for export.") }
-    let encoder = DelimitedEncoder(delimiter: String(delimiter))
-    let headers = MAttribute.getHeaders(T.attributes)
-    _ = try encoder.encode(headers: headers)
-    return try encoder.encode(rows: records)
-}
+#endif

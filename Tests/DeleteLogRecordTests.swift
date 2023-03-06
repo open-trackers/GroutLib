@@ -10,32 +10,22 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
 final class DeleteLogRecordTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
     }
 
     func testZRoutineRunFromBothStores() throws {
         let startedAt = Date.now
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let r = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         _ = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startedAt, duration: 1, toStore: mainStore)
         // try testContext.save()
         _ = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
@@ -58,9 +48,9 @@ final class DeleteLogRecordTests: TestBase {
     func testZExerciseRunFromBothStores() throws {
         let startedAt = Date.now
         let completedAt = startedAt + 1000
-        let r = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID, toStore: mainStore)
+        let r = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         let rr = ZRoutineRun.create(testContext, zRoutine: r, startedAt: startedAt, duration: 1, toStore: mainStore)
-        let e = ZExercise.create(testContext, zRoutine: r, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID, toStore: mainStore)
+        let e = ZExercise.create(testContext, zRoutine: r, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         _ = ZExerciseRun.create(testContext, zRoutineRun: rr, zExercise: e, completedAt: completedAt, intensity: 1, toStore: mainStore)
         // try testContext.save()
         _ = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)

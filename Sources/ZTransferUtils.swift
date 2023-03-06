@@ -11,6 +11,8 @@
 import CoreData
 import os
 
+import TrackerLib
+
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
                             category: "ZTransfer")
 
@@ -18,24 +20,19 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
 /// Safe to run on a background context.
 /// NOTE: does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext,
+                              mainStore: NSPersistentStore,
+                              archiveStore: NSPersistentStore,
                               now: Date = Date.now,
                               thresholdSecs: TimeInterval = 86400) throws
 {
     logger.debug("\(#function)")
-    guard let mainStore = PersistenceManager.getStore(context, .main),
-          let archiveStore = PersistenceManager.getStore(context, .archive)
-    else {
-        throw DataError.invalidStoreConfiguration(msg: "transfer to archive")
-    }
 
     let zRoutines = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
 
     let filteredZRoutines = zRoutines.filter { !$0.isFresh(context, now: now, thresholdSecs: thresholdSecs) }
 
-    let objectIDs = filteredZRoutines.map(\.objectID)
-
     // rely on cascading delete to remove children
-    try context.deleter(objectIDs: objectIDs)
+    filteredZRoutines.forEach { context.delete($0) }
 }
 
 /// Deep copy of all routines and their children from the source store to specified destination store
@@ -73,12 +70,16 @@ internal func deepCopy(_ context: NSManagedObjectContext,
             return true
         }
 
+        // NOTE: including even those ZRoutineRun records with userRemoved==1, as we need to reflect
+        // removed records in the archive (which may have been previously copied as userRemoved=0)
         try context.fetcher(predicate: routinePred, inStore: srcStore) { (sRoutineRun: ZRoutineRun) in
 
             let dRoutineRun = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
             let routineRunPred = NSPredicate(format: "zRoutineRun = %@", sRoutineRun)
 
+            // NOTE: including even those ZExerciseRun records with userRemoved==1, as we need to reflect
+            // removed records in the archive (which may have been previously copied as userRemoved=0)
             try context.fetcher(predicate: routineRunPred, inStore: srcStore) { (sExerciseRun: ZExerciseRun) in
 
                 guard let exerciseArchiveID = sExerciseRun.zExercise?.exerciseArchiveID,

@@ -10,13 +10,12 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
 final class LogCompletionTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exercise1ArchiveID = UUID()
     let exercise2ArchiveID = UUID()
@@ -44,15 +43,6 @@ final class LogCompletionTests: TestBase {
     override func setUpWithError() throws {
         try super.setUpWithError()
 
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
-
         startedAt = df.date(from: startedAtStr)
         completedAt1 = df.date(from: completedAt1Str)
         completedAt2 = df.date(from: completedAt2Str)
@@ -66,7 +56,7 @@ final class LogCompletionTests: TestBase {
 
     func testSimple() throws {
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e = Exercise.create(testContext, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
+        let e = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
         e.routine = r
         e.lastIntensity = intensity1
         e.units = Units.kilograms.rawValue
@@ -77,7 +67,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
 
-        try e.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
+        try e.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
         try testContext.save()
 
         let zr = try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)
@@ -101,36 +91,36 @@ final class LogCompletionTests: TestBase {
         /// ensure that a transfer doesn't interfere with an actively running routine
 
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e1 = Exercise.create(testContext, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
+        let e1 = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
         e1.routine = r
         e1.lastIntensity = intensity1
         e1.units = Units.kilograms.rawValue
 
-        let e2 = Exercise.create(testContext, userOrder: userOrder2, name: "blort", archiveID: exercise2ArchiveID)
+        let e2 = Exercise.create(testContext, routine: r, userOrder: userOrder2, name: "blort", archiveID: exercise2ArchiveID)
         e2.routine = r
         e2.lastIntensity = intensity2
         e2.units = Units.pounds.rawValue
         try testContext.save()
 
-        try e1.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
+        try e1.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
         try testContext.save()
 
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
 
-        try e2.logCompletion(testContext, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt2, exerciseIntensity: intensity2)
+        try e2.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt2, exerciseIntensity: intensity2)
         try testContext.save()
 
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
 
-        try transferToArchive(testContext)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
         try testContext.save()
 
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
@@ -161,5 +151,38 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(zer2)
         XCTAssertEqual(completedAt2, zer2?.completedAt)
         XCTAssertEqual(intensity2, zer2?.intensity)
+    }
+
+    func testRestoreRoutineRunAfterUserCompletesExercise() throws {
+        let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
+        let e1 = Exercise.create(testContext, routine: r, userOrder: userOrder1, name: "bleep", archiveID: exercise1ArchiveID)
+        e1.lastIntensity = intensity1
+        let e2 = Exercise.create(testContext, routine: r, userOrder: userOrder2, name: "blort", archiveID: exercise1ArchiveID)
+        e2.lastIntensity = intensity2
+        try testContext.save()
+
+        try e1.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
+        try testContext.save()
+
+        guard let zrr1 = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore)
+        else { XCTFail(); return }
+        XCTAssertEqual(duration, zrr1.duration)
+        XCTAssertEqual(startedAt, zrr1.startedAt)
+
+        // user removes ZRoutineRun (possibly from different device)
+
+        zrr1.userRemoved = true
+        try testContext.save()
+
+        // user completes exercise (possibly from different device)
+
+        try e2.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt2, exerciseIntensity: intensity2)
+        try testContext.save()
+
+        guard let zrr2 = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore)
+        else { XCTFail(); return }
+
+        // ensure that ZRoutineRun has been restored from the userRemove (possibly on another device)
+        XCTAssertFalse(zrr2.userRemoved)
     }
 }

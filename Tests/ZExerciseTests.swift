@@ -10,33 +10,34 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
 final class ZExerciseTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
     }
 
     func testGetOrCreateUpdatesNameAndUnits() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        _ = ZExercise.create(testContext, zRoutine: sr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        _ = ZExercise.create(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
         try testContext.save()
 
-        let se2 = try ZExercise.getOrCreate(testContext, zRoutine: sr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh2", exerciseUnits: .pounds, inStore: mainStore)
+        let se2 = try ZExercise.getOrCreate(testContext,
+                                            zRoutine: sr,
+                                            exerciseArchiveID: exerciseArchiveID,
+//                                            exerciseName: "bleh2",
+//                                            exerciseUnits: .pounds,
+                                            inStore: mainStore)
+        { _, element in
+            element.name = "bleh2"
+            element.units = Units.pounds.rawValue
+        }
         try testContext.save()
 
         XCTAssertEqual("bleh2", se2.name)

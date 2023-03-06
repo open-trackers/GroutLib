@@ -10,13 +10,12 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
 final class ExportTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
 
@@ -24,6 +23,8 @@ final class ExportTests: TestBase {
     var startedAt: Date!
     let completedAtStr = "2023-01-13T21:00:00Z"
     var completedAt: Date!
+    let createdAtStr = "2023-01-01T01:00:00Z"
+    var createdAt: Date!
 
     let durationStr = "1332.0"
     var duration: TimeInterval!
@@ -37,17 +38,9 @@ final class ExportTests: TestBase {
     override func setUpWithError() throws {
         try super.setUpWithError()
 
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
-
         startedAt = df.date(from: startedAtStr)
         completedAt = df.date(from: completedAtStr)
+        createdAt = df.date(from: createdAtStr)
         duration = Double(durationStr)
         intensity = Float(intensityStr)
         intensityStep = Float(intensityStepStr)
@@ -55,7 +48,7 @@ final class ExportTests: TestBase {
     }
 
     func testZRoutine() throws {
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", createdAt: createdAt, toStore: mainStore)
         try testContext.save()
 
         let request = makeRequest(ZRoutine.self)
@@ -64,8 +57,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        name,routineArchiveID
-        blah,\(routineArchiveID.uuidString)
+        name,routineArchiveID,createdAt
+        blah,\(routineArchiveID.uuidString),\(createdAtStr)
 
         """
 
@@ -73,8 +66,9 @@ final class ExportTests: TestBase {
     }
 
     func testZRoutineRun() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        _ = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, createdAt: createdAt, toStore: mainStore)
+        zrr.userRemoved = true
         try testContext.save()
 
         let request = makeRequest(ZRoutineRun.self)
@@ -83,8 +77,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        startedAt,duration,routineArchiveID
-        \(startedAtStr),\(durationStr),\(routineArchiveID.uuidString)
+        startedAt,duration,userRemoved,createdAt,routineArchiveID
+        \(startedAtStr),\(durationStr),true,\(createdAtStr),\(routineArchiveID.uuidString)
 
         """
 
@@ -92,8 +86,8 @@ final class ExportTests: TestBase {
     }
 
     func testZExercise() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        _ = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        _ = ZExercise.create(testContext, zRoutine: zr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, createdAt: createdAt, toStore: mainStore)
         try testContext.save()
 
         let request = makeRequest(ZExercise.self)
@@ -102,8 +96,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        name,units,exerciseArchiveID,routineArchiveID
-        bleh,\(Units.kilograms.rawValue),\(exerciseArchiveID.uuidString),\(routineArchiveID.uuidString)
+        name,units,exerciseArchiveID,createdAt,routineArchiveID
+        bleh,\(Units.kilograms.rawValue),\(exerciseArchiveID.uuidString),\(createdAtStr),\(routineArchiveID.uuidString)
 
         """
 
@@ -111,10 +105,11 @@ final class ExportTests: TestBase {
     }
 
     func testZExerciseRun() throws {
-        let zr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
-        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseName: "bleh", exerciseUnits: .kilograms, exerciseArchiveID: exerciseArchiveID)
-        let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration)
-        _ = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity)
+        let zr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
+        let ze = ZExercise.create(testContext, zRoutine: zr, exerciseArchiveID: exerciseArchiveID, exerciseName: "bleh", exerciseUnits: .kilograms, toStore: mainStore)
+        let zrr = ZRoutineRun.create(testContext, zRoutine: zr, startedAt: startedAt, duration: duration, toStore: mainStore)
+        let zer = ZExerciseRun.create(testContext, zRoutineRun: zrr, zExercise: ze, completedAt: completedAt, intensity: intensity, createdAt: createdAt, toStore: mainStore)
+        zer.userRemoved = true
         try testContext.save()
 
         let request = makeRequest(ZExerciseRun.self)
@@ -123,8 +118,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        completedAt,intensity,exerciseArchiveID,routineRunStartedAt
-        \(completedAtStr),\(intensityStr),\(exerciseArchiveID.uuidString),\(startedAtStr)
+        completedAt,intensity,userRemoved,createdAt,exerciseArchiveID,routineRunStartedAt
+        \(completedAtStr),\(intensityStr),true,\(createdAtStr),\(exerciseArchiveID.uuidString),\(startedAtStr)
 
         """
 
@@ -132,7 +127,7 @@ final class ExportTests: TestBase {
     }
 
     func testRoutine() throws {
-        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID)
+        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID, createdAt: createdAt)
         r.lastDuration = duration
         r.lastStartedAt = startedAt
         r.imageName = "bloop"
@@ -144,8 +139,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        archiveID,imageName,lastDuration,lastStartedAt,name,userOrder
-        \(routineArchiveID.uuidString),bloop,\(durationStr),\(startedAtStr),bleh,\(userOrderStr)
+        archiveID,imageName,lastDuration,lastStartedAt,name,userOrder,createdAt
+        \(routineArchiveID.uuidString),bloop,\(durationStr),\(startedAtStr),bleh,\(userOrderStr),\(createdAtStr)
 
         """
 
@@ -154,7 +149,7 @@ final class ExportTests: TestBase {
 
     func testExercise() throws {
         let r = Routine.create(testContext, userOrder: 77, name: "bleh", archiveID: routineArchiveID)
-        let e = Exercise.create(testContext, userOrder: userOrder, name: "bleep", archiveID: exerciseArchiveID)
+        let e = Exercise.create(testContext, routine: r, userOrder: userOrder, name: "bleep", archiveID: exerciseArchiveID, createdAt: createdAt)
         e.routine = r
         e.intensityStep = intensityStep
         e.invertedIntensity = true
@@ -173,8 +168,8 @@ final class ExportTests: TestBase {
         guard let actual = String(data: data, encoding: .utf8) else { XCTFail(); return }
 
         let expected = """
-        archiveID,intensityStep,invertedIntensity,lastCompletedAt,lastIntensity,name,primarySetting,repetitions,secondarySetting,sets,units,userOrder,routineArchiveID
-        \(exerciseArchiveID.uuidString),\(intensityStepStr),true,\(completedAtStr),\(intensityStr),bleep,10,11,12,3,2,\(userOrderStr),\(routineArchiveID)
+        archiveID,intensityStep,invertedIntensity,lastCompletedAt,lastIntensity,name,primarySetting,repetitions,secondarySetting,sets,units,userOrder,createdAt,routineArchiveID
+        \(exerciseArchiveID.uuidString),\(intensityStepStr),true,\(completedAtStr),\(intensityStr),bleep,10,11,12,3,2,\(userOrderStr),\(createdAtStr),\(routineArchiveID)
 
         """
 
@@ -182,7 +177,7 @@ final class ExportTests: TestBase {
     }
 
     func testRoutineJSON() throws {
-        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID)
+        let r = Routine.create(testContext, userOrder: userOrder, name: "bleh", archiveID: routineArchiveID, createdAt: createdAt)
         r.lastDuration = duration
         r.lastStartedAt = startedAt
         r.imageName = "bloop"
@@ -196,7 +191,7 @@ final class ExportTests: TestBase {
         let durationStr2 = "1332" // JSON doesn't include the ".0"
 
         let expected = """
-        [{"archiveID":"\(routineArchiveID.uuidString)","imageName":"bloop","userOrder":\(userOrderStr),"name":"bleh","lastStartedAt":"\(startedAtStr)","lastDuration":\(durationStr2)}]
+        [{"lastStartedAt":"\(startedAtStr)","userOrder":\(userOrderStr),"lastDuration":\(durationStr2),"createdAt":"\(createdAtStr)","imageName":"bloop","archiveID":"\(routineArchiveID.uuidString)","name":"bleh"}]
         """
 
         XCTAssertEqual(expected, actual)

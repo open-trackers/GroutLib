@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="AppSetting" representedClassName="AppSetting" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="defExIntensity" optional="YES" attributeType="Float" defaultValueString="30" usesScalarValueType="YES"/>
+        <attribute name="defExIntensityStep" optional="YES" attributeType="Float" defaultValueString="5" usesScalarValueType="YES"/>
+        <attribute name="defExReps" optional="YES" attributeType="Integer 16" defaultValueString="12" usesScalarValueType="YES"/>
+        <attribute name="defExSets" optional="YES" attributeType="Integer 16" defaultValueString="3" usesScalarValueType="YES"/>
+        <attribute name="defExUnits" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
     <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="category">
         <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="intensityStep" optional="YES" attributeType="Float" defaultValueString="5" usesScalarValueType="YES"/>
         <attribute name="invertedIntensity" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastCompletedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -17,6 +26,8 @@
     </entity>
     <entity name="Routine" representedClassName="Routine" syncable="YES" codeGenerationType="category">
         <attribute name="archiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="color" optional="YES" attributeType="Binary"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="imageName" optional="YES" attributeType="String"/>
         <attribute name="lastDuration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lastStartedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -25,6 +36,7 @@
         <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Exercise" inverseName="routine" inverseEntity="Exercise"/>
     </entity>
     <entity name="ZExercise" representedClassName="ZExercise" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="exerciseArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="units" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -33,19 +45,24 @@
     </entity>
     <entity name="ZExerciseRun" representedClassName="ZExerciseRun" syncable="YES" codeGenerationType="class">
         <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="intensity" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="userRemoved" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="zExercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZExercise" inverseName="zExerciseRuns" inverseEntity="ZExercise"/>
         <relationship name="zRoutineRun" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutineRun" inverseName="zExerciseRuns" inverseEntity="ZRoutineRun"/>
     </entity>
     <entity name="ZRoutine" representedClassName="ZRoutine" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="routineArchiveID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="zExercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZExercise" inverseName="zRoutine" inverseEntity="ZExercise"/>
         <relationship name="zRoutineRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZRoutineRun" inverseName="zRoutine" inverseEntity="ZRoutineRun"/>
     </entity>
     <entity name="ZRoutineRun" representedClassName="ZRoutineRun" syncable="YES" codeGenerationType="class">
-        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="startedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userRemoved" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="zExerciseRuns" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ZExerciseRun" inverseName="zRoutineRun" inverseEntity="ZExerciseRun"/>
         <relationship name="zRoutine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ZRoutine" inverseName="zRoutineRuns" inverseEntity="ZRoutine"/>
     </entity>

@@ -10,20 +10,22 @@
 
 import CoreData
 
+import TrackerLib
+
 /// Archive representation of a Routine record
 public extension ZRoutine {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
-                       routineName: String,
                        routineArchiveID: UUID,
-                       toStore: NSPersistentStore? = nil) -> ZRoutine
+                       routineName: String? = nil,
+                       createdAt: Date? = Date.now,
+                       toStore: NSPersistentStore) -> ZRoutine
     {
         let nu = ZRoutine(context: context)
+        nu.createdAt = createdAt
         nu.name = routineName
         nu.routineArchiveID = routineArchiveID
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 
@@ -34,15 +36,21 @@ public extension ZRoutine {
                      toStore dstStore: NSPersistentStore) throws -> ZRoutine
     {
         guard let routineArchiveID
-        else { throw DataError.missingData(msg: "routineArchiveID; can't copy") }
-        return try ZRoutine.getOrCreate(context, routineArchiveID: routineArchiveID, routineName: wrappedName, inStore: dstStore)
+        else { throw TrackerError.missingData(msg: "routineArchiveID; can't copy") }
+        return try ZRoutine.getOrCreate(context,
+                                        routineArchiveID: routineArchiveID,
+                                        inStore: dstStore)
+        { _, element in
+            element.name = wrappedName
+            element.createdAt = createdAt
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
                     routineArchiveID: UUID,
                     inStore: NSPersistentStore? = nil) throws -> ZRoutine?
     {
-        let pred = NSPredicate(format: "routineArchiveID = %@", routineArchiveID.uuidString)
+        let pred = getPredicate(routineArchiveID: routineArchiveID)
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
@@ -51,14 +59,18 @@ public extension ZRoutine {
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             routineArchiveID: UUID,
-                            routineName: String,
-                            inStore: NSPersistentStore) throws -> ZRoutine
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZRoutine) -> Void = { _, _ in }) throws -> ZRoutine
     {
-        if let nu = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
-            nu.name = routineName
-            return nu
+        if let existing = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZRoutine.create(context, routineName: routineName, routineArchiveID: routineArchiveID, toStore: inStore)
+            let nu = ZRoutine.create(context,
+                                     routineArchiveID: routineArchiveID,
+                                     toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 
@@ -68,45 +80,18 @@ public extension ZRoutine {
     }
 }
 
-extension ZRoutine: Encodable {
-    private enum CodingKeys: String, CodingKey, CaseIterable {
-        case name
-        case routineArchiveID
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(name, forKey: .name)
-        try c.encode(routineArchiveID, forKey: .routineArchiveID)
+internal extension ZRoutine {
+    static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
+        NSPredicate(format: "routineArchiveID == %@", routineArchiveID.uuidString)
     }
 }
 
-extension ZRoutine: MAttributable {
-    public static var fileNamePrefix: String {
-        "zroutines"
+public extension ZRoutine {
+    var zRoutineRunsArray: [ZRoutineRun] {
+        (zRoutineRuns?.allObjects as? [ZRoutineRun]) ?? []
     }
 
-    public static var attributes: [MAttribute] = [
-        MAttribute(CodingKeys.name, .string),
-        MAttribute(CodingKeys.routineArchiveID, .string),
-    ]
-}
-
-extension ZRoutine {
-    /// Avoid deleting 'z' records from main store where routine may still be active.
-    /// If within the time threshold (default of one day), it's fresh; if outside, it's stale.
-    /// NOTE: routine.lastStartedAt should have been initialized on first Exercise.markDone.
-    func isFresh(_ context: NSManagedObjectContext,
-                 now: Date = Date.now,
-                 thresholdSecs: TimeInterval = 86400) -> Bool
-    {
-        if let archiveID = routineArchiveID,
-           let routine = try? Routine.get(context, archiveID: archiveID),
-           let startedAt = routine.lastStartedAt,
-           now <= startedAt.addingTimeInterval(thresholdSecs)
-        {
-            return true
-        }
-        return false
+    var zExercisesArray: [ZExercise] {
+        (zExercises?.allObjects as? [ZExercise]) ?? []
     }
 }

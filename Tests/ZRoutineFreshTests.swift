@@ -10,32 +10,22 @@
 
 import CoreData
 
+import TrackerLib
+
 @testable import GroutLib
 import XCTest
 
 final class ZRoutineFreshTests: TestBase {
-    var mainStore: NSPersistentStore!
-    var archiveStore: NSPersistentStore!
-
     let routineArchiveID = UUID()
     let exerciseArchiveID = UUID()
     let secondsPerDay: TimeInterval = 86400
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-
-        guard let mainStore = PersistenceManager.getStore(testContext, .main),
-              let archiveStore = PersistenceManager.getStore(testContext, .archive)
-        else {
-            throw DataError.invalidStoreConfiguration(msg: "setup")
-        }
-
-        self.mainStore = mainStore
-        self.archiveStore = archiveStore
     }
 
     func testMissingRoutineIsStale() throws {
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(sr.isFresh(testContext))
@@ -46,7 +36,7 @@ final class ZRoutineFreshTests: TestBase {
 
         XCTAssertNil(r.lastStartedAt)
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertFalse(sr.isFresh(testContext))
@@ -59,7 +49,7 @@ final class ZRoutineFreshTests: TestBase {
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         // if within the threshold, it's fresh
@@ -77,7 +67,7 @@ final class ZRoutineFreshTests: TestBase {
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
 
-        let sr = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         // if within the threshold, it's fresh
@@ -96,13 +86,13 @@ final class ZRoutineFreshTests: TestBase {
 
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // preserved!
@@ -115,13 +105,13 @@ final class ZRoutineFreshTests: TestBase {
 
         let r = Routine.create(testContext, userOrder: 1, archiveID: routineArchiveID)
         r.lastStartedAt = lastStartedAt
-        _ = ZRoutine.create(testContext, routineName: "blah", routineArchiveID: routineArchiveID)
+        _ = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // purged!

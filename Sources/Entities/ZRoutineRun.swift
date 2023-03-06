@@ -10,21 +10,23 @@
 
 import CoreData
 
+import TrackerLib
+
 public extension ZRoutineRun {
     // NOTE: does NOT save context
     static func create(_ context: NSManagedObjectContext,
                        zRoutine: ZRoutine,
                        startedAt: Date,
-                       duration: Double,
-                       toStore: NSPersistentStore? = nil) -> ZRoutineRun
+                       duration: Double = 0,
+                       createdAt: Date? = Date.now,
+                       toStore: NSPersistentStore) -> ZRoutineRun
     {
         let nu = ZRoutineRun(context: context)
-        nu.zRoutine = zRoutine
+        zRoutine.addToZRoutineRuns(nu)
+        nu.createdAt = createdAt
         nu.startedAt = startedAt
         nu.duration = duration
-        if let toStore {
-            context.assign(nu, to: toStore)
-        }
+        context.assign(nu, to: toStore)
         return nu
     }
 
@@ -36,8 +38,17 @@ public extension ZRoutineRun {
                               toStore dstStore: NSPersistentStore) throws -> ZRoutineRun
     {
         guard let startedAt
-        else { throw DataError.missingData(msg: "startedAt; can't copy") }
-        return try ZRoutineRun.getOrCreate(context, zRoutine: dstRoutine, startedAt: startedAt, duration: duration, inStore: dstStore)
+        else { throw TrackerError.missingData(msg: "startedAt; can't copy") }
+        return try ZRoutineRun.getOrCreate(context,
+                                           zRoutine: dstRoutine,
+                                           startedAt: startedAt,
+                                           // duration: duration,
+                                           inStore: dstStore)
+        { _, element in
+            element.duration = duration
+            element.createdAt = createdAt
+            element.userRemoved = userRemoved
+        }
     }
 
     static func get(_ context: NSManagedObjectContext,
@@ -49,27 +60,35 @@ public extension ZRoutineRun {
         return try context.firstFetcher(predicate: pred, inStore: inStore)
     }
 
-    static func get(_ context: NSManagedObjectContext, forURIRepresentation url: URL) -> ZRoutineRun? {
-        NSManagedObject.get(context, forURIRepresentation: url) as? ZRoutineRun
-    }
-
     /// Fetch a ZRoutineRun record in the specified store, creating if necessary.
     /// Will update duration on existing record.
     /// NOTE: does NOT save context
     static func getOrCreate(_ context: NSManagedObjectContext,
                             zRoutine: ZRoutine,
                             startedAt: Date,
-                            duration: TimeInterval,
-                            inStore: NSPersistentStore) throws -> ZRoutineRun
+                            //                            duration: TimeInterval,
+                            inStore: NSPersistentStore,
+                            onUpdate: (Bool, ZRoutineRun) -> Void = { _, _ in }) throws -> ZRoutineRun
     {
         guard let archiveID = zRoutine.routineArchiveID
-        else { throw DataError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
+        else { throw TrackerError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
 
-        if let nu = try ZRoutineRun.get(context, routineArchiveID: archiveID, startedAt: startedAt, inStore: inStore) {
-            nu.duration = duration
-            return nu
+        if let existing = try ZRoutineRun.get(context,
+                                              routineArchiveID: archiveID,
+                                              startedAt: startedAt,
+                                              inStore: inStore)
+        {
+            //            nu.duration = duration
+            onUpdate(true, existing)
+            return existing
         } else {
-            return ZRoutineRun.create(context, zRoutine: zRoutine, startedAt: startedAt, duration: duration, toStore: inStore)
+            let nu = ZRoutineRun.create(context,
+                                        zRoutine: zRoutine,
+                                        startedAt: startedAt,
+                                        // duration: duration,
+                                        toStore: inStore)
+            onUpdate(false, nu)
+            return nu
         }
     }
 
@@ -97,42 +116,34 @@ public extension ZRoutineRun {
         // try context.deleter(ZRoutineRun.self, predicate: pred, inStore: inStore)
     }
 
-    internal static func getPredicate(routineArchiveID: UUID,
-                                      startedAt: Date) -> NSPredicate
+    /// Like a delete, but allows the mirroring to archive and iCloud to properly
+    /// reflect that the user 'deleted' the record(s) from the store(s).
+    static func userRemove(_ context: NSManagedObjectContext,
+                           routineArchiveID: UUID,
+                           startedAt: Date,
+                           inStore: NSPersistentStore? = nil) throws
+    {
+        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
+
+        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
+            element.userRemoved = true
+            return true
+        }
+    }
+}
+
+internal extension ZRoutineRun {
+    static func getPredicate(routineArchiveID: UUID,
+                             startedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
                     routineArchiveID.uuidString,
                     startedAt as NSDate)
     }
-//    var wrappedName: String {
-//        get { name ?? "unknown" }
-//        set { name = newValue }
-//    }
 }
 
-extension ZRoutineRun: Encodable {
-    private enum CodingKeys: String, CodingKey, CaseIterable {
-        case startedAt
-        case duration
-        case routineArchiveID // FK
+public extension ZRoutineRun {
+    var zExerciseRunsArray: [ZExerciseRun] {
+        (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
     }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(startedAt, forKey: .startedAt)
-        try c.encode(duration, forKey: .duration)
-        try c.encode(zRoutine?.routineArchiveID, forKey: .routineArchiveID)
-    }
-}
-
-extension ZRoutineRun: MAttributable {
-    public static var fileNamePrefix: String {
-        "zroutineruns"
-    }
-
-    public static var attributes: [MAttribute] = [
-        MAttribute(CodingKeys.startedAt, .date),
-        MAttribute(CodingKeys.duration, .double),
-        MAttribute(CodingKeys.routineArchiveID, .string),
-    ]
 }
