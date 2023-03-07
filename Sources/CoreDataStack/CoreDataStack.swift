@@ -12,9 +12,6 @@ import CoreData
 
 import TrackerLib
 
-// NOTE: needed to pass as .environmentObject
-extension CoreDataStack: ObservableObject {}
-
 // NOTE that we're using two stores with a single configuration,
 // where the Z* records on 'main' store eventually will be transferred
 // to the 'archive' store on iOS, to reduce watch storage needs.
