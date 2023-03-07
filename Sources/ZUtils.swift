@@ -60,6 +60,11 @@ public func updateCreatedAts(_ context: NSManagedObjectContext) throws {
         element.createdAt = Date.now
         return true
     }
+    try context.fetcher(predicate: pred) { (element: AppSetting) in
+        if let _ = element.createdAt { return true }
+        element.createdAt = Date.now
+        return true
+    }
 }
 
 /// Delete all `Z` records prior to a specified date.
