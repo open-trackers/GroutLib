@@ -45,14 +45,14 @@ public extension ZRoutine {
             element.createdAt = createdAt
         }
     }
+}
 
+public extension ZRoutine {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
     }
-}
 
-public extension ZRoutine {
     var zRoutineRunsArray: [ZRoutineRun] {
         (zRoutineRuns?.allObjects as? [ZRoutineRun]) ?? []
     }
