@@ -15,8 +15,9 @@ import TrackerLib
 public extension Routine {
     // NOTE: does NOT save context
     func start(_ context: NSManagedObjectContext, startDate: Date = Date.now) throws -> Date {
-        let predicate = NSPredicate(format: "routine == %@", self)
-        try context.fetcher(predicate: predicate) { (exercise: Exercise) in
+        let pred = Exercise.getPredicate(routine: self)
+        let sort = Exercise.byCreatedAt()
+        try context.fetcher(predicate: pred, sortDescriptors: sort) { (exercise: Exercise) in
             exercise.lastCompletedAt = nil
             return true
         }

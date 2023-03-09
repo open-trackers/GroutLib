@@ -21,7 +21,7 @@ extension ZExerciseRun {
     {
         let pred = getPredicate(exerciseArchiveID: exerciseArchiveID,
                                 completedAt: completedAt)
-        let sort = [NSSortDescriptor(keyPath: \ZExerciseRun.createdAt, ascending: true)]
+        let sort = byCreatedAt()
         var first: ZExerciseRun?
         try context.fetcher(predicate: pred, sortDescriptors: sort, inStore: inStore) { (element: ZExerciseRun) in
             if first == nil {

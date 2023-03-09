@@ -46,43 +46,9 @@ public extension ZRoutine {
         }
     }
 
-    static func get(_ context: NSManagedObjectContext,
-                    routineArchiveID: UUID,
-                    inStore: NSPersistentStore? = nil) throws -> ZRoutine?
-    {
-        let pred = getPredicate(routineArchiveID: routineArchiveID)
-        return try context.firstFetcher(predicate: pred, inStore: inStore)
-    }
-
-    /// Fetch a ZRoutine record in the specified store, creating if necessary.
-    /// Will update name on existing record.
-    /// NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext,
-                            routineArchiveID: UUID,
-                            inStore: NSPersistentStore,
-                            onUpdate: (Bool, ZRoutine) -> Void = { _, _ in }) throws -> ZRoutine
-    {
-        if let existing = try ZRoutine.get(context, routineArchiveID: routineArchiveID, inStore: inStore) {
-            onUpdate(true, existing)
-            return existing
-        } else {
-            let nu = ZRoutine.create(context,
-                                     routineArchiveID: routineArchiveID,
-                                     toStore: inStore)
-            onUpdate(false, nu)
-            return nu
-        }
-    }
-
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
-    }
-}
-
-internal extension ZRoutine {
-    static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "routineArchiveID == %@", routineArchiveID.uuidString)
     }
 }
 

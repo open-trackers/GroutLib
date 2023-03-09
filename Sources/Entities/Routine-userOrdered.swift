@@ -16,9 +16,7 @@ extension Routine: UserOrdered {}
 
 public extension Routine {
     static func maxUserOrder(_ context: NSManagedObjectContext) throws -> Int16? {
-        var sort: [NSSortDescriptor] {
-            [NSSortDescriptor(keyPath: \Routine.userOrder, ascending: false)]
-        }
+        let sort = Routine.byUserOrder(ascending: false)
         let routine: Routine? = try context.firstFetcher(sortDescriptors: sort)
         return routine?.userOrder
     }

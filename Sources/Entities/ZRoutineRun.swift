@@ -51,71 +51,6 @@ public extension ZRoutineRun {
         }
     }
 
-    static func get(_ context: NSManagedObjectContext,
-                    routineArchiveID: UUID,
-                    startedAt: Date,
-                    inStore: NSPersistentStore? = nil) throws -> ZRoutineRun?
-    {
-        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
-        return try context.firstFetcher(predicate: pred, inStore: inStore)
-    }
-
-    /// Fetch a ZRoutineRun record in the specified store, creating if necessary.
-    /// Will update duration on existing record.
-    /// NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext,
-                            zRoutine: ZRoutine,
-                            startedAt: Date,
-                            //                            duration: TimeInterval,
-                            inStore: NSPersistentStore,
-                            onUpdate: (Bool, ZRoutineRun) -> Void = { _, _ in }) throws -> ZRoutineRun
-    {
-        guard let archiveID = zRoutine.routineArchiveID
-        else { throw TrackerError.missingData(msg: "ZRoutine.archiveID; can't get or create") }
-
-        if let existing = try ZRoutineRun.get(context,
-                                              routineArchiveID: archiveID,
-                                              startedAt: startedAt,
-                                              inStore: inStore)
-        {
-            //            nu.duration = duration
-            onUpdate(true, existing)
-            return existing
-        } else {
-            let nu = ZRoutineRun.create(context,
-                                        zRoutine: zRoutine,
-                                        startedAt: startedAt,
-                                        // duration: duration,
-                                        toStore: inStore)
-            onUpdate(false, nu)
-            return nu
-        }
-    }
-
-    static func count(_ context: NSManagedObjectContext,
-                      predicate: NSPredicate? = nil,
-                      inStore: NSPersistentStore? = nil) throws -> Int
-    {
-        try context.counter(ZRoutineRun.self, predicate: predicate, inStore: inStore)
-    }
-
-    // for use in user delete of individual routine runs in UI, from both stores
-    static func delete(_ context: NSManagedObjectContext,
-                       routineArchiveID: UUID,
-                       startedAt: Date,
-                       inStore: NSPersistentStore? = nil) throws
-    {
-        let pred = getPredicate(routineArchiveID: routineArchiveID, startedAt: startedAt)
-
-        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
-            context.delete(element)
-            return true
-        }
-
-        // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
-        // try context.deleter(ZRoutineRun.self, predicate: pred, inStore: inStore)
-    }
-
     /// Like a delete, but allows the mirroring to archive and iCloud to properly
     /// reflect that the user 'deleted' the record(s) from the store(s).
     static func userRemove(_ context: NSManagedObjectContext,
@@ -129,16 +64,6 @@ public extension ZRoutineRun {
             element.userRemoved = true
             return true
         }
-    }
-}
-
-internal extension ZRoutineRun {
-    static func getPredicate(routineArchiveID: UUID,
-                             startedAt: Date) -> NSPredicate
-    {
-        NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
-                    routineArchiveID.uuidString,
-                    startedAt as NSDate)
     }
 }
 

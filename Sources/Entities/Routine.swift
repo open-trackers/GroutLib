@@ -30,32 +30,14 @@ public extension Routine {
         nu.archiveID = archiveID
         return nu
     }
+}
 
-    static func get(_ context: NSManagedObjectContext,
-                    archiveID: UUID) throws -> Routine?
-    {
-        let pred = NSPredicate(format: "archiveID = %@", archiveID.uuidString)
-        return try context.firstFetcher(predicate: pred)
-    }
-
+public extension Routine {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
     }
 
-    static func getFirst(_ context: NSManagedObjectContext) throws -> Routine? {
-        let sort = [NSSortDescriptor(keyPath: \Routine.userOrder, ascending: true)]
-        return try context.firstFetcher(sortDescriptors: sort)
-    }
-}
-
-internal extension Routine {
-    static func getPredicate(archiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "archiveID == %@", archiveID.uuidString)
-    }
-}
-
-public extension Routine {
     var exercisesArray: [Exercise] {
         (exercises?.allObjects as? [Exercise]) ?? []
     }

@@ -46,7 +46,6 @@ public extension ZExerciseRun {
                                             zRoutineRun: dstRoutineRun,
                                             zExercise: dstExercise,
                                             completedAt: completedAt,
-                                            // intensity: intensity,
                                             inStore: dstStore)
         { _, element in
             element.userRemoved = userRemoved
@@ -54,66 +53,9 @@ public extension ZExerciseRun {
             element.createdAt = createdAt
         }
     }
+}
 
-    static func get(_ context: NSManagedObjectContext,
-                    exerciseArchiveID: UUID,
-                    completedAt: Date,
-                    inStore: NSPersistentStore? = nil) throws -> ZExerciseRun?
-    {
-        let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
-        return try context.firstFetcher(predicate: pred, inStore: inStore)
-    }
-
-    /// Fetch a ZExerciseRun record in the specified store, creating if necessary.
-    /// Will update intensity on existing record.
-    /// Will NOT update ZRoutineRun on existing record.
-    /// NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext,
-                            zRoutineRun: ZRoutineRun,
-                            zExercise: ZExercise,
-                            completedAt: Date,
-                            // intensity: Float,
-                            inStore: NSPersistentStore,
-                            onUpdate: (Bool, ZExerciseRun) -> Void = { _, _ in }) throws -> ZExerciseRun
-    {
-        guard let exerciseArchiveID = zExercise.exerciseArchiveID
-        else { throw TrackerError.missingData(msg: "ZExercise.archiveID; can't get or create") }
-
-        if let existing = try ZExerciseRun.get(context, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: inStore) {
-            // nu.intensity = intensity
-            onUpdate(true, existing)
-            return existing
-        } else {
-            let nu = ZExerciseRun.create(context, zRoutineRun: zRoutineRun, zExercise: zExercise, completedAt: completedAt, toStore: inStore)
-            onUpdate(false, nu)
-            return nu
-        }
-    }
-
-    static func count(_ context: NSManagedObjectContext,
-                      predicate: NSPredicate? = nil,
-                      inStore: NSPersistentStore? = nil) throws -> Int
-    {
-        try context.counter(ZExerciseRun.self, predicate: predicate, inStore: inStore)
-    }
-
-    // for use in user delete of individual exercise runs in UI, from both stores
-    static func delete(_ context: NSManagedObjectContext,
-                       exerciseArchiveID: UUID,
-                       completedAt: Date,
-                       inStore: NSPersistentStore? = nil) throws
-    {
-        let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
-
-        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZExerciseRun) in
-            context.delete(element)
-            return true
-        }
-
-        // NOTE: wasn't working due to conflict errors, possibly due to to cascading delete?
-        // try context.deleter(ZExerciseRun.self, predicate: pred, inStore: inStore)
-    }
-
+public extension ZExerciseRun {
     /// Like a delete, but allows the mirroring to archive and iCloud to properly
     /// reflect that the user 'deleted' the record(s) from the store(s).
     static func userRemove(_ context: NSManagedObjectContext,
@@ -122,20 +64,10 @@ public extension ZExerciseRun {
                            inStore: NSPersistentStore? = nil) throws
     {
         let pred = getPredicate(exerciseArchiveID: exerciseArchiveID, completedAt: completedAt)
-
-        try context.fetcher(predicate: pred, inStore: inStore) { (element: ZExerciseRun) in
+        let sort = byCreatedAt()
+        try context.fetcher(predicate: pred, sortDescriptors: sort, inStore: inStore) { (element: ZExerciseRun) in
             element.userRemoved = true
             return true
         }
-    }
-}
-
-internal extension ZExerciseRun {
-    static func getPredicate(exerciseArchiveID: UUID,
-                             completedAt: Date) -> NSPredicate
-    {
-        NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
-                    exerciseArchiveID.uuidString,
-                    completedAt as NSDate)
     }
 }

@@ -36,13 +36,15 @@ final class DeleteLogRecordTests: TestBase {
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
 
-        try ZRoutineRun.delete(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: nil)
+        try ZRoutineRun.userRemove(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: nil)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
-        XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
-        XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
+        let a = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore)
+        XCTAssertTrue(a!.userRemoved)
+        let b = try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore)
+        XCTAssertTrue(b!.userRemoved)
     }
 
     func testZExerciseRunFromBothStores() throws {
@@ -60,21 +62,23 @@ final class DeleteLogRecordTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
 
-        try ZExerciseRun.delete(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: nil)
+        try ZExerciseRun.userRemove(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: nil)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
-        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
-        XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
+        let a = try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore)
+        XCTAssertTrue(a!.userRemoved)
+        let b = try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore)
+        XCTAssertTrue(b!.userRemoved)
     }
 }

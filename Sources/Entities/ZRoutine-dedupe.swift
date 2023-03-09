@@ -16,7 +16,7 @@ import TrackerLib
 extension ZRoutine {
     internal static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, inStore: NSPersistentStore) throws {
         let pred = getPredicate(routineArchiveID: routineArchiveID)
-        let sort = [NSSortDescriptor(keyPath: \ZRoutine.createdAt, ascending: true)]
+        let sort = byCreatedAt()
         var first: ZRoutine?
         try context.fetcher(predicate: pred, sortDescriptors: sort, inStore: inStore) { (element: ZRoutine) in
             if let _first = first {

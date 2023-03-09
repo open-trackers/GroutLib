@@ -13,12 +13,8 @@ import CoreData
 import TrackerLib
 
 public extension Routine {
-    static var exerciseSort: [NSSortDescriptor] {
-        [NSSortDescriptor(keyPath: \Exercise.userOrder, ascending: true)]
-    }
-
     var exercisePredicate: NSPredicate {
-        NSPredicate(format: "routine = %@", self)
+        Exercise.getPredicate(routine: self)
     }
 
     var incompletePredicate: NSPredicate {
@@ -28,27 +24,9 @@ public extension Routine {
         ])
     }
 
-    internal func nextTrailing(from userOrder: Int16) -> NSPredicate {
-        NSCompoundPredicate(andPredicateWithSubpredicates: [
-            incompletePredicate,
-            NSPredicate(format: "userOrder > %d", userOrder),
-        ])
-    }
-
-    internal func nextLeading(to userOrder: Int16) -> NSPredicate {
-        NSCompoundPredicate(andPredicateWithSubpredicates: [
-            incompletePredicate,
-            NSPredicate(format: "userOrder < %d", userOrder),
-        ])
-    }
-
     func getNextIncomplete(_ context: NSManagedObjectContext, from userOrder: Int16? = nil) throws -> NSManagedObjectID? {
-        // print("\(#function) userOrder=\(userOrder ?? -2000)")
-
-        // let req = try context.getRequest(Exercise.self, sortDescriptors: Routine.exerciseSort)
-
         let req = NSFetchRequest<Exercise>(entityName: "Exercise")
-        req.sortDescriptors = Routine.exerciseSort
+        req.sortDescriptors = Exercise.byUserOrder()
         req.returnsObjectsAsFaults = false
         req.fetchLimit = 1
 
@@ -81,5 +59,19 @@ public extension Routine {
         }
 
         return nil
+    }
+
+    internal func nextTrailing(from userOrder: Int16) -> NSPredicate {
+        NSCompoundPredicate(andPredicateWithSubpredicates: [
+            incompletePredicate,
+            NSPredicate(format: "userOrder > %d", userOrder),
+        ])
+    }
+
+    internal func nextLeading(to userOrder: Int16) -> NSPredicate {
+        NSCompoundPredicate(andPredicateWithSubpredicates: [
+            incompletePredicate,
+            NSPredicate(format: "userOrder < %d", userOrder),
+        ])
     }
 }

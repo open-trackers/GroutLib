@@ -41,24 +41,9 @@ public extension Exercise {
         return nu
     }
 
-    func updateFromAppSettings(_ context: NSManagedObjectContext) throws {
-        let appSetting = try AppSetting.getOrCreate(context)
-        lastIntensity = appSetting.defExIntensity
-        intensityStep = appSetting.defExIntensityStep
-        units = appSetting.defExUnits
-        repetitions = appSetting.defExReps
-        sets = appSetting.defExSets
-    }
-
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
-    }
-}
-
-internal extension Exercise {
-    static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
     }
 }
 
@@ -68,4 +53,15 @@ public extension Exercise {
     static let defaultIntensity: Float = 30
     static let defaultIntensityStep: Float = 5
     static let defaultSets: Int16 = 3
+}
+
+public extension Exercise {
+    func updateFromAppSettings(_ context: NSManagedObjectContext) throws {
+        let appSetting = try AppSetting.getOrCreate(context)
+        lastIntensity = appSetting.defExIntensity
+        intensityStep = appSetting.defExIntensityStep
+        units = appSetting.defExUnits
+        repetitions = appSetting.defExReps
+        sets = appSetting.defExSets
+    }
 }

@@ -16,7 +16,7 @@ import TrackerLib
 extension Exercise {
     internal static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, exerciseArchiveID: UUID) throws {
         let pred = getPredicate(routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID)
-        let sort = [NSSortDescriptor(keyPath: \Exercise.createdAt, ascending: true)]
+        let sort = Exercise.byCreatedAt()
         var first: Exercise?
         try context.fetcher(predicate: pred, sortDescriptors: sort) { (element: Exercise) in
             if first == nil {

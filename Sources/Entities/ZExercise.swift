@@ -46,8 +46,6 @@ public extension ZExercise {
         let nu = try ZExercise.getOrCreate(context,
                                            zRoutine: dstRoutine,
                                            exerciseArchiveID: exerciseArchiveID,
-//                                           exerciseName: wrappedName,
-//                                           exerciseUnits: Units(rawValue: units) ?? Units.none,
                                            inStore: dstStore)
         { _, element in
             element.name = wrappedName
@@ -56,44 +54,9 @@ public extension ZExercise {
         }
         return nu
     }
+}
 
-    static func get(_ context: NSManagedObjectContext,
-                    exerciseArchiveID: UUID,
-                    inStore: NSPersistentStore? = nil) throws -> ZExercise?
-    {
-        let pred = NSPredicate(format: "exerciseArchiveID = %@", exerciseArchiveID.uuidString)
-        return try context.firstFetcher(predicate: pred, inStore: inStore)
-    }
-
-    /// Fetch a ZExercise record in the specified store, creating if necessary.
-    /// Will update name and units on existing record.
-    /// Will NOT update ZRoutine on existing record.
-    /// NOTE: does NOT save context
-    static func getOrCreate(_ context: NSManagedObjectContext,
-                            zRoutine: ZRoutine,
-                            exerciseArchiveID: UUID,
-                            // exerciseName: String,
-                            // exerciseUnits: Units,
-                            inStore: NSPersistentStore,
-                            onUpdate: (Bool, ZExercise) -> Void = { _, _ in }) throws -> ZExercise
-    {
-        if let existing = try ZExercise.get(context, exerciseArchiveID: exerciseArchiveID, inStore: inStore) {
-//            nu.name = exerciseName
-//            nu.units = exerciseUnits.rawValue
-            onUpdate(true, existing)
-            return existing
-        } else {
-            let nu = ZExercise.create(context,
-                                      zRoutine: zRoutine,
-//                                    exerciseName: exerciseName,
-//                                    exerciseUnits: exerciseUnits,
-                                      exerciseArchiveID: exerciseArchiveID,
-                                      toStore: inStore)
-            onUpdate(false, nu)
-            return nu
-        }
-    }
-
+public extension ZExercise {
     var wrappedName: String {
         get { name ?? "unknown" }
         set { name = newValue }
@@ -101,15 +64,5 @@ public extension ZExercise {
 
     var exerciseRunsArray: [ZExerciseRun] {
         (zExerciseRuns?.allObjects as? [ZExerciseRun]) ?? []
-    }
-}
-
-internal extension ZExercise {
-    static func getPredicate(routineArchiveID: UUID,
-                             exerciseArchiveID: UUID) -> NSPredicate
-    {
-        NSPredicate(format: "zRoutine.routineArchiveID == %@ AND exerciseArchiveID == %@",
-                    routineArchiveID.uuidString,
-                    exerciseArchiveID.uuidString)
     }
 }

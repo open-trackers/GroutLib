@@ -16,7 +16,7 @@ import TrackerLib
 extension Routine {
     internal static func dedupe(_ context: NSManagedObjectContext, archiveID: UUID) throws {
         let pred = getPredicate(archiveID: archiveID)
-        let sort = [NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true)]
+        let sort = byCreatedAt()
         var first: Routine?
         try context.fetcher(predicate: pred, sortDescriptors: sort) { (element: Routine) in
             if let _first = first {

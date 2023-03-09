@@ -12,14 +12,11 @@ import CoreData
 
 import TrackerLib
 
-extension AppSetting {
-    internal static var earliestSort: [NSSortDescriptor] =
-        [NSSortDescriptor(keyPath: \AppSetting.createdAt, ascending: true)]
-
+public extension AppSetting {
     // NOTE: does NOT save context
-    public static func dedupe(_ context: NSManagedObjectContext) throws {
+    static func dedupe(_ context: NSManagedObjectContext) throws {
         var first: AppSetting?
-        try context.fetcher(sortDescriptors: earliestSort) { (element: AppSetting) in
+        try context.fetcher(sortDescriptors: byCreatedAt) { (element: AppSetting) in
             if first == nil {
                 first = element
             } else {

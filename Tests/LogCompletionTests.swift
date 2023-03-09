@@ -64,7 +64,7 @@ final class LogCompletionTests: TestBase {
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
-        XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore))
+        XCTAssertNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
 
         try e.logCompletion(testContext, mainStore: mainStore, routineStartedAt: startedAt, nuDuration: duration, exerciseCompletedAt: completedAt1, exerciseIntensity: intensity1)
@@ -77,7 +77,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(zrr)
         XCTAssertEqual(duration, zrr?.duration)
         XCTAssertEqual(startedAt, zrr?.startedAt)
-        let ze = try ZExercise.get(testContext, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore)
+        let ze = try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exercise1ArchiveID, inStore: mainStore)
         XCTAssertNotNil(ze)
         XCTAssertEqual(e.name, ze?.name)
         XCTAssertEqual(e.units, ze?.units)
@@ -134,7 +134,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertEqual(duration, zrr?.duration)
         XCTAssertEqual(startedAt, zrr?.startedAt)
 
-        let ze1 = try ZExercise.get(testContext, exerciseArchiveID: exercise1ArchiveID, inStore: archiveStore)
+        let ze1 = try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exercise1ArchiveID, inStore: archiveStore)
         XCTAssertNotNil(ze1)
         XCTAssertEqual(e1.name, ze1?.name)
         XCTAssertEqual(e1.units, ze1?.units)
@@ -143,7 +143,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertEqual(completedAt1, zer1?.completedAt)
         XCTAssertEqual(intensity1, zer1?.intensity)
 
-        let ze2 = try ZExercise.get(testContext, exerciseArchiveID: exercise2ArchiveID, inStore: archiveStore)
+        let ze2 = try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exercise2ArchiveID, inStore: archiveStore)
         XCTAssertNotNil(ze2)
         XCTAssertEqual(e2.name, ze2?.name)
         XCTAssertEqual(e2.units, ze2?.units)

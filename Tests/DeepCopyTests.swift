@@ -70,10 +70,10 @@ final class DeepCopyTests: TestBase {
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
-        XCTAssertNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
+        XCTAssertNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
 
         let sZRoutines = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
         try testContext.save()
@@ -81,10 +81,10 @@ final class DeepCopyTests: TestBase {
         XCTAssertEqual([sr], sZRoutines)
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
     }
 
     func testRoutineWithExerciseAndExerciseRun() throws {
@@ -100,7 +100,7 @@ final class DeepCopyTests: TestBase {
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         let sZRoutines = try deepCopy(testContext, fromStore: mainStore, toStore: archiveStore)
@@ -110,12 +110,12 @@ final class DeepCopyTests: TestBase {
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: mainStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
-        XCTAssertNotNil(try ZExercise.get(testContext, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
+        XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: archiveStore))
     }
 }

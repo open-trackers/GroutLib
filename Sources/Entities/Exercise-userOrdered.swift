@@ -16,10 +16,8 @@ extension Exercise: UserOrdered {}
 
 public extension Exercise {
     static func maxUserOrder(_ context: NSManagedObjectContext, routine: Routine) throws -> Int16? {
-        var sort: [NSSortDescriptor] {
-            [NSSortDescriptor(keyPath: \Exercise.userOrder, ascending: false)]
-        }
-        let pred = NSPredicate(format: "routine == %@", routine)
+        let sort = Exercise.byUserOrder(ascending: false)
+        let pred = Exercise.getPredicate(routine: routine)
         let exercise: Exercise? = try context.firstFetcher(predicate: pred, sortDescriptors: sort)
         return exercise?.userOrder
     }
