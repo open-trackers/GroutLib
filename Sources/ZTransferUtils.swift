@@ -51,7 +51,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
         let dRoutine = try sRoutine.shallowCopy(context, toStore: dstStore)
 
-        let routinePred = NSPredicate(format: "zRoutine = %@", sRoutine)
+        let routinePred = ZExercise.getPredicate(zRoutine: sRoutine)
 
         // will need dExercise for creating dExerciseRun
         var dExerciseDict: [UUID: ZExercise] = [:]
@@ -76,7 +76,7 @@ internal func deepCopy(_ context: NSManagedObjectContext,
 
             let dRoutineRun = try sRoutineRun.shallowCopy(context, dstRoutine: dRoutine, toStore: dstStore)
 
-            let routineRunPred = NSPredicate(format: "zRoutineRun = %@", sRoutineRun)
+            let routineRunPred = ZExerciseRun.getPredicate(zRoutineRun: sRoutineRun)
 
             // NOTE: including even those ZExerciseRun records with userRemoved==1, as we need to reflect
             // removed records in the archive (which may have been previously copied as userRemoved=0)

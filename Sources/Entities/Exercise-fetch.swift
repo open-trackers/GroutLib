@@ -33,7 +33,7 @@ public extension Exercise {
     static func byUserOrder(ascending: Bool = true) -> [NSSortDescriptor] {
         [
             NSSortDescriptor(keyPath: \Exercise.userOrder, ascending: ascending),
-            NSSortDescriptor(keyPath: \Exercise.createdAt, ascending: ascending),
+            NSSortDescriptor(keyPath: \Exercise.createdAt, ascending: true),
         ]
     }
 }

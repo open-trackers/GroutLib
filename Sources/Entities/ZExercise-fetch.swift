@@ -12,7 +12,11 @@ import CoreData
 
 import TrackerLib
 
-internal extension ZExercise {
+public extension ZExercise {
+    static func getPredicate(zRoutine: ZRoutine) -> NSPredicate {
+        NSPredicate(format: "zRoutine == %@", zRoutine)
+    }
+
     static func getPredicate(routineArchiveID: UUID,
                              exerciseArchiveID: UUID) -> NSPredicate
     {

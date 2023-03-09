@@ -43,7 +43,7 @@ public extension Routine {
     static func byUserOrder(ascending: Bool = true) -> [NSSortDescriptor] {
         [
             NSSortDescriptor(keyPath: \Routine.userOrder, ascending: ascending),
-            NSSortDescriptor(keyPath: \Routine.createdAt, ascending: ascending),
+            NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true),
         ]
     }
 }

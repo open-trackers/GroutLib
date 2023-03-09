@@ -12,7 +12,17 @@ import CoreData
 
 import TrackerLib
 
-internal extension ZExerciseRun {
+public extension ZExerciseRun {
+    static func getPredicate(zRoutineRun: ZRoutineRun) -> NSPredicate {
+        NSPredicate(format: "zRoutineRun == %@", zRoutineRun)
+    }
+
+    static func getPredicate(zRoutineRun: ZRoutineRun,
+                             userRemoved: Bool) -> NSPredicate
+    {
+        NSPredicate(format: "zRoutineRun == %@ AND userRemoved == %@", zRoutineRun, NSNumber(value: userRemoved))
+    }
+
     static func getPredicate(exerciseArchiveID: UUID,
                              completedAt: Date) -> NSPredicate
     {
@@ -26,6 +36,13 @@ public extension ZExerciseRun {
     static func byCreatedAt(ascending: Bool = true) -> [NSSortDescriptor] {
         [
             NSSortDescriptor(keyPath: \ZExerciseRun.createdAt, ascending: ascending),
+        ]
+    }
+
+    static func byCompletedAt(ascending: Bool = true) -> [NSSortDescriptor] {
+        [
+            NSSortDescriptor(keyPath: \ZExerciseRun.completedAt, ascending: ascending),
+            NSSortDescriptor(keyPath: \ZExerciseRun.createdAt, ascending: true),
         ]
     }
 }

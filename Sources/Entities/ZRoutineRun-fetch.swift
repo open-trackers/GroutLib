@@ -12,7 +12,11 @@ import CoreData
 
 import TrackerLib
 
-internal extension ZRoutineRun {
+public extension ZRoutineRun {
+    static func getPredicate(userRemoved: Bool) -> NSPredicate {
+        NSPredicate(format: "userRemoved == %@", NSNumber(value: userRemoved))
+    }
+
     static func getPredicate(routineArchiveID: UUID,
                              startedAt: Date) -> NSPredicate
     {
@@ -26,6 +30,13 @@ public extension ZRoutineRun {
     static func byCreatedAt(ascending: Bool = true) -> [NSSortDescriptor] {
         [
             NSSortDescriptor(keyPath: \ZRoutineRun.createdAt, ascending: ascending),
+        ]
+    }
+
+    static func byStartedAt(ascending: Bool = true) -> [NSSortDescriptor] {
+        [
+            NSSortDescriptor(keyPath: \ZRoutineRun.startedAt, ascending: ascending),
+            NSSortDescriptor(keyPath: \ZRoutineRun.createdAt, ascending: true),
         ]
     }
 }
