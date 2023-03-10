@@ -13,15 +13,13 @@ import CoreData
 import TrackerLib
 
 public extension Exercise {
-    static var intensityMaxValue: Float = 500.0
-
     var advancedIntensity: Float {
         if invertedIntensity {
             // advance downwards
             return max(0, lastIntensity - intensityStep)
         } else {
             // advance upwards
-            return min(Exercise.intensityMaxValue, lastIntensity + intensityStep)
+            return min(Exercise.intensityRange.upperBound, lastIntensity + intensityStep)
         }
     }
 

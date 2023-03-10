@@ -48,6 +48,10 @@ public extension Exercise {
 }
 
 public extension Exercise {
+    static let intensityRange: ClosedRange<Float> = 0 ... 500
+    static let intensityStepRange: ClosedRange<Float> = 0.1 ... 25
+    static let settingRange: ClosedRange<Int16> = 0 ... 50
+
     static let defaultUnits: Int16 = 0
     static let defaultReps: Int16 = 12
     static let defaultIntensity: Float = 30
