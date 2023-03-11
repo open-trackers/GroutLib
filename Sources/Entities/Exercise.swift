@@ -31,7 +31,7 @@ public extension Exercise {
         nu.name = name
         nu.archiveID = archiveID
 
-        // NOTE that these may be replaced with defaults from AppSetting
+        // NOTE: that these may be replaced with defaults from AppSetting
         nu.units = defaultUnits
         nu.repetitions = defaultReps
         nu.lastIntensity = defaultIntensity

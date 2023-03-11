@@ -12,7 +12,7 @@ import CoreData
 
 import TrackerLib
 
-// NOTE that we're using two stores with a single configuration,
+// NOTE: that we're using two stores with a single configuration,
 // where the Z* records on 'main' store eventually will be transferred
 // to the 'archive' store on iOS, to reduce watch storage needs.
 public final class CoreDataStack: BaseCoreDataStack {
@@ -22,7 +22,7 @@ public final class CoreDataStack: BaseCoreDataStack {
     // static let archiveSuffix = "archive"
 
     #if os(watchOS)
-        // NOTE the watch won't get the archive store
+        // NOTE: the watch won't get the archive store
         let storeKeys = [StoreType.main.rawValue]
     #else
         let storeKeys = [StoreType.main.rawValue, StoreType.archive.rawValue]
@@ -45,8 +45,8 @@ public final class CoreDataStack: BaseCoreDataStack {
     }
 
     // for de-duping
-    // NOTE that this is happening on background thread
-    // NOTE handler is responsible for saving context
+    // NOTE: that this is happening on background thread
+    // NOTE: handler is responsible for saving context
     override public func handleInsert(backgroundContext: NSManagedObjectContext,
                                       entityName: String,
                                       objectID: NSManagedObjectID,

@@ -34,7 +34,7 @@ public extension ZExercise {
     }
 
     /// Shallow copy of self to specified store, returning newly copied record (residing in dstStore).
-    /// NOTE assumes that routine is in dstStore.
+    /// NOTE: assumes that routine is in dstStore.
     /// Does not delete self.
     /// Does NOT save context.
     func shallowCopy(_ context: NSManagedObjectContext,
