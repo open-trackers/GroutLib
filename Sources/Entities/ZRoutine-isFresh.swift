@@ -21,9 +21,9 @@ extension ZRoutine {
                  now: Date = Date.now) -> Bool
     {
         guard let archiveID = routineArchiveID,
-           let routine = try? Routine.get(context, archiveID: archiveID),
-           let startedAt = routine.lastStartedAt,
-           now <= startedAt.addingTimeInterval(thresholdSecs)
+              let routine = try? Routine.get(context, archiveID: archiveID),
+              let startedAt = routine.lastStartedAt,
+              now <= startedAt.addingTimeInterval(thresholdSecs)
         else { return false }
         return true
     }

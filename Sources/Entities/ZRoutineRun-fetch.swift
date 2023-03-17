@@ -82,7 +82,8 @@ public extension ZRoutineRun {
     }
 
     static func getMostRecent(_ context: NSManagedObjectContext,
-                              mainStore: NSPersistentStore) throws -> ZRoutineRun? {
+                              mainStore: NSPersistentStore) throws -> ZRoutineRun?
+    {
         try context.firstFetcher(sortDescriptors: byStartedAt(ascending: false),
                                  inStore: mainStore)
     }

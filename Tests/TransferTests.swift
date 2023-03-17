@@ -27,7 +27,7 @@ final class TransferTests: TestBase {
     var completedAt3: Date!
 
     let thresholdSecs: TimeInterval = 86400
-    
+
     override func setUpWithError() throws {
         try super.setUpWithError()
 

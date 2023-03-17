@@ -39,7 +39,7 @@ final class LogCompletionTests: TestBase {
     var userOrder1: Int16!
     let userOrder2Str = "20"
     var userOrder2: Int16!
-    
+
     let thresholdSecs: TimeInterval = 86400
 
     override func setUpWithError() throws {
