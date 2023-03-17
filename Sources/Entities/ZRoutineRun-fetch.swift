@@ -75,15 +75,16 @@ public extension ZRoutineRun {
             let nu = ZRoutineRun.create(context,
                                         zRoutine: zRoutine,
                                         startedAt: startedAt,
-                                        // duration: duration,
                                         toStore: inStore)
             onUpdate(false, nu)
             return nu
         }
     }
 
-    static func getMostRecent(_ context: NSManagedObjectContext, mainStore: NSPersistentStore) throws -> ZRoutineRun? {
-        try context.firstFetcher(sortDescriptors: byStartedAt(ascending: false), inStore: mainStore)
+    static func getMostRecent(_ context: NSManagedObjectContext,
+                              mainStore: NSPersistentStore) throws -> ZRoutineRun? {
+        try context.firstFetcher(sortDescriptors: byStartedAt(ascending: false),
+                                 inStore: mainStore)
     }
 
     static func count(_ context: NSManagedObjectContext,
