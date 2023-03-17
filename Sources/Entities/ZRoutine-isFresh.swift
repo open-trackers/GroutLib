@@ -13,20 +13,18 @@ import CoreData
 import TrackerLib
 
 extension ZRoutine {
-    /// Avoid deleting 'z' records from main store where routine may still be active.
-    /// If within the time threshold (default of one day), it's fresh; if outside, it's stale.
+    /// Preserve 'z' records in main store where routine may still be active.
+    /// If within the time threshold, it's fresh; if earlier, it's stale.
     /// NOTE: routine.lastStartedAt should have been initialized on first Exercise.markDone.
     func isFresh(_ context: NSManagedObjectContext,
-                 now: Date = Date.now,
-                 thresholdSecs: TimeInterval = 86400) -> Bool
+                 thresholdSecs: TimeInterval,
+                 now: Date = Date.now) -> Bool
     {
-        if let archiveID = routineArchiveID,
+        guard let archiveID = routineArchiveID,
            let routine = try? Routine.get(context, archiveID: archiveID),
            let startedAt = routine.lastStartedAt,
            now <= startedAt.addingTimeInterval(thresholdSecs)
-        {
-            return true
-        }
-        return false
+        else { return false }
+        return true
     }
 }

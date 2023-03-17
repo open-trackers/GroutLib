@@ -26,6 +26,8 @@ final class TransferTests: TestBase {
     let completedAt3Str = "2023-01-03T05:00:00Z"
     var completedAt3: Date!
 
+    let thresholdSecs: TimeInterval = 86400
+    
     override func setUpWithError() throws {
         try super.setUpWithError()
 
@@ -41,7 +43,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -61,7 +63,7 @@ final class TransferTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -82,7 +84,7 @@ final class TransferTests: TestBase {
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
         XCTAssertNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -108,7 +110,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZExercise.get(testContext, routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt, inStore: mainStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
@@ -137,7 +139,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: mainStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore) // , startOfDay: startOfDay, now: now, tz: tz)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs) // , startOfDay: startOfDay, now: now, tz: tz)
         try testContext.save()
 
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt1, inStore: archiveStore))
@@ -162,7 +164,7 @@ final class TransferTests: TestBase {
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt2, inStore: mainStore))
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exerciseArchiveID, completedAt: completedAt3, inStore: mainStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore) // , startOfDay: startOfDay, now: now, tz: tz)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs) // , startOfDay: startOfDay, now: now, tz: tz)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutineRun.get(testContext, routineArchiveID: routineArchiveID, startedAt: startedAt, inStore: archiveStore))

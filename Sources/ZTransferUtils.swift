@@ -17,22 +17,23 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!,
                             category: "ZTransfer")
 
 /// Transfers all 'Z' records in .main store to .archive store.
+/// Preserves 'fresh' zRoutines in .main store no older than thresholdSecs. Deletes those 'stale' ones earlier.
 /// Safe to run on a background context.
 /// NOTE: does NOT save context
 public func transferToArchive(_ context: NSManagedObjectContext,
                               mainStore: NSPersistentStore,
                               archiveStore: NSPersistentStore,
-                              now: Date = Date.now,
-                              thresholdSecs: TimeInterval = 86400) throws
+                              thresholdSecs: TimeInterval,
+                              now: Date = Date.now) throws
 {
     logger.debug("\(#function)")
 
     let zRoutines = try deepCopy(context, fromStore: mainStore, toStore: archiveStore)
 
-    let filteredZRoutines = zRoutines.filter { !$0.isFresh(context, now: now, thresholdSecs: thresholdSecs) }
+    let staleRecords = zRoutines.filter { !$0.isFresh(context, thresholdSecs: thresholdSecs, now: now) }
 
     // rely on cascading delete to remove children
-    filteredZRoutines.forEach { context.delete($0) }
+    staleRecords.forEach { context.delete($0) }
 }
 
 /// Deep copy of all routines and their children from the source store to specified destination store

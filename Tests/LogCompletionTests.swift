@@ -39,6 +39,8 @@ final class LogCompletionTests: TestBase {
     var userOrder1: Int16!
     let userOrder2Str = "20"
     var userOrder2: Int16!
+    
+    let thresholdSecs: TimeInterval = 86400
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -108,7 +110,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise1ArchiveID, completedAt: completedAt1, inStore: mainStore))
@@ -120,7 +122,7 @@ final class LogCompletionTests: TestBase {
         XCTAssertNotNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: thresholdSecs)
         try testContext.save()
 
         XCTAssertNil(try ZExerciseRun.get(testContext, exerciseArchiveID: exercise2ArchiveID, completedAt: completedAt2, inStore: mainStore))

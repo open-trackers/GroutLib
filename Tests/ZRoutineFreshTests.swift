@@ -28,7 +28,7 @@ final class ZRoutineFreshTests: TestBase {
         let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
-        XCTAssertFalse(sr.isFresh(testContext))
+        XCTAssertFalse(sr.isFresh(testContext, thresholdSecs: secondsPerDay))
     }
 
     func testMissingLastStartedAtIsStale() throws {
@@ -39,7 +39,7 @@ final class ZRoutineFreshTests: TestBase {
         let sr = ZRoutine.create(testContext, routineArchiveID: routineArchiveID, routineName: "blah", toStore: mainStore)
         try testContext.save()
 
-        XCTAssertFalse(sr.isFresh(testContext))
+        XCTAssertFalse(sr.isFresh(testContext, thresholdSecs: secondsPerDay))
     }
 
     func testThresholdSecond() throws {
@@ -53,11 +53,11 @@ final class ZRoutineFreshTests: TestBase {
         try testContext.save()
 
         // if within the threshold, it's fresh
-        XCTAssertTrue(sr.isFresh(testContext, now: base, thresholdSecs: 2))
-        XCTAssertTrue(sr.isFresh(testContext, now: base, thresholdSecs: 1))
+        XCTAssertTrue(sr.isFresh(testContext, thresholdSecs: 2, now: base))
+        XCTAssertTrue(sr.isFresh(testContext, thresholdSecs: 1, now: base))
 
         // if outside the threshold, it's stale
-        XCTAssertFalse(sr.isFresh(testContext, now: base, thresholdSecs: 0))
+        XCTAssertFalse(sr.isFresh(testContext, thresholdSecs: 0, now: base))
     }
 
     func testThresholdHour() throws {
@@ -71,13 +71,13 @@ final class ZRoutineFreshTests: TestBase {
         try testContext.save()
 
         // if within the threshold, it's fresh
-        XCTAssertTrue(sr.isFresh(testContext, now: base, thresholdSecs: secondsPerDay))
-        XCTAssertTrue(sr.isFresh(testContext, now: base, thresholdSecs: 3601))
-        XCTAssertTrue(sr.isFresh(testContext, now: base, thresholdSecs: 3600))
+        XCTAssertTrue(sr.isFresh(testContext, thresholdSecs: secondsPerDay, now: base))
+        XCTAssertTrue(sr.isFresh(testContext, thresholdSecs: 3601, now: base))
+        XCTAssertTrue(sr.isFresh(testContext, thresholdSecs: 3600, now: base))
 
         // if outside the threshold, it's stale
-        XCTAssertFalse(sr.isFresh(testContext, now: base, thresholdSecs: 3599))
-        XCTAssertFalse(sr.isFresh(testContext, now: base, thresholdSecs: 0))
+        XCTAssertFalse(sr.isFresh(testContext, thresholdSecs: 3599, now: base))
+        XCTAssertFalse(sr.isFresh(testContext, thresholdSecs: 0, now: base))
     }
 
     func testTransferPreservesFreshRoutine() throws {
@@ -92,7 +92,7 @@ final class ZRoutineFreshTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: secondsPerDay, now: base)
         try testContext.save()
 
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // preserved!
@@ -111,7 +111,7 @@ final class ZRoutineFreshTests: TestBase {
         XCTAssertNotNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore))
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: archiveStore))
 
-        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, now: base, thresholdSecs: secondsPerDay)
+        try transferToArchive(testContext, mainStore: mainStore, archiveStore: archiveStore, thresholdSecs: secondsPerDay, now: base)
         try testContext.save()
 
         XCTAssertNil(try ZRoutine.get(testContext, routineArchiveID: routineArchiveID, inStore: mainStore)) // purged!
