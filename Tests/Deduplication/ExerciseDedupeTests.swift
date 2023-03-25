@@ -16,10 +16,10 @@ import TrackerLib
 import XCTest
 
 final class ExerciseDedupeTests: TestBase {
-    let catArchiveID1 = UUID()
-    let catArchiveID2 = UUID()
-    let servArchiveID1 = UUID()
-    let servArchiveID2 = UUID()
+    let routineArchiveID1 = UUID()
+    let routineArchiveID2 = UUID()
+    let exerciseArchiveID1 = UUID()
+    let exerciseArchiveID2 = UUID()
 
     let date1Str = "2023-01-02T21:00:01Z"
     var date1: Date!
@@ -34,12 +34,12 @@ final class ExerciseDedupeTests: TestBase {
     }
 
     func testDifferentArchiveID() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: servArchiveID1, createdAt: date1)
-        let s2 = Exercise.create(testContext, routine: c1, userOrder: 8, archiveID: servArchiveID2, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: exerciseArchiveID1, createdAt: date1)
+        let s2 = Exercise.create(testContext, routine: c1, userOrder: 8, archiveID: exerciseArchiveID2, createdAt: date2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Exercise.dedupe(testContext, routineArchiveID: catArchiveID1, exerciseArchiveID: servArchiveID1)
+        try Exercise.dedupe(testContext, routineArchiveID: routineArchiveID1, exerciseArchiveID: exerciseArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertFalse(s1.isDeleted)
@@ -47,12 +47,12 @@ final class ExerciseDedupeTests: TestBase {
     }
 
     func testSameArchiveIdWithinRoutine() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: servArchiveID1, createdAt: date1)
-        let s2 = Exercise.create(testContext, routine: c1, userOrder: 8, archiveID: servArchiveID1, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: exerciseArchiveID1, createdAt: date1)
+        let s2 = Exercise.create(testContext, routine: c1, userOrder: 8, archiveID: exerciseArchiveID1, createdAt: date2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Exercise.dedupe(testContext, routineArchiveID: catArchiveID1, exerciseArchiveID: servArchiveID1)
+        try Exercise.dedupe(testContext, routineArchiveID: routineArchiveID1, exerciseArchiveID: exerciseArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertFalse(s1.isDeleted)
@@ -60,13 +60,13 @@ final class ExerciseDedupeTests: TestBase {
     }
 
     func testSameArchiveIdOutsideRoutine() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let c2 = Routine.create(testContext, userOrder: 11, archiveID: catArchiveID2, createdAt: date2)
-        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: servArchiveID1, createdAt: date1)
-        let s2 = Exercise.create(testContext, routine: c2, userOrder: 8, archiveID: servArchiveID1, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let c2 = Routine.create(testContext, userOrder: 11, archiveID: routineArchiveID2, createdAt: date2)
+        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: exerciseArchiveID1, createdAt: date1)
+        let s2 = Exercise.create(testContext, routine: c2, userOrder: 8, archiveID: exerciseArchiveID1, createdAt: date2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Exercise.dedupe(testContext, routineArchiveID: catArchiveID1, exerciseArchiveID: servArchiveID1)
+        try Exercise.dedupe(testContext, routineArchiveID: routineArchiveID1, exerciseArchiveID: exerciseArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertFalse(c2.isDeleted)

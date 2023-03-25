@@ -16,10 +16,10 @@ import TrackerLib
 import XCTest
 
 final class RoutineDedupeTests: TestBase {
-    let catArchiveID1 = UUID()
-    let catArchiveID2 = UUID()
-    let servArchiveID1 = UUID()
-    let servArchiveID2 = UUID()
+    let routineArchiveID1 = UUID()
+    let routineArchiveID2 = UUID()
+    let exerciseArchiveID1 = UUID()
+    let exerciseArchiveID2 = UUID()
     let groupRaw1: Int16 = 5
     let groupRaw2: Int16 = 7
 
@@ -36,36 +36,36 @@ final class RoutineDedupeTests: TestBase {
     }
 
     func testDifferentArchiveID() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let c2 = Routine.create(testContext, userOrder: 15, archiveID: catArchiveID2, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let c2 = Routine.create(testContext, userOrder: 15, archiveID: routineArchiveID2, createdAt: date2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Routine.dedupe(testContext, archiveID: catArchiveID1)
+        try Routine.dedupe(testContext, archiveID: routineArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertFalse(c2.isDeleted)
     }
 
     func testSameArchiveID() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let c2 = Routine.create(testContext, userOrder: 15, archiveID: catArchiveID1, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let c2 = Routine.create(testContext, userOrder: 15, archiveID: routineArchiveID1, createdAt: date2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Routine.dedupe(testContext, archiveID: catArchiveID1)
+        try Routine.dedupe(testContext, archiveID: routineArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertTrue(c2.isDeleted)
     }
 
     func testDupeConsolidateExercises() throws {
-        let c1 = Routine.create(testContext, userOrder: 10, archiveID: catArchiveID1, createdAt: date1)
-        let c2 = Routine.create(testContext, userOrder: 15, archiveID: catArchiveID1, createdAt: date2)
+        let c1 = Routine.create(testContext, userOrder: 10, archiveID: routineArchiveID1, createdAt: date1)
+        let c2 = Routine.create(testContext, userOrder: 15, archiveID: routineArchiveID1, createdAt: date2)
 
-        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: servArchiveID1)
-        let s2 = Exercise.create(testContext, routine: c2, userOrder: 8, archiveID: servArchiveID2)
+        let s1 = Exercise.create(testContext, routine: c1, userOrder: 4, archiveID: exerciseArchiveID1)
+        let s2 = Exercise.create(testContext, routine: c2, userOrder: 8, archiveID: exerciseArchiveID2)
         try testContext.save() // needed for fetch request to work properly
 
-        try Routine.dedupe(testContext, archiveID: catArchiveID1)
+        try Routine.dedupe(testContext, archiveID: routineArchiveID1)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertTrue(c2.isDeleted)

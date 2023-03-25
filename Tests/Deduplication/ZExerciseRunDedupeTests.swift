@@ -16,10 +16,10 @@ import TrackerLib
 import XCTest
 
 final class ZExerciseRunDedupeTests: TestBase {
-    let catArchiveID1 = UUID()
-    let catArchiveID2 = UUID()
-    let servArchiveID1 = UUID()
-    let servArchiveID2 = UUID()
+    let routineArchiveID1 = UUID()
+    let routineArchiveID2 = UUID()
+    let exerciseArchiveID1 = UUID()
+    let exerciseArchiveID2 = UUID()
 
     let date1Str = "2023-01-02T21:00:00Z"
     var date1: Date!
@@ -48,8 +48,8 @@ final class ZExerciseRunDedupeTests: TestBase {
     }
 
     func testDifferentConsumedTime() throws {
-        let c1 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
-        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: servArchiveID1, exerciseName: name1, createdAt: date1, toStore: mainStore)
+        let c1 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
+        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: exerciseArchiveID1, exerciseName: name1, createdAt: date1, toStore: mainStore)
         let dr1 = ZRoutineRun.create(testContext, zRoutine: c1, startedAt: startedAt1, createdAt: date1, toStore: mainStore)
 
         let r1 = ZExerciseRun.create(testContext, zRoutineRun: dr1, zExercise: s1, completedAt: completedAt1, createdAt: date1, toStore: mainStore)
@@ -57,7 +57,7 @@ final class ZExerciseRunDedupeTests: TestBase {
         try testContext.save() // needed for fetch request to work properly
 
         try ZExerciseRun.dedupe(testContext,
-                                exerciseArchiveID: servArchiveID1,
+                                exerciseArchiveID: exerciseArchiveID1,
                                 // startedAt: startedAt1,
                                 completedAt: completedAt1,
                                 inStore: mainStore)
@@ -67,8 +67,8 @@ final class ZExerciseRunDedupeTests: TestBase {
     }
 
     func testSameConsumedTime() throws {
-        let c1 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
-        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: servArchiveID1, exerciseName: name1, createdAt: date1, toStore: mainStore)
+        let c1 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
+        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: exerciseArchiveID1, exerciseName: name1, createdAt: date1, toStore: mainStore)
         let dr1 = ZRoutineRun.create(testContext, zRoutine: c1, startedAt: startedAt1, createdAt: date1, toStore: mainStore)
 
         let r1 = ZExerciseRun.create(testContext, zRoutineRun: dr1, zExercise: s1, completedAt: completedAt1, createdAt: date1, toStore: mainStore)
@@ -76,7 +76,7 @@ final class ZExerciseRunDedupeTests: TestBase {
         try testContext.save() // needed for fetch request to work properly
 
         try ZExerciseRun.dedupe(testContext,
-                                exerciseArchiveID: servArchiveID1,
+                                exerciseArchiveID: exerciseArchiveID1,
                                 // startedAt: startedAt1,
                                 completedAt: completedAt1,
                                 inStore: mainStore)

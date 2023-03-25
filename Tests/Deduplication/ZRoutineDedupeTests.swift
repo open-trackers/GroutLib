@@ -16,10 +16,10 @@ import TrackerLib
 import XCTest
 
 final class ZRoutineDedupeTests: TestBase {
-    let catArchiveID1 = UUID()
-    let catArchiveID2 = UUID()
-    let servArchiveID1 = UUID()
-    let servArchiveID2 = UUID()
+    let routineArchiveID1 = UUID()
+    let routineArchiveID2 = UUID()
+    let exerciseArchiveID1 = UUID()
+    let exerciseArchiveID2 = UUID()
     let name1 = "blah1"
     let name2 = "blah2"
 
@@ -36,37 +36,37 @@ final class ZRoutineDedupeTests: TestBase {
     }
 
     func testDifferentArchiveID() throws {
-        let c1 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
-        let c2 = ZRoutine.create(testContext, routineArchiveID: catArchiveID2, routineName: name2, createdAt: date2, toStore: mainStore)
+        let c1 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
+        let c2 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID2, routineName: name2, createdAt: date2, toStore: mainStore)
         try testContext.save() // needed for fetch request to work properly
 
-        try ZRoutine.dedupe(testContext, routineArchiveID: catArchiveID1, inStore: mainStore)
+        try ZRoutine.dedupe(testContext, routineArchiveID: routineArchiveID1, inStore: mainStore)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertFalse(c2.isDeleted)
     }
 
     func testSameArchiveID() throws {
-        let c1 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
-        let c2 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name2, createdAt: date2, toStore: mainStore)
+        let c1 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
+        let c2 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name2, createdAt: date2, toStore: mainStore)
         try testContext.save() // needed for fetch request to work properly
 
-        try ZRoutine.dedupe(testContext, routineArchiveID: catArchiveID1, inStore: mainStore)
+        try ZRoutine.dedupe(testContext, routineArchiveID: routineArchiveID1, inStore: mainStore)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertTrue(c2.isDeleted)
     }
 
     func testDupeConsolidateExercises() throws {
-        // same catArchiveID
-        let c1 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
-        let c2 = ZRoutine.create(testContext, routineArchiveID: catArchiveID1, routineName: name1, createdAt: date2, toStore: mainStore)
+        // same routineArchiveID
+        let c1 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date1, toStore: mainStore)
+        let c2 = ZRoutine.create(testContext, routineArchiveID: routineArchiveID1, routineName: name1, createdAt: date2, toStore: mainStore)
 
-        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: servArchiveID1, exerciseName: name1, toStore: mainStore)
-        let s2 = ZExercise.create(testContext, zRoutine: c2, exerciseArchiveID: servArchiveID2, exerciseName: name2, toStore: mainStore)
+        let s1 = ZExercise.create(testContext, zRoutine: c1, exerciseArchiveID: exerciseArchiveID1, exerciseName: name1, toStore: mainStore)
+        let s2 = ZExercise.create(testContext, zRoutine: c2, exerciseArchiveID: exerciseArchiveID2, exerciseName: name2, toStore: mainStore)
         try testContext.save() // needed for fetch request to work properly
 
-        try ZRoutine.dedupe(testContext, routineArchiveID: catArchiveID1, inStore: mainStore)
+        try ZRoutine.dedupe(testContext, routineArchiveID: routineArchiveID1, inStore: mainStore)
 
         XCTAssertFalse(c1.isDeleted)
         XCTAssertTrue(c2.isDeleted)
