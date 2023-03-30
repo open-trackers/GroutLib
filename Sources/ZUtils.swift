@@ -69,7 +69,7 @@ public func updateCreatedAts(_ context: NSManagedObjectContext) throws {
 
 /// Delete all `Z` records prior to a specified date.
 /// NOTE: does NOT save context
-public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date, inStore: NSPersistentStore? = nil) throws {
+public func cleanLogRecords(_ context: NSManagedObjectContext, keepSince: Date, inStore: NSPersistentStore) throws {
     let pred = NSPredicate(format: "startedAt < %@", keepSince as NSDate)
 
     try context.fetcher(predicate: pred, inStore: inStore) { (element: ZRoutineRun) in
