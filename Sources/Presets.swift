@@ -87,6 +87,7 @@ public let systemImageNames = [
     "figure.pilates",
     "figure.rolling",
     "figure.run",
+    "figure.walk",
     "figure.wave",
     "figure.yoga",
     "airplane",
