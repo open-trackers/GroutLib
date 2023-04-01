@@ -65,7 +65,7 @@ public extension Exercise {
                                            name: preset,
                                            createdAt: createdAt)
 
-            try exercise.updateFromAppSettings(context)
+            try exercise.populate(context, from: preset)
         }
     }
 }
@@ -85,7 +85,10 @@ public extension Exercise {
 }
 
 public extension Exercise {
-    func updateFromAppSettings(_ context: NSManagedObjectContext) throws {
+    // NOTE: does NOT save context
+    func populate(_ context: NSManagedObjectContext, from _: ExercisePreset? = nil) throws {
+        // name is already populated by TextFieldPreset
+
         let appSetting = try AppSetting.getOrCreate(context)
         lastIntensity = appSetting.defExIntensity
         intensityStep = appSetting.defExIntensityStep
