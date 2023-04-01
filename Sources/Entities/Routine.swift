@@ -42,3 +42,9 @@ public extension Routine {
         (exercises?.allObjects as? [Exercise]) ?? []
     }
 }
+
+// public extension Routine {
+//    var filteredPresets: ExercisePresetDict? {
+//        exercisePresets
+//    }
+// }

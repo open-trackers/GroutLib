@@ -24,7 +24,10 @@ public let routinePresets: OrderedDictionary = [
     ],
 ]
 
-public let exercisePresets: OrderedDictionary = [
+public typealias ExercisePreset = String
+public typealias ExercisePresetDict = OrderedDictionary<String, [ExercisePreset]>
+
+public let exercisePresets: ExercisePresetDict = [
     "Machine/Free Weights": [
         "Abdominal",
         "Arm Curl",

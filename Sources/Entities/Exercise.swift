@@ -48,6 +48,29 @@ public extension Exercise {
 }
 
 public extension Exercise {
+    // Bulk creation of tasks, from task preset multi-select on iOS.
+    // NOTE: does NOT save context
+    static func bulkCreate(_ context: NSManagedObjectContext,
+                           routine: Routine,
+                           presets: [ExercisePreset],
+                           createdAt: Date = Date.now) throws
+    {
+        var userOrder = try (Self.maxUserOrder(context, routine: routine)) ?? 0
+        try presets.forEach { preset in
+            userOrder += 1
+
+            let exercise = Exercise.create(context,
+                                           routine: routine,
+                                           userOrder: userOrder,
+                                           name: preset,
+                                           createdAt: createdAt)
+
+            try exercise.updateFromAppSettings(context)
+        }
+    }
+}
+
+public extension Exercise {
     static let intensityRange: ClosedRange<Float> = 0 ... 500
     static let intensityPrecision = 1
     static let intensityStepRange: ClosedRange<Float> = 0.1 ... 25
