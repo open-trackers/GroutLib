@@ -27,7 +27,7 @@ public extension ZExerciseRun {
                              completedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zExercise.exerciseArchiveID = %@ AND completedAt == %@",
-                    exerciseArchiveID.uuidString,
+                    exerciseArchiveID as NSUUID,
                     completedAt as NSDate)
     }
 }

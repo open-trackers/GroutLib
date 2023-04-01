@@ -21,7 +21,7 @@ public extension ZRoutineRun {
                              startedAt: Date) -> NSPredicate
     {
         NSPredicate(format: "zRoutine.routineArchiveID = %@ AND startedAt == %@",
-                    routineArchiveID.uuidString,
+                    routineArchiveID as NSUUID,
                     startedAt as NSDate)
     }
 }

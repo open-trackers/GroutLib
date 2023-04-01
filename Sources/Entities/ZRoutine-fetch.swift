@@ -14,7 +14,7 @@ import TrackerLib
 
 internal extension ZRoutine {
     static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "routineArchiveID == %@", routineArchiveID.uuidString)
+        NSPredicate(format: "routineArchiveID == %@", routineArchiveID as NSUUID)
     }
 }
 

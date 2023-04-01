@@ -21,8 +21,8 @@ public extension ZExercise {
                              exerciseArchiveID: UUID) -> NSPredicate
     {
         NSPredicate(format: "zRoutine.routineArchiveID == %@ AND exerciseArchiveID == %@",
-                    routineArchiveID.uuidString,
-                    exerciseArchiveID.uuidString)
+                    routineArchiveID as NSUUID,
+                    exerciseArchiveID as NSUUID)
     }
 }
 

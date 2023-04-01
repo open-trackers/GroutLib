@@ -28,7 +28,7 @@ public extension Routine {
 
 public extension Routine {
     static func getPredicate(archiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "archiveID == %@", archiveID.uuidString)
+        NSPredicate(format: "archiveID == %@", archiveID as NSUUID)
     }
 }
 

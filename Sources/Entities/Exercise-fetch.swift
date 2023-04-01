@@ -18,7 +18,7 @@ public extension Exercise {
     }
 
     static func getPredicate(routineArchiveID: UUID, exerciseArchiveID: UUID) -> NSPredicate {
-        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID.uuidString, exerciseArchiveID.uuidString)
+        NSPredicate(format: "routine.archiveID == %@ AND archiveID == %@", routineArchiveID as NSUUID, exerciseArchiveID as NSUUID)
     }
 }
 
