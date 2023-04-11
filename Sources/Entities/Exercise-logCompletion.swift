@@ -83,5 +83,10 @@ extension Exercise {
         { _, element in
             element.intensity = exerciseIntensity
         }
+
+        // update the widget(s), if any
+        try WidgetEntry.refresh(context,
+                                reload: true,
+                                defaultColor: .accentColor)
     }
 }

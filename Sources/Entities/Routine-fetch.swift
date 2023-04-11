@@ -21,8 +21,8 @@ public extension Routine {
         return try context.firstFetcher(predicate: pred, sortDescriptors: sort)
     }
 
-    static func getFirst(_ context: NSManagedObjectContext) throws -> Routine? {
-        try context.firstFetcher(sortDescriptors: byUserOrder())
+    static func getFirst(_ context: NSManagedObjectContext, sort: [NSSortDescriptor] = byUserOrder()) throws -> Routine? {
+        try context.firstFetcher(sortDescriptors: sort)
     }
 }
 
@@ -43,6 +43,13 @@ public extension Routine {
     static func byUserOrder(ascending: Bool = true) -> [NSSortDescriptor] {
         [
             NSSortDescriptor(keyPath: \Routine.userOrder, ascending: ascending),
+            NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true),
+        ]
+    }
+
+    static func byLastStartedAt(ascending: Bool) -> [NSSortDescriptor] {
+        [
+            NSSortDescriptor(keyPath: \Routine.lastStartedAt, ascending: ascending),
             NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true),
         ]
     }

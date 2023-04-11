@@ -26,11 +26,11 @@ public struct WidgetEntry: TimelineEntry, Codable {
     }
 
     public let date: Date
-    public let timeInterval: Int
+    public let timeInterval: TimeInterval
     public let pairs: [Pair]
 
     public init(date: Date = Date.now,
-                timeInterval: Int,
+                timeInterval: TimeInterval,
                 pairs: [Pair] = [])
     {
         self.date = date
@@ -60,61 +60,49 @@ public extension WidgetEntry {
     // Refresh widget with the latest data.
     // NOTE: does NOT save context (if AppSetting is created)
     static func refresh(_ context: NSManagedObjectContext,
-                        inStore _: NSPersistentStore,
-                        now _: Date = Date.now,
-                        reload _: Bool,
-                        defaultColor _: Color = .clear)
+                        // inStore _: NSPersistentStore,
+                        now: Date = Date.now,
+                        reload: Bool,
+                        defaultColor: Color = .clear) throws
     {
-        guard let appSetting = try? AppSetting.getOrCreate(context) else { return }
+        let sort = Routine.byLastStartedAt(ascending: false)
 
-//        guard let consumedDay = appSetting.subjectiveToday,
-//              let zdr = try? ZDayRun.get(context, consumedDay: consumedDay, inStore: inStore) else { return }
-//
-//        let calories: Int16 = zdr.refreshCalorieSum()
-//
-//        // NOTE: to ensure consistent ordering between runs
-//        typealias Dict = OrderedDictionary<UUID, Float>
-//
-//        // as there might be more than one serving run per category, roll them up via a dictionary
-//        let categoryAmounts: Dict = zdr.servingRunsArray.reduce(into: [:]) { dict, element in
-//            guard calories > 0,
-//                  let categoryArchiveID = element.zServing?.zCategory?.categoryArchiveID
-//            else { return }
-//            let fractionValue = Float(element.calories) / Float(calories)
-//            dict[categoryArchiveID, default: 0] += fractionValue
-//        }
-//
-//        let pairs: [WidgetEntry.Pair] = categoryAmounts.reduce(into: []) { array, keyValue in
-//            let categoryArchiveID = keyValue.key
-//            let amount = keyValue.value
-//
-//            let color: Color = {
-//                guard let category = try? MCategory.get(context, archiveID: categoryArchiveID)
-//                else {
-//                    // category was deleted
-//                    return defaultColor
-//                }
-//                return category.getColor() ?? defaultColor
-//            }()
-//
-//            array.append(WidgetEntry.Pair(color, amount))
-//        }
-//
-//        refresh(timeInterval: appSetting.timeInterval,
-//                currentCalories: calories,
-//                pairs: pairs,
-//                now: now,
-//                reload: reload)
+        // obtain most recent routine
+        guard let routine = try Routine.getFirst(context, sort: sort),
+              let lastStartedAt = routine.lastStartedAt
+        else { return }
+
+        let lastEnded = lastStartedAt.addingTimeInterval(routine.lastDuration)
+
+        let timeInterval = now.timeIntervalSince(lastEnded)
+
+        var colorSet = OrderedSet<Color>()
+        try context.fetcher(sortDescriptors: sort) { (routine: Routine) in
+            let color = routine.getColor() ?? defaultColor
+            colorSet.append(color)
+            return true
+        }
+
+        let pairs: [WidgetEntry.Pair] = {
+            let colorCount = colorSet.count
+            guard colorCount > 0 else { return [] }
+            return colorSet.reduce(into: []) { array, color in
+                let pair = WidgetEntry.Pair(color, 1 / Float(colorCount))
+                array.append(pair)
+            }
+        }()
+
+        refresh(timeInterval: timeInterval, pairs: pairs, reload: reload)
     }
 
-    internal static func refresh(timeInterval: Int16,
+    internal static func refresh(timeInterval: TimeInterval,
                                  pairs: [WidgetEntry.Pair],
                                  now: Date = Date.now,
                                  reload: Bool)
     {
         print("REFRESH target \(timeInterval)")
         let entry = WidgetEntry(date: now,
-                                timeInterval: Int(timeInterval),
+                                timeInterval: timeInterval,
                                 pairs: pairs)
         UserDefaults.appGroup.set(entry)
 
