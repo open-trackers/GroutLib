@@ -26,14 +26,17 @@ public struct WidgetEntry: TimelineEntry, Codable {
     }
 
     public let date: Date
+    public let name: String
     public let timeInterval: TimeInterval
     public let pairs: [Pair]
 
     public init(date: Date = Date.now,
+                name: String,
                 timeInterval: TimeInterval,
                 pairs: [Pair] = [])
     {
         self.date = date
+        self.name = name
         self.timeInterval = timeInterval
         self.pairs = pairs
     }
@@ -69,6 +72,7 @@ public extension WidgetEntry {
 
         // obtain most recent routine
         guard let routine = try Routine.getFirst(context, sort: sort),
+              let name = routine.name,
               let lastStartedAt = routine.lastStartedAt
         else { return }
 
@@ -92,16 +96,18 @@ public extension WidgetEntry {
             }
         }()
 
-        refresh(timeInterval: timeInterval, pairs: pairs, reload: reload)
+        refresh(name: name, timeInterval: timeInterval, pairs: pairs, reload: reload)
     }
 
-    internal static func refresh(timeInterval: TimeInterval,
+    internal static func refresh(name: String,
+                                 timeInterval: TimeInterval,
                                  pairs: [WidgetEntry.Pair],
                                  now: Date = Date.now,
                                  reload: Bool)
     {
         print("REFRESH target \(timeInterval)")
         let entry = WidgetEntry(date: now,
+                                name: name,
                                 timeInterval: timeInterval,
                                 pairs: pairs)
         UserDefaults.appGroup.set(entry)
