@@ -63,7 +63,6 @@ public extension WidgetEntry {
     // Refresh widget with the latest data.
     // NOTE: does NOT save context (if AppSetting is created)
     static func refresh(_ context: NSManagedObjectContext,
-                        // inStore _: NSPersistentStore,
                         now: Date = Date.now,
                         reload: Bool,
                         defaultColor: Color = .clear) throws
