@@ -15,30 +15,23 @@ import WidgetKit
 import Collections
 
 public struct WidgetEntry: TimelineEntry, Codable {
-    public struct Pair: Codable {
-        public let color: Color
-        public let value: Float
-
-        public init(_ color: Color, _ value: Float) {
-            self.color = color
-            self.value = value
-        }
-    }
-
     public let date: Date
     public let name: String
+    public let imageName: String?
     public let timeInterval: TimeInterval
-    public let pairs: [Pair]
+    public let color: Color?
 
     public init(date: Date = Date.now,
                 name: String,
+                imageName: String?,
                 timeInterval: TimeInterval,
-                pairs: [Pair] = [])
+                color: Color? = nil)
     {
         self.date = date
         self.name = name
+        self.imageName = imageName
         self.timeInterval = timeInterval
-        self.pairs = pairs
+        self.color = color
     }
 }
 
@@ -79,36 +72,28 @@ public extension WidgetEntry {
 
         let timeInterval = now.timeIntervalSince(lastEnded)
 
-        var colorSet = OrderedSet<Color>()
-        try context.fetcher(sortDescriptors: sort) { (routine: Routine) in
-            let color = routine.getColor() ?? defaultColor
-            colorSet.append(color)
-            return true
-        }
+        let color = routine.getColor() ?? defaultColor
 
-        let pairs: [WidgetEntry.Pair] = {
-            let colorCount = colorSet.count
-            guard colorCount > 0 else { return [] }
-            return colorSet.reduce(into: []) { array, color in
-                let pair = WidgetEntry.Pair(color, 1 / Float(colorCount))
-                array.append(pair)
-            }
-        }()
-
-        refresh(name: name, timeInterval: timeInterval, pairs: pairs, reload: reload)
+        refresh(name: name,
+                imageName: routine.imageName,
+                timeInterval: timeInterval,
+                color: color,
+                reload: reload)
     }
 
     internal static func refresh(name: String,
+                                 imageName: String?,
                                  timeInterval: TimeInterval,
-                                 pairs: [WidgetEntry.Pair],
+                                 color: Color,
                                  now: Date = Date.now,
                                  reload: Bool)
     {
         print("REFRESH target \(timeInterval)")
         let entry = WidgetEntry(date: now,
                                 name: name,
+                                imageName: imageName,
                                 timeInterval: timeInterval,
-                                pairs: pairs)
+                                color: color)
         UserDefaults.appGroup.set(entry)
 
         if reload {
