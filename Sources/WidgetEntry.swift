@@ -25,7 +25,7 @@ public struct WidgetEntry: TimelineEntry, Codable {
                 name: String,
                 imageName: String?,
                 timeInterval: TimeInterval,
-                color: Color? = nil)
+                color: Color?)
     {
         self.date = date
         self.name = name
