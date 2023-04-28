@@ -53,4 +53,11 @@ public extension Routine {
             NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true),
         ]
     }
+
+    static func byName(ascending: Bool = true) -> [NSSortDescriptor] {
+        [
+            NSSortDescriptor(keyPath: \Routine.name, ascending: ascending),
+            NSSortDescriptor(keyPath: \Routine.createdAt, ascending: true),
+        ]
+    }
 }
