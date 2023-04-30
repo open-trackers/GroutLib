@@ -97,3 +97,13 @@ public extension Exercise {
         sets = appSetting.defExSets
     }
 }
+
+public extension Exercise {
+    // NOTE: does NOT save context
+    func move(_ context: NSManagedObjectContext, to nu: Routine) throws {
+        let nuMaxOrder = try Exercise.maxUserOrder(context, routine: nu) ?? 0
+        if let old = routine { old.removeFromExercises(self) }
+        userOrder = nuMaxOrder + 1
+        nu.addToExercises(self)
+    }
+}
