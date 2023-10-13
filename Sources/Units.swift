@@ -20,38 +20,38 @@ public enum Units: Int16, CaseIterable {
     public var abbreviation: String {
         switch self {
         case .none:
-            return ""
+            ""
         case .pounds:
-            return "lb"
+            "lb"
         case .kilograms:
-            return "kg"
+            "kg"
         case .minutes:
-            return "m"
+            "m"
         case .seconds:
-            return "s"
+            "s"
         }
     }
 
     public var description: String {
         switch self {
         case .none:
-            return "none"
+            "none"
         case .pounds:
-            return "pounds"
+            "pounds"
         case .kilograms:
-            return "kilograms"
+            "kilograms"
         case .minutes:
-            return "minutes"
+            "minutes"
         case .seconds:
-            return "seconds"
+            "seconds"
         }
     }
 
     public var formattedDescription: String {
         if abbreviation.count == 0 {
-            return description.capitalized
+            description.capitalized
         } else {
-            return "\(description.capitalized) (\(abbreviation))"
+            "\(description.capitalized) (\(abbreviation))"
         }
     }
 

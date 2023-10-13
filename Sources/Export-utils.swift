@@ -18,15 +18,15 @@ import TrackerLib
                                       archiveStore: NSPersistentStore,
                                       format: ExportFormat = .CSV) throws -> Data?
     {
-        let entries: [(String, Data)] = [
-            try makeDelimFile(AppSetting.self, context, format: format, inStore: mainStore),
-            try makeDelimFile(Routine.self, context, format: format, inStore: mainStore),
-            try makeDelimFile(Exercise.self, context, format: format, inStore: mainStore),
+        let entries: [(String, Data)] = try [
+            makeDelimFile(AppSetting.self, context, format: format, inStore: mainStore),
+            makeDelimFile(Routine.self, context, format: format, inStore: mainStore),
+            makeDelimFile(Exercise.self, context, format: format, inStore: mainStore),
 
-            try makeDelimFile(ZRoutine.self, context, format: format, inStore: archiveStore),
-            try makeDelimFile(ZRoutineRun.self, context, format: format, inStore: archiveStore),
-            try makeDelimFile(ZExercise.self, context, format: format, inStore: archiveStore),
-            try makeDelimFile(ZExerciseRun.self, context, format: format, inStore: archiveStore),
+            makeDelimFile(ZRoutine.self, context, format: format, inStore: archiveStore),
+            makeDelimFile(ZRoutineRun.self, context, format: format, inStore: archiveStore),
+            makeDelimFile(ZExercise.self, context, format: format, inStore: archiveStore),
+            makeDelimFile(ZExerciseRun.self, context, format: format, inStore: archiveStore),
         ]
 
         return try createZipArchive(context, entries: entries)

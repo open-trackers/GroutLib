@@ -1,6 +1,6 @@
 
 //
-//  ZExercise.swift
+//  ZExercise-dedupe.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -14,10 +14,10 @@ import CoreData
 import TrackerLib
 
 extension ZExercise {
-    internal static func dedupe(_ context: NSManagedObjectContext,
-                                routineArchiveID: UUID,
-                                exerciseArchiveID: UUID,
-                                inStore: NSPersistentStore) throws
+    static func dedupe(_ context: NSManagedObjectContext,
+                       routineArchiveID: UUID,
+                       exerciseArchiveID: UUID,
+                       inStore: NSPersistentStore) throws
     {
         let pred = getPredicate(routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID)
         let sort = ZExercise.byCreatedAt()

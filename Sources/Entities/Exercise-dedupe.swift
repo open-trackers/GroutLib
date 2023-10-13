@@ -1,6 +1,6 @@
 
 //
-//  Exercise.swift
+//  Exercise-dedupe.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -14,7 +14,7 @@ import CoreData
 import TrackerLib
 
 extension Exercise {
-    internal static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, exerciseArchiveID: UUID) throws {
+    static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, exerciseArchiveID: UUID) throws {
         let pred = getPredicate(routineArchiveID: routineArchiveID, exerciseArchiveID: exerciseArchiveID)
         let sort = Exercise.byCreatedAt()
         var first: Exercise?

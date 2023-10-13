@@ -1,5 +1,5 @@
 //
-//  ZExerciseRun.swift
+//  ZExerciseRun-encodable.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //

@@ -12,7 +12,7 @@ import CoreData
 
 import TrackerLib
 
-internal extension ZRoutine {
+extension ZRoutine {
     static func getPredicate(routineArchiveID: UUID) -> NSPredicate {
         NSPredicate(format: "routineArchiveID == %@", routineArchiveID as NSUUID)
     }

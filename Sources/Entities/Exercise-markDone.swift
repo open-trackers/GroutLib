@@ -16,10 +16,10 @@ public extension Exercise {
     var advancedIntensity: Float {
         if invertedIntensity {
             // advance downwards
-            return max(0, lastIntensity - intensityStep)
+            max(0, lastIntensity - intensityStep)
         } else {
             // advance upwards
-            return min(Exercise.intensityRange.upperBound, lastIntensity + intensityStep)
+            min(Exercise.intensityRange.upperBound, lastIntensity + intensityStep)
         }
     }
 

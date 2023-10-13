@@ -1,6 +1,6 @@
 
 //
-//  ZRoutine.swift
+//  ZRoutine-dedupe.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -14,7 +14,7 @@ import CoreData
 import TrackerLib
 
 extension ZRoutine {
-    internal static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, inStore: NSPersistentStore) throws {
+    static func dedupe(_ context: NSManagedObjectContext, routineArchiveID: UUID, inStore: NSPersistentStore) throws {
         let pred = getPredicate(routineArchiveID: routineArchiveID)
         let sort = byCreatedAt()
         var first: ZRoutine?

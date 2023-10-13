@@ -1,6 +1,6 @@
 
 //
-//  Routine.swift
+//  Routine-dedupe.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -14,7 +14,7 @@ import CoreData
 import TrackerLib
 
 extension Routine {
-    internal static func dedupe(_ context: NSManagedObjectContext, archiveID: UUID) throws {
+    static func dedupe(_ context: NSManagedObjectContext, archiveID: UUID) throws {
         let pred = getPredicate(archiveID: archiveID)
         let sort = byCreatedAt()
         var first: Routine?

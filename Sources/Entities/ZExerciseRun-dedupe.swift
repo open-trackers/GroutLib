@@ -1,6 +1,6 @@
 
 //
-//  ZExerciseRun.swift
+//  ZExerciseRun-dedupe.swift
 //
 // Copyright 2022, 2023  OpenAlloc LLC
 //
@@ -14,10 +14,10 @@ import CoreData
 import TrackerLib
 
 extension ZExerciseRun {
-    internal static func dedupe(_ context: NSManagedObjectContext,
-                                exerciseArchiveID: UUID,
-                                completedAt: Date,
-                                inStore: NSPersistentStore) throws
+    static func dedupe(_ context: NSManagedObjectContext,
+                       exerciseArchiveID: UUID,
+                       completedAt: Date,
+                       inStore: NSPersistentStore) throws
     {
         let pred = getPredicate(exerciseArchiveID: exerciseArchiveID,
                                 completedAt: completedAt)
